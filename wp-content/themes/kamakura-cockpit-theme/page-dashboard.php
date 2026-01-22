@@ -1072,12 +1072,11 @@ $match_results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_match_re
                     <h3 class="text-sm font-bold text-gray-300 mb-3">LATEST NEWS</h3>
                     <div
                         class="w-full h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
-                        <a class="twitter-timeline" data-lang="ja" data-theme="dark" data-height="400"
-                            data-chrome="noheader nofooter noborders transparent"
-                            href="https://twitter.com/stadiumNFT?ref_src=twsrc%5Etfw">
+                        <a class="twitter-timeline inline-block bg-[#1d9bf0] text-white px-5 py-2.5 rounded-full font-bold no-underline hover:bg-[#1a8cd8] transition duration-200 shadow-md"
+                            data-lang="ja" data-theme="dark" data-height="400"
+                            data-chrome="noheader nofooter noborders transparent" href="https://twitter.com/stadiumNFT">
                             Tweets by stadiumNFT
                         </a>
-                        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
                     </div>
                 </div>
                 <div
@@ -1458,6 +1457,7 @@ $match_results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_match_re
             </div>
         </div>
     </footer>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>
 
 </html>

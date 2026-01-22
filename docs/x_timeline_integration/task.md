@@ -1,0 +1,5 @@
+- [x] internal: Troubleshoot X Timeline 429 Error
+    - [x] Check `header.php` and `footer.php` for duplicate `widgets.js` inclusions
+    - [x] Move `widgets.js` to `page-dashboard.php` footer to ensure reliable execution
+    - [x] Style the fallback Link so it looks good even if the widget fails (Tailwind classes applied)
+    - [x] Notify user to test in Incognito/different network
