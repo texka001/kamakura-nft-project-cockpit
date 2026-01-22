@@ -1,0 +1,4 @@
+- [ ] Find the "OWNED ASSETS" section in the codebase.
+- [x] Create an implementation plan.
+- [x] Add the "BUY MORE ASSETS" button.
+- [x] Verify the changes. (Approved)
