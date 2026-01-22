@@ -21,9 +21,11 @@ if (is_user_logged_in()) {
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit'])) {
+    error_log('[KMNFT Contact] Form submitted.');
 
     // Verify Nonce
     if (isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'kmnft_contact_action')) {
+        error_log('[KMNFT Contact] Nonce verified.');
 
         $name = sanitize_text_field($_POST['name']);
         $email = sanitize_email($_POST['email']);
@@ -33,8 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
         // Validation
         if (empty($name) || empty($email) || empty($subject) || empty($message_content)) {
             $error_msg = 'All fields are required.';
+            error_log('[KMNFT Contact] Validation failed: Empty fields.');
         } elseif (!is_email($email)) {
             $error_msg = 'Invalid email address.';
+            error_log('[KMNFT Contact] Validation failed: Invalid email. ' . $email);
         } else {
             // Send Email
             $admin_email = get_option('admin_email');
@@ -54,16 +58,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
             $email_body .= "<p>" . nl2br(esc_html($message_content)) . "</p>";
             $email_body .= "</body></html>";
 
-            if (wp_mail($to, $email_subject, $email_body, $headers)) {
+            error_log('[KMNFT Contact] Attempting to send email to: ' . $to);
+            $mail_result = wp_mail($to, $email_subject, $email_body, $headers);
+
+            if ($mail_result) {
+                error_log('[KMNFT Contact] wp_mail returned TRUE. Success.');
                 $success_msg = 'Your message has been sent successfully.';
                 // Reset fields
                 $subject = '';
                 $message_content = '';
             } else {
+                global $ts_mail_errors;
+                global $phpmailer;
+                if (isset($ts_mail_errors)) {
+                    error_log('[KMNFT Contact] Mail Error: ' . print_r($ts_mail_errors, true));
+                }
+                if (isset($phpmailer) && isset($phpmailer->ErrorInfo)) {
+                    error_log('[KMNFT Contact] PHPMailer Info: ' . $phpmailer->ErrorInfo);
+                }
+                error_log('[KMNFT Contact] wp_mail returned FALSE. Failed.');
                 $error_msg = 'Failed to send message. Please try again later.';
             }
         }
     } else {
+        error_log('[KMNFT Contact] Nonce verification failed.');
         $error_msg = 'Security check failed. Please refresh and try again.';
     }
 }
@@ -87,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
                         'kmnft-gold': '#ffd700',
                     }
                 }
-            }
+        }
         }
     </script>
     <style>
