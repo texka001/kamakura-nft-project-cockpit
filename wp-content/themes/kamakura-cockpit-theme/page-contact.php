@@ -37,9 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
             $error_msg = 'Invalid email address.';
         } else {
             // Send Email
-            $to = get_option('admin_email'); // Admin email
+            $admin_email = get_option('admin_email');
+            $to = $admin_email;
             $headers = array('Content-Type: text/html; charset=UTF-8');
-            $headers[] = 'From: ' . $name . ' <' . $email . '>';
+            // Use Admin Email as 'From' to avoid SPF/DKIM issues on production
+            $headers[] = 'From: Kamakura Stadium NFT <' . $admin_email . '>';
             $headers[] = 'Reply-To: ' . $email;
 
             $email_subject = '[Contact Form] ' . $subject;
