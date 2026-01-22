@@ -117,7 +117,9 @@ $match_results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_match_re
 
         </div>
         <div class="flex items-center space-x-4 ml-auto">
-            <span class="text-xs text-gray-400">Welcome,
+            <a href="<?php echo home_url('/contact'); ?>"
+                class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">CONTACT</a>
+            <span class="text-xs text-gray-400 hidden sm:inline">Welcome,
                 <?php echo $is_logged_in ? esc_html($current_user->user_login) : 'Guest'; ?></span>
             <?php if ($is_logged_in): ?>
                 <a href="<?php echo wp_logout_url(home_url('/dashboard')); ?>"
