@@ -56,6 +56,7 @@ function kmnft_create_core_pages()
 	$pages = array(
 		'login' => 'KMNFT Login',
 		'dashboard' => 'KMNFT Dashboard',
+		'contact' => 'KMNFT Contact',
 	);
 
 	foreach ($pages as $slug => $template_name) {
@@ -75,4 +76,4 @@ function kmnft_create_core_pages()
 		}
 	}
 }
-add_action('after_switch_theme', 'kmnft_create_core_pages');
+add_action('init', 'kmnft_create_core_pages');
