@@ -72,6 +72,15 @@ if ($is_logged_in && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kmnf
 // Fetch Match Results (Public)
 $match_results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_match_results ORDER BY match_date DESC");
 
+// Fetch Gallery Tokens (Random selection for display)
+$gallery_tokens = $wpdb->get_col("SELECT DISTINCT token_id FROM {$wpdb->prefix}kmnft_holdings ORDER BY RAND() LIMIT 15");
+if (empty($gallery_tokens)) {
+    // Fallback if no holdings found
+    $gallery_tokens = range(1, 15);
+}
+// Duplicate for infinite scroll loop
+$gallery_loop = array_merge($gallery_tokens, $gallery_tokens);
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -114,6 +123,33 @@ $match_results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_match_re
 
         .cyber-border {
             border-left: 2px solid #00ff41;
+        }
+
+        /* Gallery Marquee */
+        .marquee-mask {
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 1rem;
+            width: max-content;
+            animation: marquee-scroll 40s linear infinite;
+        }
+
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes marquee-scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
         }
     </style>
 </head>
@@ -195,30 +231,38 @@ $match_results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_match_re
 
                 <?php if (!empty($ksp_by_season) && count($ksp_by_season) > 0): ?>
                     <div class="mt-4 space-y-2">
-                        <?php 
+                        <?php
                         // First item is typically the latest season due to ORDER BY season DESC
                         $latest_season = $ksp_by_season[0];
                         ?>
                         <div class="flex justify-between items-center text-sm border-b border-white/10 pb-1">
-                            <span class="text-kmnft-green font-bold"><?php echo esc_html($latest_season->season); ?> Season</span>
-                            <span class="text-white font-mono"><?php echo number_format($latest_season->total_points); ?> pt</span>
+                            <span class="text-kmnft-green font-bold"><?php echo esc_html($latest_season->season); ?>
+                                Season</span>
+                            <span class="text-white font-mono"><?php echo number_format($latest_season->total_points); ?>
+                                pt</span>
                         </div>
-                        
+
                         <?php if (count($ksp_by_season) > 1): ?>
                             <details class="group/details">
-                                <summary class="cursor-pointer text-xs text-gray-500 hover:text-white transition flex items-center gap-1 list-none outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 transform group-open/details:rotate-90 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                <summary
+                                    class="cursor-pointer text-xs text-gray-500 hover:text-white transition flex items-center gap-1 list-none outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-3 w-3 transform group-open/details:rotate-90 transition" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
                                     </svg>
                                     Past Seasons
                                 </summary>
                                 <div class="mt-2 pl-4 space-y-1 border-l border-white/10 ml-1.5">
-                                    <?php for ($i = 1; $i < count($ksp_by_season); $i++): 
+                                    <?php for ($i = 1; $i < count($ksp_by_season); $i++):
                                         $season_data = $ksp_by_season[$i];
-                                    ?>
+                                        ?>
                                         <div class="flex justify-between items-center text-xs">
                                             <span class="text-gray-400"><?php echo esc_html($season_data->season); ?></span>
-                                            <span class="text-gray-300 font-mono"><?php echo number_format($season_data->total_points); ?> pt</span>
+                                            <span
+                                                class="text-gray-300 font-mono"><?php echo number_format($season_data->total_points); ?>
+                                                pt</span>
                                         </div>
                                     <?php endfor; ?>
                                 </div>
@@ -374,6 +418,42 @@ $match_results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_match_re
 
         <!-- Right Col: Assets & Content (8 cols) -->
         <div class="md:col-span-8 space-y-6">
+
+            <!-- NFT Gallery Section -->
+            <div class="glass-card p-4 rounded-lg mb-6 relative overflow-hidden group">
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <h3 class="text-sm font-bold text-gray-300 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-kmnft-green" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        NFT GALLERY
+                    </h3>
+                    <span
+                        class="text-[10px] text-gray-500 bg-gray-900 px-2 py-0.5 rounded border border-gray-700">LIVE</span>
+                </div>
+
+                <div class="marquee-mask w-full overflow-hidden relative">
+                    <div class="marquee-track py-2">
+                        <?php foreach ($gallery_loop as $g_token):
+                            $g_img_url = KMNFT_IMAGE_BASE_URL . esc_attr($g_token) . '.png';
+                            ?>
+                            <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer relative group/item"
+                                onclick="openImageModal('<?php echo $g_img_url; ?>')">
+                                <img src="<?php echo $g_img_url; ?>" alt="Token <?php echo esc_attr($g_token); ?>"
+                                    class="w-full h-full object-cover opacity-80 group-hover/item:opacity-100 transition duration-300"
+                                    loading="lazy"
+                                    onerror="this.src='<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';this.style.opacity='0.5';">
+                                <div
+                                    class="absolute bottom-0 inset-x-0 bg-black/60 p-1 text-center translate-y-full group-hover/item:translate-y-0 transition duration-300">
+                                    <span class="text-[8px] font-mono text-white">#<?php echo esc_html($g_token); ?></span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
 
             <!-- My Seat / Holdings -->
             <?php if ($is_logged_in): ?>
