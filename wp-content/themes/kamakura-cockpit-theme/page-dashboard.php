@@ -21,9 +21,19 @@ if ($is_logged_in) {
     // Fetch Holdings
     $holdings = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}kmnft_holdings WHERE user_id = %d", $current_user->ID));
 
-    // Fetch KSP Balance (Sum of amount)
-    $ksp_balance = $wpdb->get_var($wpdb->prepare("SELECT SUM(amount) FROM {$wpdb->prefix}kmnft_ksp_ledger WHERE user_id = %d", $current_user->ID));
-    $ksp_balance = $ksp_balance ? number_format($ksp_balance) : 0;
+    // Fetch Annual KSP
+    $ksp_by_season = array();
+    $ksp_total_val = 0;
+    // Instantiate directly as we are in the theme context
+    if (class_exists('KMNFT_User_Manager')) {
+        $kmnft_manager = new KMNFT_User_Manager();
+        $ksp_by_season = $kmnft_manager->get_user_annual_ksp($current_user->ID);
+        foreach ($ksp_by_season as $s) {
+            $ksp_total_val += intval($s->total_points);
+        }
+    }
+
+    $ksp_balance = number_format($ksp_total_val);
 }
 
 // Handle Password Change
@@ -182,10 +192,45 @@ $match_results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_match_re
                 <div class="text-4xl font-bold text-white neon-text">
                     <?php echo $ksp_balance; ?>
                 </div>
-                <div class="text-xs text-kmnft-green mt-2 flex items-center">
-                    <span class="w-2 h-2 bg-kmnft-green rounded-full mr-2 animate-pulse"></span>
-                    ACTIVE
-                </div>
+
+                <?php if (!empty($ksp_by_season) && count($ksp_by_season) > 0): ?>
+                    <div class="mt-4 space-y-2">
+                        <?php 
+                        // First item is typically the latest season due to ORDER BY season DESC
+                        $latest_season = $ksp_by_season[0];
+                        ?>
+                        <div class="flex justify-between items-center text-sm border-b border-white/10 pb-1">
+                            <span class="text-kmnft-green font-bold"><?php echo esc_html($latest_season->season); ?> Season</span>
+                            <span class="text-white font-mono"><?php echo number_format($latest_season->total_points); ?> pt</span>
+                        </div>
+                        
+                        <?php if (count($ksp_by_season) > 1): ?>
+                            <details class="group/details">
+                                <summary class="cursor-pointer text-xs text-gray-500 hover:text-white transition flex items-center gap-1 list-none outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 transform group-open/details:rotate-90 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                    Past Seasons
+                                </summary>
+                                <div class="mt-2 pl-4 space-y-1 border-l border-white/10 ml-1.5">
+                                    <?php for ($i = 1; $i < count($ksp_by_season); $i++): 
+                                        $season_data = $ksp_by_season[$i];
+                                    ?>
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="text-gray-400"><?php echo esc_html($season_data->season); ?></span>
+                                            <span class="text-gray-300 font-mono"><?php echo number_format($season_data->total_points); ?> pt</span>
+                                        </div>
+                                    <?php endfor; ?>
+                                </div>
+                            </details>
+                        <?php endif; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="text-xs text-kmnft-green mt-2 flex items-center">
+                        <span class="w-2 h-2 bg-kmnft-green rounded-full mr-2 animate-pulse"></span>
+                        ACTIVE
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- Profile / Rank -->

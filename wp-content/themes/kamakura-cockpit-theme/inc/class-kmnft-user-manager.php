@@ -2077,4 +2077,32 @@ class KMNFT_User_Manager
         fclose($output);
         exit;
     }
+
+    public function get_user_annual_ksp($user_id)
+    {
+        global $wpdb;
+        $user_id = intval($user_id);
+
+        // 1. Get User's Token IDs
+        $holdings_table = $wpdb->prefix . 'kmnft_holdings';
+        $token_ids = $wpdb->get_col($wpdb->prepare("SELECT token_id FROM $holdings_table WHERE user_id = %d", $user_id));
+
+        if (empty($token_ids)) {
+            return array();
+        }
+
+        // 2. Aggregate KSP by Season for these tokens
+        $ksp_table = $wpdb->prefix . 'kmnft_token_ksp';
+        $placeholders = implode(',', array_fill(0, count($token_ids), '%s'));
+
+        $sql = "SELECT season, SUM(acquisition_point) as total_points 
+                FROM $ksp_table 
+                WHERE token_id IN ($placeholders) 
+                GROUP BY season 
+                ORDER BY season DESC";
+
+        $results = $wpdb->get_results($wpdb->prepare($sql, $token_ids));
+
+        return $results;
+    }
 }
