@@ -41,6 +41,9 @@ class KMNFT_User_Manager
         add_action('admin_post_kmnft_download_sample_league_schedule_csv', array($this, 'process_download_sample_league_schedule_csv'));
         add_action('admin_post_kmnft_download_league_schedule_csv', array($this, 'process_download_league_schedule_csv'));
 
+        // Settings Actions
+        add_action('admin_post_kmnft_save_settings', array($this, 'process_settings_save'));
+
         // Enqueue Admin Scripts
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
 
@@ -114,7 +117,16 @@ class KMNFT_User_Manager
             'League Schedule',
             'manage_options',
             'kmnft-league-schedule',
+            'kmnft-league-schedule',
             array($this, 'render_league_schedule_page')
+        );
+        add_submenu_page(
+            'kmnft-console',
+            'Settings',
+            'Settings',
+            'manage_options',
+            'kmnft-settings',
+            array($this, 'render_settings_page')
         );
     }
 
@@ -420,6 +432,83 @@ class KMNFT_User_Manager
             </div>
         </div>
         <?php
+    }
+
+    // --- SETTINGS FUNCTIONS ---
+
+    public function render_settings_page()
+    {
+        $prefix = get_option('kmnft_contact_subject_prefix', '[Contact Form]');
+        $recipients = get_option('kmnft_contact_recipients', '');
+        ?>
+        <div class="wrap">
+            <h1>お問い合わせフォーム設定 (Contact Form Settings)</h1>
+
+            <?php if (isset($_GET['status']) && $_GET['status'] === 'success'): ?>
+                <div class="notice notice-success is-dismissible">
+                    <p><strong>保存しました。</strong></p>
+                </div>
+            <?php endif; ?>
+
+            <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px;">
+                <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
+                    <input type="hidden" name="action" value="kmnft_save_settings">
+                    <?php wp_nonce_field('kmnft_settings_nonce', 'kmnft_nonce'); ?>
+
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="subject_prefix">メール件名の接頭辞<br>(Subject Prefix)</label></th>
+                            <td>
+                                <input type="text" name="subject_prefix" id="subject_prefix"
+                                    value="<?php echo esc_attr($prefix); ?>" class="regular-text">
+                                <p class="description">
+                                    お問い合わせメールの件名の先頭に付く文字列です。<br>
+                                    例: <code>【KMNFT】</code> や <code>[お問い合わせ]</code> など。<br>
+                                    デフォルト: <code>[Contact Form]</code>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="recipients">通知先メールアドレス<br>(Recipient Emails)</label></th>
+                            <td>
+                                <textarea name="recipients" id="recipients" rows="5"
+                                    class="large-text code"><?php echo esc_textarea($recipients); ?></textarea>
+                                <p class="description">
+                                    お問い合わせがあった際に通知を受け取るメールアドレスを入力してください。<br>
+                                    <strong>複数入力する場合は、改行して1行に1つのアドレスを入力してください。</strong><br>
+                                    <br>
+                                    入力例:<br>
+                                    <code>admin@example.com</code><br>
+                                    <code>support@example.com</code><br>
+                                    <br>
+                                    ※空欄の場合は、サイトの管理者メールアドレス (<code><?php echo get_option('admin_email'); ?></code>)
+                                    に送信されます。
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    <?php submit_button('設定を保存'); ?>
+                </form>
+            </div>
+        </div>
+        <?php
+    }
+
+    public function process_settings_save()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        check_admin_referer('kmnft_settings_nonce', 'kmnft_nonce');
+
+        $prefix = isset($_POST['subject_prefix']) ? sanitize_text_field($_POST['subject_prefix']) : '[Contact Form]';
+        $recipients = isset($_POST['recipients']) ? trim($_POST['recipients']) : '';
+
+        update_option('kmnft_contact_subject_prefix', $prefix);
+        update_option('kmnft_contact_recipients', $recipients);
+
+        wp_redirect(admin_url('admin.php?page=kmnft-settings&status=success'));
+        exit;
     }
 
     // --- USER FUNCTIONS ---

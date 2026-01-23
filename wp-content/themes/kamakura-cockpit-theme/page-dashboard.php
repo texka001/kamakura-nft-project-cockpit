@@ -146,6 +146,33 @@ $match_results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_match_re
                     class="w-full h-full object-cover object-center relative z-10 opacity-90 hover:opacity-100 transition duration-500">
             </div>
 
+            <!-- Game Guide Module -->
+            <a href="https://kamakura-stadium-nft.com/shootzone/" target="_blank" class="block group">
+                <div
+                    class="glass-card p-4 rounded-lg relative overflow-hidden flex items-center justify-between border border-kmnft-green/30 hover:bg-kmnft-green/10 transition duration-300">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-kmnft-green/20 flex items-center justify-center text-kmnft-green group-hover:scale-110 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white group-hover:text-kmnft-green transition">GAME GUIDE
+                            </h3>
+                            <p class="text-[10px] text-gray-400">詳しい遊び方はこちら</p>
+                        </div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5 text-gray-500 group-hover:text-white group-hover:translate-x-1 transition"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </div>
+            </a>
+
             <!-- KSP Module -->
             <div class="glass-card p-6 rounded-lg relative overflow-hidden group">
                 <div
