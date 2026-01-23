@@ -51,6 +51,7 @@ class KMNFT_User_Manager
         $this->ensure_match_table();
         $this->ensure_standings_table();
         $this->ensure_league_schedule_table();
+        $this->ensure_token_ksp_table();
     }
 
     public function enqueue_admin_scripts()
@@ -936,39 +937,19 @@ class KMNFT_User_Manager
                         continue;
                     }
 
-                    $existing_id = $wpdb->get_var($wpdb->prepare(
-                        "SELECT id FROM $table_name WHERE token_id = %s AND acquisition_date = %s",
-                        $token_id,
-                        $acquisition_date
-                    ));
-
-                    if ($existing_id) {
-                        // Update Point
-                        $wpdb->update(
-                            $table_name,
-                            array(
-                                'acquisition_point' => $acquisition_point,
-                                'season' => $season,
-                                'reason_1' => $reason_1,
-                                'reason_2' => $reason_2
-                            ),
-                            array('id' => $existing_id)
-                        );
-                    } else {
-                        // Insert
-                        $wpdb->insert(
-                            $table_name,
-                            array(
-                                'token_id' => $token_id,
-                                'acquisition_date' => $acquisition_date,
-                                'acquisition_point' => $acquisition_point,
-                                'season' => $season,
-                                'reason_1' => $reason_1,
-                                'reason_2' => $reason_2
-                            ),
-                            array('%s', '%s', '%d', '%s', '%s', '%s')
-                        );
-                    }
+                    // Always Insert (Append Mode)
+                    $wpdb->insert(
+                        $table_name,
+                        array(
+                            'token_id' => $token_id,
+                            'acquisition_date' => $acquisition_date,
+                            'acquisition_point' => $acquisition_point,
+                            'season' => $season,
+                            'reason_1' => $reason_1,
+                            'reason_2' => $reason_2
+                        ),
+                        array('%s', '%s', '%d', '%s', '%s', '%s')
+                    );
                     $row_count++;
                 }
                 fclose($handle);
@@ -1097,8 +1078,29 @@ class KMNFT_User_Manager
             }
         }
 
-        wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=deleted&count=' . intval($deleted_count)));
         exit;
+    }
+
+    private function ensure_token_ksp_table()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'kmnft_token_ksp';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            token_id varchar(50) NOT NULL,
+            acquisition_date date NOT NULL,
+            acquisition_point int(11) NOT NULL DEFAULT 0,
+            season varchar(20) DEFAULT '' NOT NULL,
+            reason_1 text DEFAULT '' NOT NULL,
+            reason_2 text DEFAULT '' NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY  (id)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
     }
 
     // --- MATCH RESULTS FUNCTIONS ---
