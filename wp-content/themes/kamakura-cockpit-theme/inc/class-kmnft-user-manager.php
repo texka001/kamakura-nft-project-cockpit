@@ -117,7 +117,6 @@ class KMNFT_User_Manager
             'League Schedule',
             'manage_options',
             'kmnft-league-schedule',
-            'kmnft-league-schedule',
             array($this, 'render_league_schedule_page')
         );
         add_submenu_page(
