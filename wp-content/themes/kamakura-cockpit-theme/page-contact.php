@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
 
             $headers = array('Content-Type: text/html; charset=UTF-8');
             // Use Admin Email as 'From' to avoid SPF/DKIM issues on production
-            $headers[] = 'From: Kamakura Stadium NFT <' . $admin_email . '>';
+            $headers[] = 'From: KAMAKURA STADIUM NFT PORTAL(β) <' . $admin_email . '>';
             $headers[] = 'Reply-To: ' . $email;
 
             // Get Subject Prefix from Settings
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - Kamakura Stadium NFT Cockpit</title>
+    <title>Contact - KAMAKURA STADIUM NFT PORTAL(β)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
     <div class="relative z-10 w-full max-w-lg p-6 md:p-10 glass-panel rounded-xl shadow-2xl my-10">
         <div class="text-center mb-8">
             <h1 class="text-2xl md:text-3xl font-bold tracking-wider text-white mb-2">CONTACT SUPPORT</h1>
-            <p class="text-gray-400 text-xs md:text-sm tracking-widest uppercase">Kamakura Stadium NFT Project</p>
+            <p class="text-gray-400 text-xs md:text-sm tracking-widest uppercase">KAMAKURA STADIUM NFT PORTAL(β)</p>
         </div>
 
         <?php if ($error_msg): ?>

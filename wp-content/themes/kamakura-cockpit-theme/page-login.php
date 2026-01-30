@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_forgot_password'
         $reset_link = home_url('/login/?view=reset&email=' . urlencode($email) . '&token=' . $token);
 
         // Send Email
-        $subject = '[Kamakura Stadium NFT] Password Reset Request';
+        $subject = '[KAMAKURA STADIUM NFT PORTAL(β)] Password Reset Request';
         $message = "You requested a password reset.\n\n";
         $message .= "Click the link below to reset your password (valid for 1 hour):\n";
         $message .= $reset_link . "\n\n";
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_reset_password']
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Kamakura Stadium NFT Cockpit</title>
+    <title>Login - KAMAKURA STADIUM NFT PORTAL(β)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_reset_password']
     <div class="relative z-10 w-full max-w-md p-8 glass-panel rounded-xl shadow-2xl">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold tracking-wider text-white mb-2">ACCESS PORTAL</h1>
-            <p class="text-gray-400 text-sm tracking-widest uppercase">Kamakura Stadium NFT</p>
+            <p class="text-gray-400 text-sm tracking-widest uppercase">KAMAKURA STADIUM NFT PORTAL(β)</p>
         </div>
 
         <?php if ($error_msg): ?>

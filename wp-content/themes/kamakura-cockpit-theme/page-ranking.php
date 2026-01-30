@@ -62,7 +62,7 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking - Kamakura Stadium NFT</title>
+    <title>Ranking - KAMAKURA STADIUM NFT PORTAL(β)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -108,8 +108,7 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
     <header class="w-full h-16 glass-card flex items-center justify-between px-6 fixed top-0 z-50">
         <div class="flex items-center space-x-4">
             <a href="<?php echo home_url('/dashboard'); ?>"
-                class="text-kmnft-green font-bold tracking-widest text-lg hover:opacity-80 transition">KAMAKURA STADIUM
-                NFT</a>
+                class="text-kmnft-green font-bold tracking-widest text-lg hover:opacity-80 transition">KAMAKURA STADIUM NFT PORTAL(β)</a>
         </div>
         <div class="flex items-center space-x-4 ml-auto">
             <a href="<?php echo home_url('/dashboard'); ?>"
@@ -336,7 +335,7 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
 
     <footer class="mt-auto py-10 border-t border-gray-800 text-center">
         <div class="text-[10px] text-gray-600 uppercase tracking-widest mb-2">Developed by</div>
-        <div class="text-sm font-bold text-gray-400">KAMAKURA STADIUM NFT PROJECT</div>
+        <div class="text-sm font-bold text-gray-400">KAMAKURA STADIUM NFT PORTAL(β)</div>
         <div class="mt-4 flex justify-center space-x-6">
             <a href="<?php echo home_url('/dashboard'); ?>"
                 class="text-[10px] text-gray-500 hover:text-white transition">Cockpit</a>

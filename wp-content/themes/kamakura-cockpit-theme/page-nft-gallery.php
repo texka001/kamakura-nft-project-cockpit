@@ -21,7 +21,7 @@ $has_more = ($initial_limit < $total_count);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFT Gallery - Kamakura Stadium NFT</title>
+    <title>NFT Gallery - KAMAKURA STADIUM NFT PORTAL(β)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -59,7 +59,7 @@ $has_more = ($initial_limit < $total_count);
         <div class="flex items-center space-x-4">
             <a href="<?php echo home_url('/dashboard'); ?>"
                 class="text-kmnft-green font-bold tracking-widest text-lg hover:text-white transition">
-                KAMAKURA STADIUM NFT
+                KAMAKURA STADIUM NFT PORTAL(β)
             </a>
         </div>
         <div>
