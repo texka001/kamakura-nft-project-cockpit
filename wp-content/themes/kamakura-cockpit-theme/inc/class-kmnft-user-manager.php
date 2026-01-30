@@ -1767,13 +1767,13 @@ class KMNFT_User_Manager
                 var mediaUploader;
                 function updateHiddenInput() { var urls = []; $('#goal-images-container img').each(function () { urls.push($(this).attr('src')); }); $('#goal_images_hidden').val(urls.join(',')); }
 
-                                                                                                                                                                                                                $('#upload_goal_image_btn').click(functi                 on(e) {
+                                                                                                                                                                                                                        $('#upload_goal_image_btn').click(functi                 on(e) {
                     e.preventDefault();
                     if(mediaUploader) {
                         mediaUploader.open();
                         return;
                     }
-                                                                                                                                        mediaUploader = wp.media.frames.file_frame = wp.media({
+                                                                                                                                                mediaUploader = wp.media.frames.file_frame = wp.media({
                         title: 'Choose Goal Image',
                         button: {
                             text: 'Choose Image'
@@ -1796,7 +1796,7 @@ class KMNFT_User_Manager
                 $('#goal-images-container').empty();
                 updateHiddenInput();
             });
-                                                                                                                                                                                                            });
+                                                                                                                                                                                                                    });
         </script>
         <?php
     }
@@ -2527,7 +2527,7 @@ class KMNFT_User_Manager
         $table_user_summary = $wpdb->prefix . 'kmnft_ksp_user_summary';
 
         return $wpdb->get_results($wpdb->prepare(
-            "SELECT season, total_points, rank 
+            "SELECT season, total_points, `rank` 
              FROM $table_user_summary 
              WHERE user_id = %d 
              ORDER BY season DESC",
