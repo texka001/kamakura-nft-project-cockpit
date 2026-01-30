@@ -38,6 +38,16 @@ if ($is_logged_in) {
     }
 
     $ksp_balance = number_format($ksp_total_val);
+
+    // Fetch Token Level KSP Summary for Holdings
+    $tokens_ksp_summary = array();
+    if (!empty($holdings) && !empty($ksp_by_season)) {
+        $latest_season_label = $ksp_by_season[0]->season;
+        $token_ids = array_map(function ($h) {
+            return $h->token_id;
+        }, $holdings);
+        $tokens_ksp_summary = $kmnft_manager->get_tokens_ksp_summary($token_ids, $latest_season_label);
+    }
 }
 
 // Handle Password Change
@@ -572,6 +582,24 @@ if (!$is_logged_in) {
                                         <div class="text-xs font-mono text-kmnft-green truncate">
                                             <?php echo esc_html($holding->token_id); ?>
                                         </div>
+
+                                        <?php
+                                        $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
+                                        if ($token_ksp_data):
+                                            ?>
+                                            <div class="flex items-center justify-between mt-1 pt-1 border-t border-white/10">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-[9px] text-gray-500 font-bold uppercase">KSP</span>
+                                                    <span
+                                                        class="text-[10px] font-mono text-white"><?php echo number_format($token_ksp_data->total_points); ?></span>
+                                                </div>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-[9px] text-gray-500 font-bold uppercase">Rank</span>
+                                                    <span
+                                                        class="text-[10px] font-mono text-kmnft-gold"><?php echo $token_ksp_data->rank > 0 ? '#' . esc_html($token_ksp_data->rank) : '-'; ?></span>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
                                         <?php if (!empty($holding->zone_x) && !empty($holding->zone_y)): ?>
                                             <div class="flex items-center mt-1 space-x-2">
                                                 <span
