@@ -505,16 +505,28 @@ if (!$is_logged_in) {
                             <h2
                                 class="text-lg font-bold text-white tracking-wide border-b border-kmnft-green pb-1 inline-block">
                                 OWNED ASSETS</h2>
-                            <a href="https://kamakura-stadium-nft.com/" target="_blank"
-                                class="inline-flex items-center gap-1.5 px-3 py-1 border border-kmnft-green/50 text-kmnft-green text-[10px] font-bold rounded hover:bg-kmnft-green hover:text-black transition duration-200 group uppercase tracking-wider">
-                                <span>アセットを追加購入</span>
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-2.5 w-2.5 transform group-hover:translate-x-0.5 transition" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </a>
+                            <div class="flex items-center gap-2">
+                                <a href="https://kamakura-stadium-nft.com/" target="_blank"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1 border border-kmnft-green/50 text-kmnft-green text-[10px] font-bold rounded hover:bg-kmnft-green hover:text-black transition duration-200 group uppercase tracking-wider">
+                                    <span>アセットを追加購入</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-2.5 w-2.5 transform group-hover:translate-x-0.5 transition" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                                <?php if (count($holdings) > 5): ?>
+                                    <button id="show-more-assets" onclick="showAllAssets()"
+                                        class="px-3 py-1 border border-gray-600 text-gray-400 text-[10px] font-bold rounded hover:border-kmnft-green hover:text-kmnft-green transition uppercase tracking-wider">
+                                        Show More
+                                    </button>
+                                    <button id="show-less-assets" onclick="showLessAssets()" style="display:none;"
+                                        class="px-3 py-1 border border-red-900/50 text-red-500 text-[10px] font-bold rounded hover:bg-red-500 hover:text-white transition uppercase tracking-wider">
+                                        Show Less
+                                    </button>
+                                <?php endif; ?>
+                            </div>
                         </div>
                         <span class="text-xs text-gray-500">
                             <?php echo count($holdings); ?> ASSETS
@@ -564,18 +576,7 @@ if (!$is_logged_in) {
                             <?php endforeach; ?>
                         </div>
 
-                        <?php if (count($holdings) > 5): ?>
-                            <div class="text-center mt-6">
-                                <button id="show-more-assets" onclick="showAllAssets()"
-                                    class="px-6 py-2 bg-kmnft-navy border border-gray-700 hover:border-kmnft-green text-xs text-gray-300 hover:text-kmnft-green rounded transition uppercase tracking-wider">
-                                    Show More
-                                </button>
-                                <button id="show-less-assets" onclick="showLessAssets()" style="display:none;"
-                                    class="px-6 py-2 bg-kmnft-navy border border-gray-700 hover:border-red-500 text-xs text-gray-300 hover:text-red-500 rounded transition uppercase tracking-wider">
-                                    Show Less
-                                </button>
-                            </div>
-                        <?php endif; ?>
+
 
                     <?php else: ?>
                         <div class="text-center py-10 text-gray-500 text-sm">
@@ -1209,56 +1210,13 @@ if (!$is_logged_in) {
                     </div>
                 </div>
 
-                <script>
-                    function toggleSeason(header) {
-                        const content = header.nextElementSibling;
-                        const icon = header.querySelector('svg');
-                        if (content && content.classList.contains('hidden')) {
-                            content.classList.remove('hidden');
-                            if (icon) icon.style.transform = 'rotate(180deg)';
-                        } else if (content) {
-                            content.classList.add('hidden');
-                            if (icon) icon.style.transform = 'rotate(0deg)';
-                        }
-                    }
-
-                    function toggleLatestSeason() {
-                        const hiddenRows = document.querySelectorAll('.latest-season-hidden');
-                        const btn = document.getElementById('btn-show-latest');
-
-                        hiddenRows.forEach(row => {
-                            row.classList.toggle('hidden');
-                        });
-
-                        if (btn) {
-                            if (btn.innerText.includes('Show Full Schedule')) {
-                                btn.innerText = 'Show Next Match Only';
-                            } else {
-                                btn.innerText = 'Show Full Schedule';
-                            }
-                        }
-                    }
-
-                    function toggleHistory() {
-                        const pastSeasons = document.querySelectorAll('.past-season');
-                        const btn = document.getElementById('btn-show-history');
-
-                        pastSeasons.forEach(season => {
-                            season.classList.toggle('hidden');
-                        });
-
-                        if (btn) {
-                            const span = btn.querySelector('span');
-                            const svg = btn.querySelector('svg');
-                            if (span.innerText === 'Previous Seasons') {
-                                span.innerText = 'Hide Previous Seasons';
-                                svg.style.transform = 'rotate(180deg)';
-                            } else {
-                                span.innerText = 'Previous Seasons';
-                                svg.style.transform = 'rotate(0deg)';
-                            }
-                        }
-                    }
+                <script>                 function toggleSeason(header) {                     const content = header.nextElementSibling;                     const icon = header.querySelector('svg');                     if (content && content.classList.contains('hidden')) {                         content.classList.remove('hidden');                         if (icon) icon.style.transform = 'rotate(180deg)';                     } else if (content) {                         content.classList.add('hidden');                         if (icon) icon.style.transform = 'rotate(0deg)';                     }                 }
+                     function toggleLatestSeason() {                     const hiddenRows = document.querySelectorAll('.latest-season-hidden');                     const btn = document.getElementById('btn-show-latest');
+                         hiddenRows.forEach(row => {                         row.classList.toggle('hidden');                     });
+                         if (btn) {                         if (btn.innerText.includes('Show Full Schedule')) {                             btn.innerText = 'Show Next Match Only';                         } else {                             btn.innerText = 'Show Full Schedule';                         }                     }                 }
+                     function toggleHistory() {                     const pastSeasons = document.querySelectorAll('.past-season');                     const btn = document.getElementById('btn-show-history');
+                         pastSeasons.forEach(season => {                         season.classList.toggle('hidden');                     });
+                         if (btn) {                         const span = btn.querySelector('span');                         const svg = btn.querySelector('svg');                         if (span.innerText === 'Previous Seasons') {                             span.innerText = 'Hide Previous Seasons';                             svg.style.transform = 'rotate(180deg)';                         } else {                             span.innerText = 'Previous Seasons';                             svg.style.transform = 'rotate(0deg)';                         }                     }                 }
                 </script>
             <?php endif; ?>
 
