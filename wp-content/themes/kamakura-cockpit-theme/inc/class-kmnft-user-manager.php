@@ -1176,60 +1176,86 @@ class KMNFT_User_Manager
         // Wash and Replace: Token Summary
         $wpdb->query($wpdb->prepare("DELETE FROM {$table_token_summary} WHERE season = %s", $season));
 
-        // Calculate Rank using variables (Standard Ranking: 1, 1, 3)
-        // Note: We use CROSS JOIN for initialization to ensure variables work in a single query execution.
-        $wpdb->query($wpdb->prepare(
-            "INSERT INTO {$table_token_summary} (token_id, season, total_points, rank, updated_at)
-                 SELECT token_id, season, total_points, rank, NOW()
-                 FROM (
-                     SELECT 
-                        token_id, 
-                        season, 
-                        total_points,
-                        @row_num := @row_num + 1,
-                        @rank := IF(@current_points = total_points, @rank, @row_num) as rank,
-                        @current_points := total_points
-                     FROM (
-                        SELECT token_id, %s as season, SUM(acquisition_point) as total_points
-                        FROM {$table_token_ksp}
-                        WHERE season = %s
-                        GROUP BY token_id
-                        ORDER BY total_points DESC
-                     ) as sub
-                     CROSS JOIN (SELECT @rank := 0, @current_points := NULL, @row_num := 0) as vars
-                 ) as ranked_sub",
-            $season,
+        // Fetch Token Data for PHP-side processing
+        $token_results = $wpdb->get_results($wpdb->prepare(
+            "SELECT token_id, SUM(acquisition_point) as total_points 
+             FROM {$table_token_ksp} 
+             WHERE season = %s 
+             GROUP BY token_id 
+             ORDER BY total_points DESC",
             $season
         ));
+
+        if ($token_results) {
+            $values = [];
+            $placeholders = [];
+            $rank = 0;
+            $row_num = 0;
+            $prev_points = null;
+
+            foreach ($token_results as $row) {
+                $row_num++;
+                if ($prev_points !== $row->total_points) {
+                    $rank = $row_num;
+                }
+                $prev_points = $row->total_points;
+
+                array_push($values, $row->token_id, $season, $row->total_points, $rank);
+                $placeholders[] = "(%s, %s, %d, %d, NOW())";
+            }
+
+            // Bulk Insert Token Summary
+            // Split into chunks if too large (e.g. 500 rows)
+            $chunks = array_chunk($placeholders, 500);
+            $value_chunks = array_chunk($values, 500 * 4); // 4 values per row
+
+            foreach ($chunks as $i => $chunk) {
+                $query = "INSERT INTO {$table_token_summary} (token_id, season, total_points, rank, updated_at) VALUES " . implode(', ', $chunk);
+                $wpdb->query($wpdb->prepare($query, $value_chunks[$i]));
+            }
+        }
 
         // Wash and Replace: User Summary (based on current holdings)
         $wpdb->query($wpdb->prepare("DELETE FROM {$table_user_summary} WHERE season = %s", $season));
 
-        // Calculate Rank for Users (Standard Ranking: 1, 1, 3)
-        $wpdb->query($wpdb->prepare(
-            "INSERT INTO {$table_user_summary} (user_id, season, total_points, rank, updated_at)
-                 SELECT user_id, season, total_points, rank, NOW()
-                 FROM (
-                     SELECT 
-                        user_id, 
-                        season, 
-                        total_points,
-                        @row_num_user := @row_num_user + 1,
-                        @rank_user := IF(@current_points_user = total_points, @rank_user, @row_num_user) as rank,
-                        @current_points_user := total_points
-                     FROM (
-                        SELECT h.user_id, %s as season, SUM(tk.acquisition_point) as total_points
-                        FROM {$table_holdings} h
-                        JOIN {$table_token_ksp} tk ON h.token_id = tk.token_id
-                        WHERE tk.season = %s
-                        GROUP BY h.user_id
-                        ORDER BY total_points DESC
-                     ) as sub
-                     CROSS JOIN (SELECT @rank_user := 0, @current_points_user := NULL, @row_num_user := 0) as vars
-                 ) as ranked_sub",
-            $season,
+        // Fetch User Data for PHP-side processing
+        $user_results = $wpdb->get_results($wpdb->prepare(
+            "SELECT h.user_id, SUM(tk.acquisition_point) as total_points
+             FROM {$table_holdings} h
+             JOIN {$table_token_ksp} tk ON h.token_id = tk.token_id
+             WHERE tk.season = %s
+             GROUP BY h.user_id
+             ORDER BY total_points DESC",
             $season
         ));
+
+        if ($user_results) {
+            $values = [];
+            $placeholders = [];
+            $rank = 0;
+            $row_num = 0;
+            $prev_points = null;
+
+            foreach ($user_results as $row) {
+                $row_num++;
+                if ($prev_points !== $row->total_points) {
+                    $rank = $row_num;
+                }
+                $prev_points = $row->total_points;
+
+                array_push($values, $row->user_id, $season, $row->total_points, $rank);
+                $placeholders[] = "(%d, %s, %d, %d, NOW())";
+            }
+
+            // Bulk Insert User Summary
+            $chunks = array_chunk($placeholders, 500);
+            $value_chunks = array_chunk($values, 500 * 4); // 4 values per row
+
+            foreach ($chunks as $i => $chunk) {
+                $query = "INSERT INTO {$table_user_summary} (user_id, season, total_points, rank, updated_at) VALUES " . implode(', ', $chunk);
+                $wpdb->query($wpdb->prepare($query, $value_chunks[$i]));
+            }
+        }
 
         // Calculate counts for messaging
         $token_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_token_summary WHERE season = %s", $season));
@@ -1663,41 +1689,41 @@ class KMNFT_User_Manager
                 </table>
             </div>
         </div>
-        <script>     jQuery(documen                        t).ready(funct                  ion($) {         var mediaUploader;
-                 function updateHiddenInput() {         var urls = [];         $('#goal-images-container img').each(function () {             urls.push($(this).attr('src'));         });         $('#goal_images_hidden').val(urls.join(','));     }
+        <script>     jQuery(documen                        t).ready(funct                 ion($) {         var mediaUploader;
+                         function updateHiddenInput() {         var urls = [];         $('#goal-images-container img').each(function () {             urls.push($(this).attr('src'));         });         $('#goal_images_hidden').val(urls.join(','));     }
 
-                                                                                                $('#upload_goal_image_btn').click(functi                 on (e) {
-                        e.preventDefault();
-                        if (mediaUploader) {
-                            mediaUploader.open();
-                            return;
-                        }
-                        mediaUploader = wp.media.frames.file_frame = wp.media({
-                            title: 'Choose Goal Image',
-                            button: {
-                                text: 'Choose Image'
-                            },
-                            multiple: true
-                        });
+                                                                                                        $('#upload_goal_image_btn').click(functi                 on (e) {
+                                e.preventDefault();
+                                if (mediaUploader) {
+                                    mediaUploader.open();
+                                    return;
+                                }
+                                mediaUploader = wp.media.frames.file_frame = wp.media({
+                                    title: 'Choose Goal Image',
+                                    button: {
+                                        text: 'Choose Image'
+                                    },
+                                    multiple: true
+                                });
 
-                        mediaUploader.on('select', function () {
-                            var selection = mediaUploader.state().get('selection');
-                            selection.each(function (attachment) {
-                                attachment = attachment.toJSON();
-                                $('#goal-images-container').append('<div style="position:relative; width:80px; height:80px;"><img src="' + attachment.url + '" style="width:100%; height:100%; object-fit:cover; border:1px solid #ccc;"></div>');
+                                mediaUploader.on('select', function () {
+                                    var selection = mediaUploader.state().get('selection');
+                                    selection.each(function (attachment) {
+                                        attachment = attachment.toJSON();
+                                        $('#goal-images-container').append('<div style="position:relative; width:80px; height:80px;"><img src="' + attachment.url + '" style="width:100%; height:100%; object-fit:cover; border:1px solid #ccc;"></div>');
+                                    });
+                                    updateHiddenInput();
+                                });
+                                mediaUploader.open();
                             });
-                            updateHiddenInput();
-                        });
-                        mediaUploader.open();
-                    });
 
-                    $('#clear_goal_images_btn').click(function () {
-                        $('#goal-images-container').empty();
-                        updateHiddenInput();
-                    });
-                                                                                            });
-                </script>
-                <?php
+                            $('#clear_goal_images_btn').click(function () {
+                                $('#goal-images-container').empty();
+                                updateHiddenInput();
+                            });
+                                                                                                    });
+                        </script>
+                        <?php
     }
 
     public function process_match_save()
@@ -1832,121 +1858,121 @@ class KMNFT_User_Manager
 
         $items = $wpdb->get_results("SELECT * FROM $table_name ORDER BY announcement_date DESC");
         ?>
-                <div class="wrap">
-                    <h1>League Standings Manager</h1>
-                    <p>Upload the latest league standings CSV.</p>
+                        <div class="wrap">
+                            <h1>League Standings Manager</h1>
+                            <p>Upload the latest league standings CSV.</p>
 
-                    <?php if (isset($_GET['status'])): ?>
-                            <?php if ($_GET['status'] === 'success'): ?>
-                                    <div class="notice notice-success is-dismissible">
-                                        <p><strong>Success!</strong> Saved.</p>
-                                    </div>
-                            <?php elseif ($_GET['status'] === 'deleted'): ?>
-                                    <div class="notice notice-success is-dismissible">
-                                        <p><strong>Success!</strong> Deleted.</p>
-                                    </div>
-                            <?php elseif ($_GET['status'] === 'error'): ?>
-                                    <div class="notice notice-error is-dismissible">
-                                        <p><strong>Error:</strong> <?php echo esc_html(urldecode($_GET['msg'])); ?></p>
-                                    </div>
+                            <?php if (isset($_GET['status'])): ?>
+                                        <?php if ($_GET['status'] === 'success'): ?>
+                                                    <div class="notice notice-success is-dismissible">
+                                                        <p><strong>Success!</strong> Saved.</p>
+                                                    </div>
+                                        <?php elseif ($_GET['status'] === 'deleted'): ?>
+                                                    <div class="notice notice-success is-dismissible">
+                                                        <p><strong>Success!</strong> Deleted.</p>
+                                                    </div>
+                                        <?php elseif ($_GET['status'] === 'error'): ?>
+                                                    <div class="notice notice-error is-dismissible">
+                                                        <p><strong>Error:</strong> <?php echo esc_html(urldecode($_GET['msg'])); ?></p>
+                                                    </div>
+                                        <?php endif; ?>
                             <?php endif; ?>
-                    <?php endif; ?>
 
-                    <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px;">
-                        <h2><?php echo $edit_item ? 'Update Standings' : 'Add New Standings'; ?></h2>
-                        <form action="<?php echo admin_url('admin-post.php'); ?>" method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="action" value="kmnft_save_standings">
-                            <?php if ($edit_item): ?>
-                                    <input type="hidden" name="item_id" value="<?php echo esc_attr($edit_item->id); ?>">
-                            <?php endif; ?>
-                            <?php wp_nonce_field('kmnft_standings_nonce', 'kmnft_nonce'); ?>
+                            <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px;">
+                                <h2><?php echo $edit_item ? 'Update Standings' : 'Add New Standings'; ?></h2>
+                                <form action="<?php echo admin_url('admin-post.php'); ?>" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="action" value="kmnft_save_standings">
+                                    <?php if ($edit_item): ?>
+                                                <input type="hidden" name="item_id" value="<?php echo esc_attr($edit_item->id); ?>">
+                                    <?php endif; ?>
+                                    <?php wp_nonce_field('kmnft_standings_nonce', 'kmnft_nonce'); ?>
 
-                            <table class="form-table">
-                                <tr>
-                                    <th><label for="announcement_date">Announcement Date</label></th>
-                                    <td><input type="date" name="announcement_date" id="announcement_date" required
-                                            value="<?php echo $edit_item ? esc_attr($edit_item->announcement_date) : date('Y-m-d'); ?>">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th><label for="csv_file">CSV File</label></th>
-                                    <td>
-                                        <input type="file" name="csv_file" id="csv_file" accept=".csv" <?php echo $edit_item ? '' : 'required'; ?>>
-                                        <p class="description">
-                                            Columns: <code>rank</code>, <code>clubname</code>, <code>PL</code>, <code>W</code>,
-                                            <code>D</code>, <code>L</code>, <code>GD</code>, <code>PT</code><br>
-                                            Auto-detects "Kamakura" or "鎌倉" to set Our Rank/Points.<br>
-                                            <?php if ($edit_item): ?>
-                                                    <strong>Note:</strong> Uploading a new CSV will replace the existing data. Leave empty to
-                                                    keep current data.
-                                            <?php endif; ?>
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th><label for="memo">Memo</label></th>
-                                    <td><textarea name="memo" id="memo" rows="3"
-                                            class="large-text"><?php echo $edit_item ? esc_textarea($edit_item->memo) : ''; ?></textarea>
-                                    </td>
-                                </tr>
-                            </table>
-                            <?php submit_button($edit_item ? 'Update Standings' : 'Save Standings'); ?>
-                            <?php if ($edit_item): ?>
-                                    <a href="<?php echo admin_url('admin.php?page=kmnft-standings'); ?>"
-                                        class="button button-secondary">Cancel</a>
-                            <?php endif; ?>
-                        </form>
-                    </div>
-
-                    <div style="margin-top: 30px;">
-                        <h2>History</h2>
-                        <table class="widefat fixed striped">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Teams</th>
-                                    <th>Our Rank</th>
-                                    <th>Our Points</th>
-                                    <th>Memo</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if ($items): ?>
-                                        <?php foreach ($items as $item): ?>
-                                                <?php
-                                                $data = json_decode($item->data, true);
-                                                $count = is_array($data) ? count($data) : 0;
-                                                ?>
-                                                <tr>
-                                                    <td><?php echo esc_html($item->announcement_date); ?></td>
-                                                    <td><?php echo $count; ?> Teams</td>
-                                                    <td><?php echo esc_html($item->our_rank); ?></td>
-                                                    <td><?php echo esc_html($item->our_points); ?></td>
-                                                    <td><?php echo esc_html($item->memo); ?></td>
-                                                    <td>
-                                                        <a href="<?php echo admin_url('admin.php?page=kmnft-standings&action=edit&id=' . $item->id); ?>"
-                                                            class="button button-small">Edit</a>
-                                                        <form action="<?php echo admin_url('admin-post.php'); ?>" method="post"
-                                                            onsubmit="return confirm('Delete?');" style="display:inline;">
-                                                            <input type="hidden" name="action" value="kmnft_delete_standings">
-                                                            <input type="hidden" name="item_id" value="<?php echo $item->id; ?>">
-                                                            <?php wp_nonce_field('kmnft_standings_delete_nonce', 'kmnft_nonce'); ?>
-                                                            <button type="submit" class="button button-small button-link-delete">Delete</button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                        <?php endforeach; ?>
-                                <?php else: ?>
+                                    <table class="form-table">
                                         <tr>
-                                            <td colspan="6">No records found.</td>
+                                            <th><label for="announcement_date">Announcement Date</label></th>
+                                            <td><input type="date" name="announcement_date" id="announcement_date" required
+                                                    value="<?php echo $edit_item ? esc_attr($edit_item->announcement_date) : date('Y-m-d'); ?>">
+                                            </td>
                                         </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <?php
+                                        <tr>
+                                            <th><label for="csv_file">CSV File</label></th>
+                                            <td>
+                                                <input type="file" name="csv_file" id="csv_file" accept=".csv" <?php echo $edit_item ? '' : 'required'; ?>>
+                                                <p class="description">
+                                                    Columns: <code>rank</code>, <code>clubname</code>, <code>PL</code>, <code>W</code>,
+                                                    <code>D</code>, <code>L</code>, <code>GD</code>, <code>PT</code><br>
+                                                    Auto-detects "Kamakura" or "鎌倉" to set Our Rank/Points.<br>
+                                                    <?php if ($edit_item): ?>
+                                                                <strong>Note:</strong> Uploading a new CSV will replace the existing data. Leave empty to
+                                                                keep current data.
+                                                    <?php endif; ?>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th><label for="memo">Memo</label></th>
+                                            <td><textarea name="memo" id="memo" rows="3"
+                                                    class="large-text"><?php echo $edit_item ? esc_textarea($edit_item->memo) : ''; ?></textarea>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <?php submit_button($edit_item ? 'Update Standings' : 'Save Standings'); ?>
+                                    <?php if ($edit_item): ?>
+                                                <a href="<?php echo admin_url('admin.php?page=kmnft-standings'); ?>"
+                                                    class="button button-secondary">Cancel</a>
+                                    <?php endif; ?>
+                                </form>
+                            </div>
+
+                            <div style="margin-top: 30px;">
+                                <h2>History</h2>
+                                <table class="widefat fixed striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Teams</th>
+                                            <th>Our Rank</th>
+                                            <th>Our Points</th>
+                                            <th>Memo</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if ($items): ?>
+                                                    <?php foreach ($items as $item): ?>
+                                                                <?php
+                                                                $data = json_decode($item->data, true);
+                                                                $count = is_array($data) ? count($data) : 0;
+                                                                ?>
+                                                                <tr>
+                                                                    <td><?php echo esc_html($item->announcement_date); ?></td>
+                                                                    <td><?php echo $count; ?> Teams</td>
+                                                                    <td><?php echo esc_html($item->our_rank); ?></td>
+                                                                    <td><?php echo esc_html($item->our_points); ?></td>
+                                                                    <td><?php echo esc_html($item->memo); ?></td>
+                                                                    <td>
+                                                                        <a href="<?php echo admin_url('admin.php?page=kmnft-standings&action=edit&id=' . $item->id); ?>"
+                                                                            class="button button-small">Edit</a>
+                                                                        <form action="<?php echo admin_url('admin-post.php'); ?>" method="post"
+                                                                            onsubmit="return confirm('Delete?');" style="display:inline;">
+                                                                            <input type="hidden" name="action" value="kmnft_delete_standings">
+                                                                            <input type="hidden" name="item_id" value="<?php echo $item->id; ?>">
+                                                                            <?php wp_nonce_field('kmnft_standings_delete_nonce', 'kmnft_nonce'); ?>
+                                                                            <button type="submit" class="button button-small button-link-delete">Delete</button>
+                                                                        </form>
+                                                                    </td>
+                                                                </tr>
+                                                    <?php endforeach; ?>
+                                        <?php else: ?>
+                                                    <tr>
+                                                        <td colspan="6">No records found.</td>
+                                                    </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <?php
     }
 
     public function process_standings_save()
@@ -2069,122 +2095,122 @@ class KMNFT_User_Manager
 
         $items = $wpdb->get_results("SELECT * FROM $table_name ORDER BY season_year DESC");
         ?>
-                <div class="wrap">
-                    <h1>League Schedule Manager</h1>
-                    <p>Upload the league schedule/results CSV for a season.</p>
+                        <div class="wrap">
+                            <h1>League Schedule Manager</h1>
+                            <p>Upload the league schedule/results CSV for a season.</p>
 
-                    <?php if (isset($_GET['status'])): ?>
-                            <?php if ($_GET['status'] === 'success'): ?>
-                                    <div class="notice notice-success is-dismissible">
-                                        <p><strong>Success!</strong> Saved.</p>
-                                    </div>
-                            <?php elseif ($_GET['status'] === 'deleted'): ?>
-                                    <div class="notice notice-success is-dismissible">
-                                        <p><strong>Success!</strong> Deleted.</p>
-                                    </div>
-                            <?php elseif ($_GET['status'] === 'error'): ?>
-                                    <div class="notice notice-error is-dismissible">
-                                        <p><strong>Error:</strong> <?php echo esc_html(urldecode($_GET['msg'])); ?></p>
-                                    </div>
+                            <?php if (isset($_GET['status'])): ?>
+                                        <?php if ($_GET['status'] === 'success'): ?>
+                                                    <div class="notice notice-success is-dismissible">
+                                                        <p><strong>Success!</strong> Saved.</p>
+                                                    </div>
+                                        <?php elseif ($_GET['status'] === 'deleted'): ?>
+                                                    <div class="notice notice-success is-dismissible">
+                                                        <p><strong>Success!</strong> Deleted.</p>
+                                                    </div>
+                                        <?php elseif ($_GET['status'] === 'error'): ?>
+                                                    <div class="notice notice-error is-dismissible">
+                                                        <p><strong>Error:</strong> <?php echo esc_html(urldecode($_GET['msg'])); ?></p>
+                                                    </div>
+                                        <?php endif; ?>
                             <?php endif; ?>
-                    <?php endif; ?>
 
-                    <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px;">
-                        <h2><?php echo $edit_item ? 'Update Schedule' : 'Add New Schedule'; ?></h2>
-                        <form action="<?php echo admin_url('admin-post.php'); ?>" method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="action" value="kmnft_save_league_schedule">
-                            <?php if ($edit_item): ?>
-                                    <input type="hidden" name="item_id" value="<?php echo esc_attr($edit_item->id); ?>">
-                            <?php endif; ?>
-                            <?php wp_nonce_field('kmnft_league_schedule_nonce', 'kmnft_nonce'); ?>
+                            <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px;">
+                                <h2><?php echo $edit_item ? 'Update Schedule' : 'Add New Schedule'; ?></h2>
+                                <form action="<?php echo admin_url('admin-post.php'); ?>" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="action" value="kmnft_save_league_schedule">
+                                    <?php if ($edit_item): ?>
+                                                <input type="hidden" name="item_id" value="<?php echo esc_attr($edit_item->id); ?>">
+                                    <?php endif; ?>
+                                    <?php wp_nonce_field('kmnft_league_schedule_nonce', 'kmnft_nonce'); ?>
 
-                            <table class="form-table">
-                                <tr>
-                                    <th><label for="season_year">Season Year</label></th>
-                                    <td><input type="text" name="season_year" id="season_year" required
-                                            value="<?php echo $edit_item ? esc_attr($edit_item->season_year) : date('Y'); ?>">
-                                        <p class="description">e.g. 2025</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th><label for="csv_file">CSV File</label></th>
-                                    <td>
-                                        <input type="file" name="csv_file" id="csv_file" accept=".csv" <?php echo $edit_item ? '' : 'required'; ?>>
-                                        <p class="description">
-                                            Format: <code>Section</code>, <code>Date(m/d)</code>, <code>Time</code>,
-                                            <code>Score(H - A)</code>, <code>Opponent</code>, <code>Location</code><br>
-                                            Example: <code>1, 4/6, 13:00, 3 - 1, イトゥアーノFC横浜, 鎌倉スタジアム</code><br>
-                                            <?php if ($edit_item): ?>
-                                                    <br><strong
-                                                        style="color: #dc3232;">注意：新しいCSVファイルをアップロードすると、このシーズンの既存データはすべて上書きされます。</strong>
-                                            <?php endif; ?>
-                                        </p>
-                                        <p>
-                                            <a href="<?php echo admin_url('admin-post.php?action=kmnft_download_sample_league_schedule_csv'); ?>"
-                                                class="button button-secondary">Download Sample CSV</a>
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                            <?php submit_button($edit_item ? 'Update Schedule' : 'Save Schedule'); ?>
-                            <?php if ($edit_item): ?>
-                                    <a href="<?php echo admin_url('admin.php?page=kmnft-league-schedule'); ?>"
-                                        class="button button-secondary">Cancel</a>
-                            <?php endif; ?>
-                        </form>
-                    </div>
-
-                    <div style="margin-top: 30px;">
-                        <h2>History</h2>
-                        <table class="widefat fixed striped">
-                            <thead>
-                                <tr>
-                                    <th>Season</th>
-                                    <th>Matches</th>
-                                    <th>Summary (W-L-D)</th>
-                                    <th>Created At</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if ($items): ?>
-                                        <?php foreach ($items as $item): ?>
-                                                <?php
-                                                $data = json_decode($item->data, true);
-                                                $stats = !empty($item->summary_stats) ? json_decode($item->summary_stats, true) : null;
-                                                $count = is_array($data) ? count($data) : 0;
-                                                $summary_text = ($stats && isset($stats['win'])) ? "{$stats['win']} - {$stats['lose']} - {$stats['draw']}" : '-';
-                                                ?>
-                                                <tr>
-                                                    <td><?php echo esc_html($item->season_year); ?></td>
-                                                    <td><?php echo $count; ?> Matches</td>
-                                                    <td><?php echo esc_html($summary_text); ?></td>
-                                                    <td><?php echo esc_html($item->created_at); ?></td>
-                                                    <td>
-                                                        <a href="<?php echo admin_url('admin.php?page=kmnft-league-schedule&action=edit&id=' . $item->id); ?>"
-                                                            class="button button-small">Edit</a>
-                                                        <a href="<?php echo admin_url('admin-post.php?action=kmnft_download_league_schedule_csv&item_id=' . $item->id); ?>"
-                                                            class="button button-small button-secondary">Download</a>
-                                                        <form action="<?php echo admin_url('admin-post.php'); ?>" method="post"
-                                                            onsubmit="return confirm('Delete?');" style="display:inline;">
-                                                            <input type="hidden" name="action" value="kmnft_delete_league_schedule">
-                                                            <input type="hidden" name="item_id" value="<?php echo $item->id; ?>">
-                                                            <?php wp_nonce_field('kmnft_league_schedule_delete_nonce', 'kmnft_nonce'); ?>
-                                                            <button type="submit" class="button button-small button-link-delete">Delete</button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                        <?php endforeach; ?>
-                                <?php else: ?>
+                                    <table class="form-table">
                                         <tr>
-                                            <td colspan="5">No records found.</td>
+                                            <th><label for="season_year">Season Year</label></th>
+                                            <td><input type="text" name="season_year" id="season_year" required
+                                                    value="<?php echo $edit_item ? esc_attr($edit_item->season_year) : date('Y'); ?>">
+                                                <p class="description">e.g. 2025</p>
+                                            </td>
                                         </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <?php
+                                        <tr>
+                                            <th><label for="csv_file">CSV File</label></th>
+                                            <td>
+                                                <input type="file" name="csv_file" id="csv_file" accept=".csv" <?php echo $edit_item ? '' : 'required'; ?>>
+                                                <p class="description">
+                                                    Format: <code>Section</code>, <code>Date(m/d)</code>, <code>Time</code>,
+                                                    <code>Score(H - A)</code>, <code>Opponent</code>, <code>Location</code><br>
+                                                    Example: <code>1, 4/6, 13:00, 3 - 1, イトゥアーノFC横浜, 鎌倉スタジアム</code><br>
+                                                    <?php if ($edit_item): ?>
+                                                                <br><strong
+                                                                    style="color: #dc3232;">注意：新しいCSVファイルをアップロードすると、このシーズンの既存データはすべて上書きされます。</strong>
+                                                    <?php endif; ?>
+                                                </p>
+                                                <p>
+                                                    <a href="<?php echo admin_url('admin-post.php?action=kmnft_download_sample_league_schedule_csv'); ?>"
+                                                        class="button button-secondary">Download Sample CSV</a>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <?php submit_button($edit_item ? 'Update Schedule' : 'Save Schedule'); ?>
+                                    <?php if ($edit_item): ?>
+                                                <a href="<?php echo admin_url('admin.php?page=kmnft-league-schedule'); ?>"
+                                                    class="button button-secondary">Cancel</a>
+                                    <?php endif; ?>
+                                </form>
+                            </div>
+
+                            <div style="margin-top: 30px;">
+                                <h2>History</h2>
+                                <table class="widefat fixed striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Season</th>
+                                            <th>Matches</th>
+                                            <th>Summary (W-L-D)</th>
+                                            <th>Created At</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if ($items): ?>
+                                                    <?php foreach ($items as $item): ?>
+                                                                <?php
+                                                                $data = json_decode($item->data, true);
+                                                                $stats = !empty($item->summary_stats) ? json_decode($item->summary_stats, true) : null;
+                                                                $count = is_array($data) ? count($data) : 0;
+                                                                $summary_text = ($stats && isset($stats['win'])) ? "{$stats['win']} - {$stats['lose']} - {$stats['draw']}" : '-';
+                                                                ?>
+                                                                <tr>
+                                                                    <td><?php echo esc_html($item->season_year); ?></td>
+                                                                    <td><?php echo $count; ?> Matches</td>
+                                                                    <td><?php echo esc_html($summary_text); ?></td>
+                                                                    <td><?php echo esc_html($item->created_at); ?></td>
+                                                                    <td>
+                                                                        <a href="<?php echo admin_url('admin.php?page=kmnft-league-schedule&action=edit&id=' . $item->id); ?>"
+                                                                            class="button button-small">Edit</a>
+                                                                        <a href="<?php echo admin_url('admin-post.php?action=kmnft_download_league_schedule_csv&item_id=' . $item->id); ?>"
+                                                                            class="button button-small button-secondary">Download</a>
+                                                                        <form action="<?php echo admin_url('admin-post.php'); ?>" method="post"
+                                                                            onsubmit="return confirm('Delete?');" style="display:inline;">
+                                                                            <input type="hidden" name="action" value="kmnft_delete_league_schedule">
+                                                                            <input type="hidden" name="item_id" value="<?php echo $item->id; ?>">
+                                                                            <?php wp_nonce_field('kmnft_league_schedule_delete_nonce', 'kmnft_nonce'); ?>
+                                                                            <button type="submit" class="button button-small button-link-delete">Delete</button>
+                                                                        </form>
+                                                                    </td>
+                                                                </tr>
+                                                    <?php endforeach; ?>
+                                        <?php else: ?>
+                                                    <tr>
+                                                        <td colspan="5">No records found.</td>
+                                                    </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <?php
     }
 
     public function process_league_schedule_save()

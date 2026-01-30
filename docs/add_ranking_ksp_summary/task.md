@@ -1,7 +1,8 @@
-# Task: Adding Ranking to KSP Summary
+# Task: Debugging Aggregation Error
 
-- [x] Modify `ensure_ksp_summary_tables` to include `rank` column
-- [x] Update aggregation logic to calculate Standard Ranking (1, 1, 3) in `process_token_ksp_aggregation`
-- [x] Update `process_token_summary_export` to include `rank` column in CSV
-- [x] Update `process_user_summary_export` to include `rank` column in CSV
-- [x] Verify Implementation
+- [/] Switch aggregation logic to PHP-side calculation
+    - [ ] Modify `process_token_ksp_aggregation` to fetch raw data first
+    - [ ] Calculate Standard Ranking in PHP
+    - [ ] Insert data using bulk INSERT
+- [ ] Add explicit counting of raw input rows for better error messages
+- [ ] Verify if data exists using debug messages if count is 0
