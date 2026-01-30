@@ -185,8 +185,10 @@ if (!$is_logged_in) {
 
         </div>
         <div class="flex items-center space-x-4 ml-auto">
-            <a href="<?php echo home_url('/ranking'); ?>"
-                class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">RANKING</a>
+            <?php if ($is_logged_in): ?>
+                <a href="<?php echo home_url('/ranking'); ?>"
+                    class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">RANKING</a>
+            <?php endif; ?>
             <a href="<?php echo home_url('/contact'); ?>"
                 class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">CONTACT</a>
             <span class="text-xs text-gray-400 hidden sm:inline">Welcome,

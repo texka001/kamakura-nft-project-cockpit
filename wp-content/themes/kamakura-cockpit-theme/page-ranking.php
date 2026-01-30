@@ -5,6 +5,11 @@
 
 global $wpdb;
 
+if (!is_user_logged_in()) {
+    wp_redirect(home_url('/login'));
+    exit;
+}
+
 // Define table names
 $table_token_summary = $wpdb->prefix . 'kmnft_ksp_token_summary';
 $table_user_summary = $wpdb->prefix . 'kmnft_ksp_user_summary';
