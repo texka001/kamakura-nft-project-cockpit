@@ -450,9 +450,14 @@ if (!$is_logged_in) {
                                 // Map directly to percentage
                                 $left = ($x / 120) * 100;
                                 $bottom = ($y / 64) * 100;
+
+                                $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
+                                $pts = $token_ksp_data ? number_format($token_ksp_data->total_points) : '0';
+                                $rnk = ($token_ksp_data && $token_ksp_data->rank > 0) ? $token_ksp_data->rank : '';
                                 ?>
                                 <div class="absolute w-1.5 h-1.5 bg-kmnft-gold rounded-full shadow-[0_0_4px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2"
                                     style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
+                                    onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>')"
                                     title="ID: <?php echo esc_attr($holding->token_id); ?> (X:<?php echo $x; ?>, Y:<?php echo $y; ?>)">
                                 </div>
                             <?php endif; ?>
@@ -563,9 +568,14 @@ if (!$is_logged_in) {
                                 <?php
                                 $is_hidden = $index >= 5 ? 'hidden hidden-asset' : '';
                                 $image_url = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
+                                $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
+                                $pts = $token_ksp_data ? number_format($token_ksp_data->total_points) : '0';
+                                $rnk = ($token_ksp_data && $token_ksp_data->rank > 0) ? $token_ksp_data->rank : '';
+                                $zx = isset($holding->zone_x) ? $holding->zone_x : '';
+                                $zy = isset($holding->zone_y) ? $holding->zone_y : '';
                                 ?>
                                 <div class="asset-item group relative glass-card rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer <?php echo $is_hidden; ?>"
-                                    onclick="openImageModal('<?php echo $image_url; ?>')">
+                                    onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($zx); ?>', '<?php echo esc_js($zy); ?>')">
                                     <!-- Image -->
                                     <div class="aspect-square w-full bg-gray-900 relative">
                                         <img src="<?php echo $image_url; ?>" alt="Asset <?php echo esc_attr($holding->token_id); ?>"
@@ -1293,22 +1303,60 @@ if (!$is_logged_in) {
 
     </main>
 
-    <!-- Asset Image Modal -->
-    <div id="image-modal"
-        class="fixed inset-0 z-[100] bg-black/90 hidden flex items-center justify-center p-4 backdrop-blur-sm"
-        onclick="closeImageModal()">
-        <div class="relative max-w-4xl w-full max-h-screen flex flex-col items-center">
-            <button onclick="closeImageModal()"
-                class="absolute -top-10 right-0 text-gray-400 hover:text-white transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+    <!-- Asset Detail Modal (Ported from Ranking) -->
+    <div id="token-modal"
+        class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+        <div
+            class="glass-card max-w-2xl w-full rounded-2xl overflow-hidden relative animate-in zoom-in duration-300 shadow-2xl shadow-kmnft-green/20">
+            <button onclick="closeTokenModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white transition z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/50 overflow-hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <img id="modal-image" src="" alt="Asset Detail"
-                class="w-auto h-auto max-h-[85vh] object-contain rounded-lg border border-gray-800 shadow-2xl shadow-kmnft-green/10"
-                onclick="event.stopPropagation()">
+            <div class="flex flex-col md:flex-row h-full">
+                <!-- Image Section -->
+                <div class="w-full md:w-3/5 bg-black/40 aspect-square">
+                    <img id="modal-token-image" src="" alt="Token NFT" class="w-full h-full object-contain">
+                </div>
+                <!-- Info Section -->
+                <div
+                    class="w-full md:w-2/5 p-6 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/10 bg-gray-900/60 overflow-hidden">
+                    <div class="space-y-6">
+                        <div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Token ID</div>
+                            <div id="modal-token-id"
+                                class="text-xl md:text-2xl font-bold font-mono text-white break-all">#000000</div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="flex gap-8">
+                                <div>
+                                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season Rank
+                                    </div>
+                                    <div id="modal-token-rank" class="text-3xl font-bold text-kmnft-green neon-text">#1
+                                    </div>
+                                </div>
+                                <div id="modal-token-coord-container">
+                                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Coordinates
+                                    </div>
+                                    <div class="text-xl font-bold text-gray-300 font-mono">
+                                        X:<span id="modal-token-x">0</span> Y:<span id="modal-token-y">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total KSP</div>
+                                <div id="modal-token-points" class="text-3xl font-bold text-kmnft-gold font-mono">
+                                    0<span class="text-xs text-gray-500 ml-1">PT</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        <!-- Tap background to close -->
+        <div class="absolute inset-0 -z-10" onclick="closeTokenModal()"></div>
     </div>
 
     <!-- Map Modal -->
@@ -1347,6 +1395,10 @@ if (!$is_logged_in) {
                             $last4 = substr($holding->token_id, -4);
                             $image_url_large = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
 
+                            $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
+                            $pts = $token_ksp_data ? number_format($token_ksp_data->total_points) : '0';
+                            $rnk = ($token_ksp_data && $token_ksp_data->rank > 0) ? $token_ksp_data->rank : '';
+
                             // Tooltip Y Position
                             $tooltip_y_class = ($y > 32) ? 'top-full mt-2' : 'bottom-full mb-2';
 
@@ -1362,29 +1414,30 @@ if (!$is_logged_in) {
                                 $tooltip_x_class = 'left-1/2 -translate-x-1/2';
                             }
                             ?>
-                            <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
-                                style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;">
+                                    <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
+                                        style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
+                                        onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>')">
 
-                                <!-- Label (Last 4 Digits) -->
-                                <span
-                                    class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] md:text-[10px] text-white font-mono bg-black/50 px-1 rounded whitespace-nowrap pointer-events-none">
-                                    <?php echo esc_html($last4); ?>
-                                </span>
+                                        <!-- Label (Last 4 Digits) -->
+                                        <span
+                                            class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] md:text-[10px] text-white font-mono bg-black/50 px-1 rounded whitespace-nowrap pointer-events-none">
+                                            <?php echo esc_html($last4); ?>
+                                        </span>
 
-                                <!-- Tooltip -->
-                                <div
-                                    class="absolute <?php echo $tooltip_y_class . ' ' . $tooltip_x_class; ?> bg-black/90 border border-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 flex flex-col items-center shadow-xl">
-                                    <img src="<?php echo $image_url_large; ?>" alt="Asset"
-                                        class="w-16 h-16 object-cover rounded mb-1 bg-gray-800">
-                                    <div class="font-mono text-[10px] text-gray-300">ID:
-                                        <?php echo esc_html($holding->token_id); ?>
+                                        <!-- Tooltip -->
+                                        <div
+                                            class="absolute <?php echo $tooltip_y_class . ' ' . $tooltip_x_class; ?> bg-black/90 border border-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 flex flex-col items-center shadow-xl">
+                                            <img src="<?php echo $image_url_large; ?>" alt="Asset"
+                                                class="w-16 h-16 object-cover rounded mb-1 bg-gray-800">
+                                            <div class="font-mono text-[10px] text-gray-300">ID:
+                                                <?php echo esc_html($holding->token_id); ?>
+                                            </div>
+                                            <div class="font-mono text-[10px] text-kmnft-green whitespace-nowrap">(X:<?php echo $x; ?>,
+                                                Y:<?php echo $y; ?>)
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="font-mono text-[10px] text-kmnft-green whitespace-nowrap">(X:<?php echo $x; ?>,
-                                        Y:<?php echo $y; ?>)
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
+                            <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -1396,53 +1449,119 @@ if (!$is_logged_in) {
     </div>
 
     <script>
-        function openImageModal(url) {
-            const modal = document.getElementById('image-modal');
-            const img = document.getElementById('modal-image');
-            img.src = url;
+        <script>
+            const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
+            const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
+
+            function openTokenModal(tokenId, rank, points, x, y) {
+                document.getElementById('modal-token-id').textContent = '#' + tokenId;
+            document.getElementById('modal-token-rank').textContent = rank ? '#' + rank : '-';
+            document.getElementById('modal-token-points').innerHTML = (points || '0') + '<span class="text-xs text-gray-500 ml-1">PT</span>';
+
+            const coordContainer = document.getElementById('modal-token-coord-container');
+            if (x !== undefined && y !== undefined && x !== '' && y !== '') {
+                document.getElementById('modal-token-x').textContent = x;
+            document.getElementById('modal-token-y').textContent = y;
+            coordContainer.classList.remove('hidden');
+            } else {
+                coordContainer.classList.add('hidden');
+            }
+
+            const img = document.getElementById('modal-token-image');
+            img.src = imageBaseUrl + tokenId + '.png';
+            img.onerror = function () {
+                this.src = fallbackImage;
+            this.style.opacity = '0.5';
+            };
+
+            const modal = document.getElementById('token-modal');
             modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
         }
 
-        function closeImageModal() {
-            const modal = document.getElementById('image-modal');
+            function closeTokenModal() {
+            const modal = document.getElementById('token-modal');
             modal.classList.add('hidden');
-            document.body.style.overflow = 'auto'; // Restore scrolling
-            // Clear src after delay to avoid flicker if re-opened quickly
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+            // Clear src after delay
             setTimeout(() => {
-                document.getElementById('modal-image').src = '';
+                document.getElementById('modal-token-image').src = '';
             }, 200);
         }
 
-        function openMapModal() {
+            // Keep openImageModal for backward compatibility and general images
+            function openImageModal(url) {
+            // If it's a token image URL, try to extract ID and show as token
+            if (url.includes(imageBaseUrl)) {
+                const tokenId = url.replace(imageBaseUrl, '').replace('.png', '');
+            // We don't have rank/points here easily, but we can at least show the ID
+            openTokenModal(tokenId, '-', '0', '', '');
+            return;
+            }
+
+            // Otherwise, show as a simple image in the token modal but hide the info panel
+            const modal = document.getElementById('token-modal');
+            const img = document.getElementById('modal-token-image');
+            img.src = url;
+
+            // Hide the info section for non-token images
+            const infoSection = document.querySelector('#token-modal .md\\:w-2\\/5');
+            const imgSection = document.querySelector('#token-modal .md\\:w-3\\/5');
+            if (infoSection && imgSection) {
+                infoSection.classList.add('hidden');
+            imgSection.classList.remove('md:w-3/5');
+            imgSection.classList.add('w-full');
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+            // Modify closeTokenModal to restore layout
+            const originalCloseTokenModal = closeTokenModal;
+            closeTokenModal = function() {
+                originalCloseTokenModal();
+            const infoSection = document.querySelector('#token-modal .md\\:w-2\\/5');
+            const imgSection = document.querySelector('#token-modal .md\\:w-3\\/5');
+            if (infoSection && imgSection) {
+                infoSection.classList.remove('hidden');
+            imgSection.classList.add('md:w-3/5');
+            imgSection.classList.remove('w-full');
+            }
+        };
+
+            function openMapModal() {
             const modal = document.getElementById('map-modal');
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
 
-        function closeMapModal() {
+            function closeMapModal() {
             const modal = document.getElementById('map-modal');
             modal.classList.add('hidden');
             document.body.style.overflow = 'auto';
         }
 
-        // Close on Escape key
-        document.addEventListener('keydown', function (event) {
+            // Close on Escape key
+            document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 closeImageModal();
-                closeMapModal();
-                closePasswordModal();
+            closeMapModal();
+            closePasswordModal();
             }
         });
 
-        function toggleSection(contentId, iconId) {
+            function toggleSection(contentId, iconId) {
             const content = document.getElementById(contentId);
             const icon = document.getElementById(iconId);
             if (content) content.classList.toggle('hidden');
             if (icon) icon.classList.toggle('rotate-180');
         }
 
-        function showAllAssets() {
+            function showAllAssets() {
             const hiddenAssets = document.querySelectorAll('.asset-item.hidden-asset');
             hiddenAssets.forEach(el => {
                 el.classList.remove('hidden');
@@ -1453,12 +1572,12 @@ if (!$is_logged_in) {
             if (btnLess) btnLess.style.display = 'inline-block';
         }
 
-        function showLessAssets() {
+            function showLessAssets() {
             const allAssets = document.querySelectorAll('.asset-item');
             allAssets.forEach((el, index) => {
                 if (index >= 5) {
-                    el.classList.add('hidden');
-                    el.classList.add('hidden-asset'); // Ensure marker class is kept
+                el.classList.add('hidden');
+            el.classList.add('hidden-asset'); // Ensure marker class is kept
                 }
             });
             const btnMore = document.getElementById('show-more-assets');
@@ -1467,7 +1586,7 @@ if (!$is_logged_in) {
             if (btnLess) btnLess.style.display = 'none';
         }
 
-        function showAllMatches() {
+            function showAllMatches() {
             const hiddenMatches = document.querySelectorAll('.match-item.hidden-match');
             hiddenMatches.forEach(el => {
                 el.classList.remove('hidden');
@@ -1478,12 +1597,12 @@ if (!$is_logged_in) {
             if (btnLess) btnLess.style.display = 'inline-block';
         }
 
-        function showLessMatches() {
+            function showLessMatches() {
             const allMatches = document.querySelectorAll('.match-item');
             allMatches.forEach((el, index) => {
                 if (index >= 3) {
-                    el.classList.add('hidden');
-                    el.classList.add('hidden-match');
+                el.classList.add('hidden');
+            el.classList.add('hidden-match');
                 }
             });
             const btnMore = document.getElementById('show-more-matches');
@@ -1492,56 +1611,56 @@ if (!$is_logged_in) {
             if (btnLess) btnLess.style.display = 'none';
         }
 
-        function togglePrize(id) {
+            function togglePrize(id) {
             const el = document.getElementById('prize-memo-' + id);
             const icon = document.getElementById('prize-icon-' + id);
             if (el) el.classList.toggle('hidden');
             if (icon) icon.classList.toggle('rotate-180');
         }
 
-        function openPasswordModal() {
-            document.getElementById('password-modal').classList.remove('hidden');
+            function openPasswordModal() {
+                document.getElementById('password-modal').classList.remove('hidden');
         }
 
-        function closePasswordModal() {
-            document.getElementById('password-modal').classList.add('hidden');
+            function closePasswordModal() {
+                document.getElementById('password-modal').classList.add('hidden');
         }
 
-        // --- User Icon Upload ---
-        const dashboardNonce = "<?php echo wp_create_nonce('kmnft_dashboard_nonce'); ?>";
+            // --- User Icon Upload ---
+            const dashboardNonce = "<?php echo wp_create_nonce('kmnft_dashboard_nonce'); ?>";
 
-        function uploadUserIcon(input) {
+            function uploadUserIcon(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                const spinner = document.getElementById('avatar-spinner');
+            const spinner = document.getElementById('avatar-spinner');
 
-                // Show Spinner
-                spinner.classList.remove('hidden');
+            // Show Spinner
+            spinner.classList.remove('hidden');
 
-                const formData = new FormData();
-                formData.append('action', 'kmnft_upload_user_icon');
-                formData.append('file', file);
-                formData.append('nonce', dashboardNonce);
+            const formData = new FormData();
+            formData.append('action', 'kmnft_upload_user_icon');
+            formData.append('file', file);
+            formData.append('nonce', dashboardNonce);
 
-                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-                    method: 'POST',
-                    body: formData
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                method: 'POST',
+            body: formData
                 })
                     .then(response => response.json())
                     .then(data => {
-                        spinner.classList.add('hidden');
-                        if (data.success) {
-                            // Update Image
-                            document.getElementById('user-avatar-img').src = data.data.url;
+                spinner.classList.add('hidden');
+            if (data.success) {
+                // Update Image
+                document.getElementById('user-avatar-img').src = data.data.url;
                             // alert('Icon updated!');
                         } else {
-                            alert('Error: ' + (data.data.message || 'Upload failed'));
+                alert('Error: ' + (data.data.message || 'Upload failed'));
                         }
                     })
                     .catch(error => {
-                        spinner.classList.add('hidden');
-                        console.error('Error:', error);
-                        alert('Upload error occurred.');
+                spinner.classList.add('hidden');
+            console.error('Error:', error);
+            alert('Upload error occurred.');
                     });
             }
         }
@@ -1667,29 +1786,29 @@ if (!$is_logged_in) {
             const handleResize = () => {
                 // Only active on desktop (md breakpoint approx 768px)
                 if (window.innerWidth < 768) {
-                    sidebar.style.top = '';
-                    sidebar.style.bottom = '';
-                    return;
+                sidebar.style.top = '';
+            sidebar.style.bottom = '';
+            return;
                 }
 
-                const windowHeight = window.innerHeight;
-                const sidebarHeight = sidebar.scrollHeight;
-                const headerOffset = 96; // 6rem (top-24)
-                const bottomOffset = 24; // Margin from bottom
+            const windowHeight = window.innerHeight;
+            const sidebarHeight = sidebar.scrollHeight;
+            const headerOffset = 96; // 6rem (top-24)
+            const bottomOffset = 24; // Margin from bottom
 
-                // Always reset bottom to auto as we only control top
-                sidebar.style.bottom = 'auto';
+            // Always reset bottom to auto as we only control top
+            sidebar.style.bottom = 'auto';
 
                 if (sidebarHeight > (windowHeight - headerOffset)) {
                     // Sidebar is taller than viewport
                     // Calculate negative top so bottom sticks when scrolling down
                     // Formula: ViewportHeight - SidebarHeight - BottomMargin
                     const topValue = windowHeight - sidebarHeight - bottomOffset;
-                    sidebar.style.top = `${topValue}px`;
+            sidebar.style.top = `${topValue}px`;
                 } else {
-                    // Sidebar is shorter than viewport
-                    // Stick to top
-                    sidebar.style.top = `${headerOffset}px`;
+                // Sidebar is shorter than viewport
+                // Stick to top
+                sidebar.style.top = `${headerOffset}px`;
                 }
             };
 
