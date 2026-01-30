@@ -204,9 +204,7 @@ if (!$is_logged_in) {
 
 
         <!-- Left Col: Stats (4 cols) -->
-        <div
-            id="dashboard-sidebar"
-            class="md:col-span-4 space-y-6 md:sticky md:self-start">
+        <div id="dashboard-sidebar" class="md:col-span-4 space-y-6 md:sticky md:self-start">
             <!-- Project Logo Module -->
             <!-- Project Logo Module -->
             <div class="glass-card p-0 rounded-lg flex items-center justify-center relative overflow-hidden h-28">
@@ -254,50 +252,50 @@ if (!$is_logged_in) {
                 </div>
 
                 <?php if (!empty($ksp_by_season) && count($ksp_by_season) > 0): ?>
-                        <div class="mt-4 space-y-2">
-                            <?php
-                            // First item is typically the latest season due to ORDER BY season DESC
-                            $latest_season = $ksp_by_season[0];
-                            ?>
-                            <div class="flex justify-between items-center text-sm border-b border-white/10 pb-1">
-                                <span class="text-kmnft-green font-bold"><?php echo esc_html($latest_season->season); ?>
-                                    Season</span>
-                                <span class="text-white font-mono"><?php echo number_format($latest_season->total_points); ?>
-                                    pt</span>
-                            </div>
+                    <div class="mt-4 space-y-2">
+                        <?php
+                        // First item is typically the latest season due to ORDER BY season DESC
+                        $latest_season = $ksp_by_season[0];
+                        ?>
+                        <div class="flex justify-between items-center text-sm border-b border-white/10 pb-1">
+                            <span class="text-kmnft-green font-bold"><?php echo esc_html($latest_season->season); ?>
+                                Season</span>
+                            <span class="text-white font-mono"><?php echo number_format($latest_season->total_points); ?>
+                                pt</span>
+                        </div>
 
-                            <?php if (count($ksp_by_season) > 1): ?>
-                                    <details class="group/details">
-                                        <summary
-                                            class="cursor-pointer text-xs text-gray-500 hover:text-white transition flex items-center gap-1 list-none outline-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="h-3 w-3 transform group-open/details:rotate-90 transition" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 5l7 7-7 7" />
-                                            </svg>
-                                            Past Seasons
-                                        </summary>
-                                        <div class="mt-2 pl-4 space-y-1 border-l border-white/10 ml-1.5">
-                                            <?php for ($i = 1; $i < count($ksp_by_season); $i++):
-                                                $season_data = $ksp_by_season[$i];
-                                                ?>
-                                                    <div class="flex justify-between items-center text-xs">
-                                                        <span class="text-gray-400"><?php echo esc_html($season_data->season); ?></span>
-                                                        <span
-                                                            class="text-gray-300 font-mono"><?php echo number_format($season_data->total_points); ?>
-                                                            pt</span>
-                                                    </div>
-                                            <?php endfor; ?>
+                        <?php if (count($ksp_by_season) > 1): ?>
+                            <details class="group/details">
+                                <summary
+                                    class="cursor-pointer text-xs text-gray-500 hover:text-white transition flex items-center gap-1 list-none outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-3 w-3 transform group-open/details:rotate-90 transition" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
+                                    Past Seasons
+                                </summary>
+                                <div class="mt-2 pl-4 space-y-1 border-l border-white/10 ml-1.5">
+                                    <?php for ($i = 1; $i < count($ksp_by_season); $i++):
+                                        $season_data = $ksp_by_season[$i];
+                                        ?>
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="text-gray-400"><?php echo esc_html($season_data->season); ?></span>
+                                            <span
+                                                class="text-gray-300 font-mono"><?php echo number_format($season_data->total_points); ?>
+                                                pt</span>
                                         </div>
-                                    </details>
-                            <?php endif; ?>
-                        </div>
+                                    <?php endfor; ?>
+                                </div>
+                            </details>
+                        <?php endif; ?>
+                    </div>
                 <?php else: ?>
-                        <div class="text-xs text-kmnft-green mt-2 flex items-center">
-                            <span class="w-2 h-2 bg-kmnft-green rounded-full mr-2 animate-pulse"></span>
-                            ACTIVE
-                        </div>
+                    <div class="text-xs text-kmnft-green mt-2 flex items-center">
+                        <span class="w-2 h-2 bg-kmnft-green rounded-full mr-2 animate-pulse"></span>
+                        ACTIVE
+                    </div>
                 <?php endif; ?>
             </div>
 
@@ -326,34 +324,34 @@ if (!$is_logged_in) {
                 ?>
                 <div class="absolute top-6 right-6 group">
                     <?php if ($is_logged_in): ?>
-                            <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-kmnft-gold cursor-pointer relative"
-                                onclick="document.getElementById('user-icon-input').click()">
-                                <img id="user-avatar-img" src="<?php echo esc_url($avatar_url); ?>" alt="User Avatar"
-                                    class="w-full h-full object-cover">
-                                <div
-                                    class="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-[8px] text-white text-center">
-                                    CHANGE
-                                </div>
+                        <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-kmnft-gold cursor-pointer relative"
+                            onclick="document.getElementById('user-icon-input').click()">
+                            <img id="user-avatar-img" src="<?php echo esc_url($avatar_url); ?>" alt="User Avatar"
+                                class="w-full h-full object-cover">
+                            <div
+                                class="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-[8px] text-white text-center">
+                                CHANGE
                             </div>
-                            <!-- Spinner -->
-                            <div id="avatar-spinner"
-                                class="hidden absolute top-0 left-0 w-16 h-16 rounded-full bg-black/60 flex items-center justify-center">
-                                <svg class="animate-spin h-6 w-6 text-kmnft-green" xmlns="http://www.w3.org/2000/svg"
-                                    fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                                    </circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <input type="file" id="user-icon-input" class="hidden" accept="image/png, image/jpeg"
-                                onchange="uploadUserIcon(this)">
+                        </div>
+                        <!-- Spinner -->
+                        <div id="avatar-spinner"
+                            class="hidden absolute top-0 left-0 w-16 h-16 rounded-full bg-black/60 flex items-center justify-center">
+                            <svg class="animate-spin h-6 w-6 text-kmnft-green" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                                </circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                        </div>
+                        <input type="file" id="user-icon-input" class="hidden" accept="image/png, image/jpeg"
+                            onchange="uploadUserIcon(this)">
                     <?php else: ?>
-                            <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-600 relative">
-                                <img src="<?php echo esc_url($avatar_url); ?>" alt="Guest Avatar"
-                                    class="w-full h-full object-cover opacity-50">
-                            </div>
+                        <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-600 relative">
+                            <img src="<?php echo esc_url($avatar_url); ?>" alt="Guest Avatar"
+                                class="w-full h-full object-cover opacity-50">
+                        </div>
                     <?php endif; ?>
                 </div>
 
@@ -374,16 +372,16 @@ if (!$is_logged_in) {
                     <div>
                         <div class="text-xs text-gray-400">Registered ID</div>
                         <?php if ($is_logged_in): ?>
-                                <div class="text-sm font-mono">
-                                    <?php echo esc_html($current_user->user_email); ?>
-                                </div>
-                                <button onclick="openPasswordModal()"
-                                    class="mt-2 text-[10px] text-gray-500 hover:text-white underline transition">
-                                    Change Password
-                                </button>
+                            <div class="text-sm font-mono">
+                                <?php echo esc_html($current_user->user_email); ?>
+                            </div>
+                            <button onclick="openPasswordModal()"
+                                class="mt-2 text-[10px] text-gray-500 hover:text-white underline transition">
+                                Change Password
+                            </button>
                         <?php else: ?>
-                                <a href="<?php echo home_url('/login'); ?>"
-                                    class="inline-block mt-1 px-3 py-1 bg-kmnft-green text-black text-xs font-bold rounded hover:bg-white transition">LOGIN</a>
+                            <a href="<?php echo home_url('/login'); ?>"
+                                class="inline-block mt-1 px-3 py-1 bg-kmnft-green text-black text-xs font-bold rounded hover:bg-white transition">LOGIN</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -415,21 +413,21 @@ if (!$is_logged_in) {
 
                         <!-- Plots -->
                         <?php foreach ($holdings as $holding): ?>
-                                <?php if (is_numeric($holding->zone_x) && is_numeric($holding->zone_y)): ?>
-                                        <?php
-                                        // Clamp values (0-120, 0-64)
-                                        $x = max(0, min(120, floatval($holding->zone_x)));
-                                        $y = max(0, min(64, floatval($holding->zone_y)));
+                            <?php if (is_numeric($holding->zone_x) && is_numeric($holding->zone_y)): ?>
+                                <?php
+                                // Clamp values (0-120, 0-64)
+                                $x = max(0, min(120, floatval($holding->zone_x)));
+                                $y = max(0, min(64, floatval($holding->zone_y)));
 
-                                        // Map directly to percentage
-                                        $left = ($x / 120) * 100;
-                                        $bottom = ($y / 64) * 100;
-                                        ?>
-                                        <div class="absolute w-1.5 h-1.5 bg-kmnft-gold rounded-full shadow-[0_0_4px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2"
-                                            style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
-                                            title="ID: <?php echo esc_attr($holding->token_id); ?> (X:<?php echo $x; ?>, Y:<?php echo $y; ?>)">
-                                        </div>
-                                <?php endif; ?>
+                                // Map directly to percentage
+                                $left = ($x / 120) * 100;
+                                $bottom = ($y / 64) * 100;
+                                ?>
+                                <div class="absolute w-1.5 h-1.5 bg-kmnft-gold rounded-full shadow-[0_0_4px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2"
+                                    style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
+                                    title="ID: <?php echo esc_attr($holding->token_id); ?> (X:<?php echo $x; ?>, Y:<?php echo $y; ?>)">
+                                </div>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -445,219 +443,219 @@ if (!$is_logged_in) {
 
             <!-- NFT Gallery Section -->
             <?php if (!$is_logged_in): ?>
-                    <div class="glass-card p-4 rounded-lg mb-6 relative overflow-hidden group">
-                        <div class="flex items-center justify-between mb-4 px-2">
-                            <h3 class="text-sm font-bold text-gray-300 flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-kmnft-green" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                NFT GALLERY
-                            </h3>
-                            <div class="flex items-center gap-2">
-                                <a href="<?php echo home_url('/nft-gallery'); ?>"
-                                    class="text-[10px] text-gray-400 hover:text-white transition flex items-center gap-1 group/link">
-                                    VIEW ALL
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-3 w-3 transform group-hover/link:translate-x-0.5 transition" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
-                                </a>
-                                <span
-                                    class="text-[10px] text-gray-500 bg-gray-900 px-2 py-0.5 rounded border border-gray-700">LIVE</span>
-                            </div>
-                        </div>
-
-                        <div class="marquee-mask w-full overflow-hidden relative">
-                            <div class="marquee-track py-2">
-                                <?php foreach ($gallery_loop as $g_token):
-                                    $g_original_url = KMNFT_IMAGE_BASE_URL . esc_attr($g_token) . '.png';
-                                    // Use cached thumbnail for display
-                                    $g_thumb_url = function_exists('kmnft_get_remote_thumbnail') ? kmnft_get_remote_thumbnail($g_original_url, $g_token) : $g_original_url;
-                                    ?>
-                                        <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer relative group/item"
-                                            onclick="openImageModal('<?php echo $g_original_url; ?>')">
-                                            <img src="<?php echo $g_thumb_url; ?>" alt="Token <?php echo esc_attr($g_token); ?>"
-                                                class="w-full h-full object-cover opacity-80 group-hover/item:opacity-100 transition duration-300"
-                                                loading="lazy"
-                                                onerror="this.src='<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';this.style.opacity='0.5';">
-                                            <div
-                                                class="absolute bottom-0 inset-x-0 bg-black/60 p-1 text-center translate-y-full group-hover/item:translate-y-0 transition duration-300">
-                                                <span class="text-[8px] font-mono text-white">#<?php echo esc_html($g_token); ?></span>
-                                            </div>
-                                        </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
-            <?php endif; ?>
-
-            <!-- My Seat / Holdings -->
-            <?php if ($is_logged_in): ?>
-                    <div class="glass-card p-6 rounded-lg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h2
-                                class="text-lg font-bold text-white tracking-wide border-b border-kmnft-green pb-1 inline-block">
-                                OWNED ASSETS</h2>
-                            <span class="text-xs text-gray-500">
-                                <?php echo count($holdings); ?> ASSETS
-                            </span>
-                        </div>
-
-                        <?php if ($holdings): ?>
-                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="asset-grid">
-                                    <?php foreach ($holdings as $index => $holding): ?>
-                                            <?php
-                                            $is_hidden = $index >= 5 ? 'hidden hidden-asset' : '';
-                                            $image_url = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
-                                            ?>
-                                            <div class="asset-item group relative glass-card rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer <?php echo $is_hidden; ?>"
-                                                onclick="openImageModal('<?php echo $image_url; ?>')">
-                                                <!-- Image -->
-                                                <div class="aspect-square w-full bg-gray-900 relative">
-                                                    <img src="<?php echo $image_url; ?>" alt="Asset <?php echo esc_attr($holding->token_id); ?>"
-                                                        class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500"
-                                                        loading="lazy">
-                                                    <div
-                                                        class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-100">
-                                                    </div>
-                                                </div>
-
-                                                <!-- Overlay Info -->
-                                                <div class="absolute bottom-0 left-0 w-full p-3">
-                                                    <div class="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">Token ID</div>
-                                                    <div class="text-xs font-mono text-kmnft-green truncate">
-                                                        <?php echo esc_html($holding->token_id); ?>
-                                                    </div>
-                                                    <?php if (!empty($holding->zone_x) && !empty($holding->zone_y)): ?>
-                                                            <div class="flex items-center mt-1 space-x-2">
-                                                                <span
-                                                                    class="text-[10px] text-gray-500 bg-gray-900 px-1 rounded border border-gray-700">X:<?php echo esc_html($holding->zone_x); ?></span>
-                                                                <span
-                                                                    class="text-[10px] text-gray-500 bg-gray-900 px-1 rounded border border-gray-700">Y:<?php echo esc_html($holding->zone_y); ?></span>
-                                                            </div>
-                                                    <?php elseif (!empty($holding->zone_code)): ?>
-                                                            <div
-                                                                class="mt-1 text-[10px] text-gray-500 bg-gray-900 px-1 rounded border border-gray-700 inline-block">
-                                                                <?php echo esc_html($holding->zone_code); ?>
-                                                            </div>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                    <?php endforeach; ?>
-                                </div>
-
-                                <?php if (count($holdings) > 5): ?>
-                                        <div class="text-center mt-6">
-                                            <button id="show-more-assets" onclick="showAllAssets()"
-                                                class="px-6 py-2 bg-kmnft-navy border border-gray-700 hover:border-kmnft-green text-xs text-gray-300 hover:text-kmnft-green rounded transition uppercase tracking-wider">
-                                                Show More
-                                            </button>
-                                            <button id="show-less-assets" onclick="showLessAssets()" style="display:none;"
-                                                class="px-6 py-2 bg-kmnft-navy border border-gray-700 hover:border-red-500 text-xs text-gray-300 hover:text-red-500 rounded transition uppercase tracking-wider">
-                                                Show Less
-                                            </button>
-                                        </div>
-                                <?php endif; ?>
-
-                        <?php else: ?>
-                                <div class="text-center py-10 text-gray-500 text-sm">
-                                    No Assets Found. Please contact admin.
-                                </div>
-                        <?php endif; ?>
-                        <div class="mt-8 text-center">
-                            <a href="https://kamakura-stadium-nft.com/" target="_blank"
-                                class="inline-flex items-center gap-2 px-6 py-2 border border-kmnft-green/50 text-kmnft-green text-xs font-bold rounded hover:bg-kmnft-green hover:text-black transition duration-200 group uppercase tracking-wider">
-                                <span>アセットを追加購入</span>
+                <div class="glass-card p-4 rounded-lg mb-6 relative overflow-hidden group">
+                    <div class="flex items-center justify-between mb-4 px-2">
+                        <h3 class="text-sm font-bold text-gray-300 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-kmnft-green" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            NFT GALLERY
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <a href="<?php echo home_url('/nft-gallery'); ?>"
+                                class="text-[10px] text-gray-400 hover:text-white transition flex items-center gap-1 group/link">
+                                VIEW ALL
                                 <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-3 w-3 transform group-hover:translate-x-1 transition" fill="none"
+                                    class="h-3 w-3 transform group-hover/link:translate-x-0.5 transition" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                 </svg>
                             </a>
-                            <p class="text-[10px] text-gray-500 mt-2">公式ストアへ移動します</p>
+                            <span
+                                class="text-[10px] text-gray-500 bg-gray-900 px-2 py-0.5 rounded border border-gray-700">LIVE</span>
                         </div>
                     </div>
+
+                    <div class="marquee-mask w-full overflow-hidden relative">
+                        <div class="marquee-track py-2">
+                            <?php foreach ($gallery_loop as $g_token):
+                                $g_original_url = KMNFT_IMAGE_BASE_URL . esc_attr($g_token) . '.png';
+                                // Use cached thumbnail for display
+                                $g_thumb_url = function_exists('kmnft_get_remote_thumbnail') ? kmnft_get_remote_thumbnail($g_original_url, $g_token) : $g_original_url;
+                                ?>
+                                <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer relative group/item"
+                                    onclick="openImageModal('<?php echo $g_original_url; ?>')">
+                                    <img src="<?php echo $g_thumb_url; ?>" alt="Token <?php echo esc_attr($g_token); ?>"
+                                        class="w-full h-full object-cover opacity-80 group-hover/item:opacity-100 transition duration-300"
+                                        loading="lazy"
+                                        onerror="this.src='<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';this.style.opacity='0.5';">
+                                    <div
+                                        class="absolute bottom-0 inset-x-0 bg-black/60 p-1 text-center translate-y-full group-hover/item:translate-y-0 transition duration-300">
+                                        <span class="text-[8px] font-mono text-white">#<?php echo esc_html($g_token); ?></span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- My Seat / Holdings -->
+            <?php if ($is_logged_in): ?>
+                <div class="glass-card p-6 rounded-lg">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2
+                            class="text-lg font-bold text-white tracking-wide border-b border-kmnft-green pb-1 inline-block">
+                            OWNED ASSETS</h2>
+                        <span class="text-xs text-gray-500">
+                            <?php echo count($holdings); ?> ASSETS
+                        </span>
+                    </div>
+
+                    <?php if ($holdings): ?>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="asset-grid">
+                            <?php foreach ($holdings as $index => $holding): ?>
+                                <?php
+                                $is_hidden = $index >= 5 ? 'hidden hidden-asset' : '';
+                                $image_url = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
+                                ?>
+                                <div class="asset-item group relative glass-card rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer <?php echo $is_hidden; ?>"
+                                    onclick="openImageModal('<?php echo $image_url; ?>')">
+                                    <!-- Image -->
+                                    <div class="aspect-square w-full bg-gray-900 relative">
+                                        <img src="<?php echo $image_url; ?>" alt="Asset <?php echo esc_attr($holding->token_id); ?>"
+                                            class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500"
+                                            loading="lazy">
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-100">
+                                        </div>
+                                    </div>
+
+                                    <!-- Overlay Info -->
+                                    <div class="absolute bottom-0 left-0 w-full p-3">
+                                        <div class="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">Token ID</div>
+                                        <div class="text-xs font-mono text-kmnft-green truncate">
+                                            <?php echo esc_html($holding->token_id); ?>
+                                        </div>
+                                        <?php if (!empty($holding->zone_x) && !empty($holding->zone_y)): ?>
+                                            <div class="flex items-center mt-1 space-x-2">
+                                                <span
+                                                    class="text-[10px] text-gray-500 bg-gray-900 px-1 rounded border border-gray-700">X:<?php echo esc_html($holding->zone_x); ?></span>
+                                                <span
+                                                    class="text-[10px] text-gray-500 bg-gray-900 px-1 rounded border border-gray-700">Y:<?php echo esc_html($holding->zone_y); ?></span>
+                                            </div>
+                                        <?php elseif (!empty($holding->zone_code)): ?>
+                                            <div
+                                                class="mt-1 text-[10px] text-gray-500 bg-gray-900 px-1 rounded border border-gray-700 inline-block">
+                                                <?php echo esc_html($holding->zone_code); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <?php if (count($holdings) > 5): ?>
+                            <div class="text-center mt-6">
+                                <button id="show-more-assets" onclick="showAllAssets()"
+                                    class="px-6 py-2 bg-kmnft-navy border border-gray-700 hover:border-kmnft-green text-xs text-gray-300 hover:text-kmnft-green rounded transition uppercase tracking-wider">
+                                    Show More
+                                </button>
+                                <button id="show-less-assets" onclick="showLessAssets()" style="display:none;"
+                                    class="px-6 py-2 bg-kmnft-navy border border-gray-700 hover:border-red-500 text-xs text-gray-300 hover:text-red-500 rounded transition uppercase tracking-wider">
+                                    Show Less
+                                </button>
+                            </div>
+                        <?php endif; ?>
+
+                    <?php else: ?>
+                        <div class="text-center py-10 text-gray-500 text-sm">
+                            No Assets Found. Please contact admin.
+                        </div>
+                    <?php endif; ?>
+                    <div class="mt-8 text-center">
+                        <a href="https://kamakura-stadium-nft.com/" target="_blank"
+                            class="inline-flex items-center gap-2 px-6 py-2 border border-kmnft-green/50 text-kmnft-green text-xs font-bold rounded hover:bg-kmnft-green hover:text-black transition duration-200 group uppercase tracking-wider">
+                            <span>アセットを追加購入</span>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-3 w-3 transform group-hover:translate-x-1 transition" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                        <p class="text-[10px] text-gray-500 mt-2">公式ストアへ移動します</p>
+                    </div>
+                </div>
             <?php endif; ?>
 
 
 
             <!-- Match Highlights -->
             <?php if ($match_results): ?>
-                    <div class="glass-card p-6 rounded-lg mb-6">
-                        <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
-                            <h3 class="text-sm font-bold text-gray-300">LATEST MATCH RESULTS</h3>
-                            <button onclick="toggleSection('latest-matches-content', 'matches-toggle-icon')"
-                                class="text-gray-400 hover:text-white transition">
-                                <svg id="matches-toggle-icon" xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div id="latest-matches-content">
-                            <div class="space-y-6">
-                                <?php foreach ($match_results as $index => $match): ?>
-                                        <?php
-                                        $is_hidden_match = $index >= 3 ? 'hidden hidden-match' : '';
+                <div class="glass-card p-6 rounded-lg mb-6">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                        <h3 class="text-sm font-bold text-gray-300">LATEST MATCH RESULTS</h3>
+                        <button onclick="toggleSection('latest-matches-content', 'matches-toggle-icon')"
+                            class="text-gray-400 hover:text-white transition">
+                            <svg id="matches-toggle-icon" xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="latest-matches-content">
+                        <div class="space-y-6">
+                            <?php foreach ($match_results as $index => $match): ?>
+                                <?php
+                                $is_hidden_match = $index >= 3 ? 'hidden hidden-match' : '';
 
-                                        $win_status = intval($match->is_win);
-                                        if ($win_status === 1) {
-                                            // WIN
-                                            $bgColor = 'bg-green-900/20';
-                                            $borderColor = 'border-kmnft-green/30';
-                                            $resultText = 'WIN';
-                                            $resultTextColor = 'text-kmnft-green';
-                                        } elseif ($win_status === 2) {
-                                            // DRAW
-                                            $bgColor = 'bg-gray-800/40';
-                                            $borderColor = 'border-gray-600';
-                                            $resultText = 'DRAW';
-                                            $resultTextColor = 'text-gray-300';
-                                        } else {
-                                            // LOSE
-                                            $bgColor = 'bg-gray-800/40';
-                                            $borderColor = 'border-gray-700';
-                                            $resultText = 'LOSE';
-                                            $resultTextColor = 'text-red-500';
-                                        }
+                                $win_status = intval($match->is_win);
+                                if ($win_status === 1) {
+                                    // WIN
+                                    $bgColor = 'bg-green-900/20';
+                                    $borderColor = 'border-kmnft-green/30';
+                                    $resultText = 'WIN';
+                                    $resultTextColor = 'text-kmnft-green';
+                                } elseif ($win_status === 2) {
+                                    // DRAW
+                                    $bgColor = 'bg-gray-800/40';
+                                    $borderColor = 'border-gray-600';
+                                    $resultText = 'DRAW';
+                                    $resultTextColor = 'text-gray-300';
+                                } else {
+                                    // LOSE
+                                    $bgColor = 'bg-gray-800/40';
+                                    $borderColor = 'border-gray-700';
+                                    $resultText = 'LOSE';
+                                    $resultTextColor = 'text-red-500';
+                                }
 
-                                        // Parse Token IDs
-                                        $goal_tokens = explode(',', $match->goal_token_ids);
-                                        $goal_tokens = array_map('trim', $goal_tokens);
-                                        $goal_tokens = array_filter($goal_tokens);
-                                        ?>
-                                        <div
-                                            class="match-item <?php echo $is_hidden_match; ?> <?php echo $bgColor; ?> border <?php echo $borderColor; ?> rounded p-4">
-                                            <div class="flex justify-between items-center mb-3">
-                                                <div class="text-xs text-gray-400 font-mono">
-                                                    <?php if (!empty($match->section_label)): ?>
-                                                            <span
-                                                                class="mr-2 text-kmnft-gold"><?php echo esc_html($match->section_label); ?></span>
-                                                    <?php endif; ?>
-                                                    <?php echo esc_html($match->match_date); ?>
-                                                </div>
-                                                <div class="text-sm font-bold <?php echo $resultTextColor; ?>">
-                                                    <?php echo $resultText; ?>
-                                                    <?php echo esc_html($match->result_score); ?>
-                                                </div>
+                                // Parse Token IDs
+                                $goal_tokens = explode(',', $match->goal_token_ids);
+                                $goal_tokens = array_map('trim', $goal_tokens);
+                                $goal_tokens = array_filter($goal_tokens);
+                                ?>
+                                <div
+                                    class="match-item <?php echo $is_hidden_match; ?> <?php echo $bgColor; ?> border <?php echo $borderColor; ?> rounded p-4">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div class="text-xs text-gray-400 font-mono">
+                                            <?php if (!empty($match->section_label)): ?>
+                                                <span
+                                                    class="mr-2 text-kmnft-gold"><?php echo esc_html($match->section_label); ?></span>
+                                            <?php endif; ?>
+                                            <?php echo esc_html($match->match_date); ?>
+                                        </div>
+                                        <div class="text-sm font-bold <?php echo $resultTextColor; ?>">
+                                            <?php echo $resultText; ?>
+                                            <?php echo esc_html($match->result_score); ?>
+                                        </div>
+                                    </div>
+                                    <!-- Header Row for Alignment -->
+                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-2">
+                                        <div class="md:col-span-4">
+                                            <div class="text-sm text-white font-bold">VS
+                                                <?php echo esc_html($match->opponent); ?>
                                             </div>
-                                            <!-- Header Row for Alignment -->
-                                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-2">
-                                                <div class="md:col-span-4">
-                                                    <div class="text-sm text-white font-bold">VS
-                                                        <?php echo esc_html($match->opponent); ?>
-                                                    </div>
-                                                </div>
-                                                <div class="md:col-span-8 hidden md:block">
-                                                    <h4 class="text-xs font-bold text-gray-400">GOAL SCENES</h4>
-                                                </div>
-                                                <!-- Mobile only: Goal scenes title usually appears above images, but here we want to enforce structure using grid. 
+                                        </div>
+                                        <div class="md:col-span-8 hidden md:block">
+                                            <h4 class="text-xs font-bold text-gray-400">GOAL SCENES</h4>
+                                        </div>
+                                        <!-- Mobile only: Goal scenes title usually appears above images, but here we want to enforce structure using grid. 
                                              If on mobile we want standard flow: VS -> Map -> Goal Scenes Title -> Images.
                                              The grid above puts VS and Goal Scenes Title in one row on desktop.
                                              On mobile (grid-cols-1), it would be VS -> Goal Scenes Title -> Map -> Images.
@@ -701,129 +699,129 @@ if (!$is_logged_in) {
                                              Where does the "GOAL SCENES" title go on mobile?
                                              I should add it back in the Images column but `md:hidden`.
                                         -->
-                                            </div>
+                                    </div>
 
-                                            <!-- Layout: Map + Images -->
-                                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                                                <!-- Mini Map Column (approx 33%) -->
-                                                <div class="md:col-span-4">
-                                                    <div class="w-full bg-[#1a4023] rounded p-1.5 border border-white/10">
-                                                        <div class="relative w-full h-full" style="aspect-ratio: 120/64;">
-                                                            <!-- Field Boundary -->
-                                                            <div
-                                                                class="absolute inset-0 border border-white/30 pointer-events-none z-0 rounded-sm">
-                                                            </div>
-
-                                                            <img src="<?php echo get_template_directory_uri(); ?>/assets/images/ground_map.png"
-                                                                alt="Ground Map"
-                                                                class="w-full h-full object-cover opacity-60 relative z-0 rounded-sm">
-
-                                                            <!-- Goal Plots -->
-                                                            <?php foreach ($goal_tokens as $i => $token_id): ?>
-                                                                    <?php
-                                                                    // Lookup coordinates
-                                                                    $coord_query = $wpdb->prepare("SELECT zone_x, zone_y FROM {$wpdb->prefix}kmnft_holdings WHERE token_id = %s", $token_id);
-                                                                    $coord = $wpdb->get_row($coord_query);
-
-                                                                    if ($coord && is_numeric($coord->zone_x) && is_numeric($coord->zone_y)) {
-                                                                        $x = max(0, min(120, floatval($coord->zone_x)));
-                                                                        $y = max(0, min(64, floatval($coord->zone_y)));
-
-                                                                        $left = ($x / 120) * 100;
-                                                                        $bottom = ($y / 64) * 100;
-
-                                                                        $seq = $i + 1;
-                                                                        ?>
-                                                                            <div class="absolute w-4 h-4 bg-red-500 rounded-full border border-white flex items-center justify-center text-[8px] text-white font-bold z-10 -translate-x-1/2 translate-y-1/2 shadow-lg hover:scale-125 transition"
-                                                                                style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
-                                                                                title="Goal <?php echo $seq; ?> (ID: <?php echo esc_attr($token_id); ?>)">
-                                                                                <?php echo $seq; ?>
-                                                                            </div>
-                                                                            <?php
-                                                                    }
-                                                                    ?>
-                                                            <?php endforeach; ?>
-                                                        </div>
+                                    <!-- Layout: Map + Images -->
+                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                        <!-- Mini Map Column (approx 33%) -->
+                                        <div class="md:col-span-4">
+                                            <div class="w-full bg-[#1a4023] rounded p-1.5 border border-white/10">
+                                                <div class="relative w-full h-full" style="aspect-ratio: 120/64;">
+                                                    <!-- Field Boundary -->
+                                                    <div
+                                                        class="absolute inset-0 border border-white/30 pointer-events-none z-0 rounded-sm">
                                                     </div>
-                                                </div>
 
-                                                <!-- Goal Images Column (approx 67%) -->
-                                                <div class="md:col-span-8">
-                                                    <h4 class="text-xs font-bold text-gray-400 mb-2 md:hidden">GOAL SCENES</h4>
-                                                    <div class="grid grid-cols-2 gap-2">
+                                                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/ground_map.png"
+                                                        alt="Ground Map"
+                                                        class="w-full h-full object-cover opacity-60 relative z-0 rounded-sm">
+
+                                                    <!-- Goal Plots -->
+                                                    <?php foreach ($goal_tokens as $i => $token_id): ?>
                                                         <?php
-                                                        $img_urls = array_filter(explode(',', $match->goal_images));
-                                                        $total_imgs = count($img_urls);
-                                                        $display_limit = 4;
+                                                        // Lookup coordinates
+                                                        $coord_query = $wpdb->prepare("SELECT zone_x, zone_y FROM {$wpdb->prefix}kmnft_holdings WHERE token_id = %s", $token_id);
+                                                        $coord = $wpdb->get_row($coord_query);
+
+                                                        if ($coord && is_numeric($coord->zone_x) && is_numeric($coord->zone_y)) {
+                                                            $x = max(0, min(120, floatval($coord->zone_x)));
+                                                            $y = max(0, min(64, floatval($coord->zone_y)));
+
+                                                            $left = ($x / 120) * 100;
+                                                            $bottom = ($y / 64) * 100;
+
+                                                            $seq = $i + 1;
+                                                            ?>
+                                                            <div class="absolute w-4 h-4 bg-red-500 rounded-full border border-white flex items-center justify-center text-[8px] text-white font-bold z-10 -translate-x-1/2 translate-y-1/2 shadow-lg hover:scale-125 transition"
+                                                                style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
+                                                                title="Goal <?php echo $seq; ?> (ID: <?php echo esc_attr($token_id); ?>)">
+                                                                <?php echo $seq; ?>
+                                                            </div>
+                                                            <?php
+                                                        }
                                                         ?>
-                                                        <?php foreach ($img_urls as $idx => $url): ?>
-                                                                <?php $is_hidden = $idx >= $display_limit; ?>
-                                                                <div
-                                                                    class="relative group aspect-video rounded overflow-hidden border border-white/10 <?php echo $is_hidden ? 'hidden extra-images-' . $match->id : ''; ?>">
-                                                                    <!-- Sequence Number Badge -->
-                                                                    <div
-                                                                        class="absolute top-1 left-1 w-4 h-4 bg-red-500 rounded-full border border-white flex items-center justify-center text-[9px] text-white font-bold z-10 shadow-md pointer-events-none">
-                                                                        <?php echo $idx + 1; ?>
-                                                                    </div>
-                                                                    <img src="<?php echo esc_url(trim($url)); ?>"
-                                                                        class="w-full h-full object-cover cursor-pointer hover:scale-110 transition duration-500"
-                                                                        onclick="openImageModal(this.src)" alt="Goal Scene">
-                                                                </div>
-                                                        <?php endforeach; ?>
-                                                    </div>
-                                                    <?php if ($total_imgs > $display_limit): ?>
-                                                            <button
-                                                                onclick="document.querySelectorAll('.extra-images-<?php echo $match->id; ?>').forEach(el => el.classList.remove('hidden')); this.style.display='none';"
-                                                                class="text-[10px] text-kmnft-green hover:underline mt-2">
-                                                                + Show <?php echo $total_imgs - $display_limit; ?> More
-                                                            </button>
-                                                    <?php endif; ?>
-                                                    <?php if ($total_imgs === 0): ?>
-                                                            <p class="text-[10px] text-gray-500 italic">None</p>
-                                                    <?php endif; ?>
+                                                    <?php endforeach; ?>
                                                 </div>
                                             </div>
+                                        </div>
 
-                                            <!-- Shoot Zone Prize Toggle & Content -->
-                                            <?php if (!empty($match->shoot_prize_memo)): ?>
-                                                    <div class="flex justify-end mt-2 relative z-20">
-                                                        <button onclick="togglePrize('<?php echo $match->id; ?>')"
-                                                            class="text-[10px] text-kmnft-green hover:text-white border border-kmnft-green/50 hover:bg-kmnft-green/10 px-3 py-1 rounded transition flex items-center gap-1">
-                                                            <span>SHOOT ZONE PRIZE</span>
-                                                            <svg id="prize-icon-<?php echo $match->id; ?>" xmlns="http://www.w3.org/2000/svg"
-                                                                class="h-3 w-3 transform transition-transform duration-300" fill="none"
-                                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                    d="M19 9l-7 7-7-7" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-
-                                                    <div id="prize-memo-<?php echo $match->id; ?>"
-                                                        class="hidden mt-2 pt-2 border-t border-gray-700/50">
-                                                        <div class="text-xs text-gray-300 font-mono leading-relaxed bg-black/20 p-3 rounded">
-                                                            <?php echo nl2br(esc_html($match->shoot_prize_memo)); ?>
+                                        <!-- Goal Images Column (approx 67%) -->
+                                        <div class="md:col-span-8">
+                                            <h4 class="text-xs font-bold text-gray-400 mb-2 md:hidden">GOAL SCENES</h4>
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <?php
+                                                $img_urls = array_filter(explode(',', $match->goal_images));
+                                                $total_imgs = count($img_urls);
+                                                $display_limit = 4;
+                                                ?>
+                                                <?php foreach ($img_urls as $idx => $url): ?>
+                                                    <?php $is_hidden = $idx >= $display_limit; ?>
+                                                    <div
+                                                        class="relative group aspect-video rounded overflow-hidden border border-white/10 <?php echo $is_hidden ? 'hidden extra-images-' . $match->id : ''; ?>">
+                                                        <!-- Sequence Number Badge -->
+                                                        <div
+                                                            class="absolute top-1 left-1 w-4 h-4 bg-red-500 rounded-full border border-white flex items-center justify-center text-[9px] text-white font-bold z-10 shadow-md pointer-events-none">
+                                                            <?php echo $idx + 1; ?>
                                                         </div>
+                                                        <img src="<?php echo esc_url(trim($url)); ?>"
+                                                            class="w-full h-full object-cover cursor-pointer hover:scale-110 transition duration-500"
+                                                            onclick="openImageModal(this.src)" alt="Goal Scene">
                                                     </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                            <?php if ($total_imgs > $display_limit): ?>
+                                                <button
+                                                    onclick="document.querySelectorAll('.extra-images-<?php echo $match->id; ?>').forEach(el => el.classList.remove('hidden')); this.style.display='none';"
+                                                    class="text-[10px] text-kmnft-green hover:underline mt-2">
+                                                    + Show <?php echo $total_imgs - $display_limit; ?> More
+                                                </button>
+                                            <?php endif; ?>
+                                            <?php if ($total_imgs === 0): ?>
+                                                <p class="text-[10px] text-gray-500 italic">None</p>
                                             <?php endif; ?>
                                         </div>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <?php if (count($match_results) > 3): ?>
-                                    <div class="text-center mt-4">
-                                        <button id="show-more-matches" onclick="showAllMatches()"
-                                            class="text-xs text-kmnft-green hover:text-white underline transition">
-                                            Show All Matches
-                                        </button>
-                                        <button id="show-less-matches" onclick="showLessMatches()" style="display:none;"
-                                            class="text-xs text-red-400 hover:text-white underline transition">
-                                            Show Less Matches
-                                        </button>
                                     </div>
-                            <?php endif; ?>
+
+                                    <!-- Shoot Zone Prize Toggle & Content -->
+                                    <?php if (!empty($match->shoot_prize_memo)): ?>
+                                        <div class="flex justify-end mt-2 relative z-20">
+                                            <button onclick="togglePrize('<?php echo $match->id; ?>')"
+                                                class="text-[10px] text-kmnft-green hover:text-white border border-kmnft-green/50 hover:bg-kmnft-green/10 px-3 py-1 rounded transition flex items-center gap-1">
+                                                <span>SHOOT ZONE PRIZE</span>
+                                                <svg id="prize-icon-<?php echo $match->id; ?>" xmlns="http://www.w3.org/2000/svg"
+                                                    class="h-3 w-3 transform transition-transform duration-300" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div id="prize-memo-<?php echo $match->id; ?>"
+                                            class="hidden mt-2 pt-2 border-t border-gray-700/50">
+                                            <div class="text-xs text-gray-300 font-mono leading-relaxed bg-black/20 p-3 rounded">
+                                                <?php echo nl2br(esc_html($match->shoot_prize_memo)); ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
+
+                        <?php if (count($match_results) > 3): ?>
+                            <div class="text-center mt-4">
+                                <button id="show-more-matches" onclick="showAllMatches()"
+                                    class="text-xs text-kmnft-green hover:text-white underline transition">
+                                    Show All Matches
+                                </button>
+                                <button id="show-less-matches" onclick="showLessMatches()" style="display:none;"
+                                    class="text-xs text-red-400 hover:text-white underline transition">
+                                    Show Less Matches
+                                </button>
+                            </div>
+                        <?php endif; ?>
                     </div>
+                </div>
             <?php endif; ?>
 
             <!-- League Standings Section -->
@@ -831,149 +829,149 @@ if (!$is_logged_in) {
             $standings_history = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_standings ORDER BY announcement_date DESC");
             if ($standings_history):
                 ?>
-                    <div class="glass-card p-6 rounded-lg mb-6">
-                        <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
-                            <h3 class="text-sm font-bold text-gray-300">LEAGUE STANDINGS</h3>
-                            <button onclick="toggleSection('standings-content', 'standings-toggle-icon')"
-                                class="text-gray-400 hover:text-white transition">
-                                <svg id="standings-toggle-icon" xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div id="standings-content">
-                            <div class="space-y-12">
-                                <?php foreach ($standings_history as $index => $standing):
-                                    $is_hidden_history = $index >= 1 ? 'hidden extra-standings' : '';
+                <div class="glass-card p-6 rounded-lg mb-6">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                        <h3 class="text-sm font-bold text-gray-300">LEAGUE STANDINGS</h3>
+                        <button onclick="toggleSection('standings-content', 'standings-toggle-icon')"
+                            class="text-gray-400 hover:text-white transition">
+                            <svg id="standings-toggle-icon" xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="standings-content">
+                        <div class="space-y-12">
+                            <?php foreach ($standings_history as $index => $standing):
+                                $is_hidden_history = $index >= 1 ? 'hidden extra-standings' : '';
+                                ?>
+                                <div class="<?php echo $is_hidden_history; ?>">
+                                    <?php
+                                    $standings_data = !empty($standing->data) ? json_decode($standing->data, true) : null;
                                     ?>
-                                        <div class="<?php echo $is_hidden_history; ?>">
-                                            <?php
-                                            $standings_data = !empty($standing->data) ? json_decode($standing->data, true) : null;
-                                            ?>
-                                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                                                <!-- Table or Image -->
+                                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                                        <!-- Table or Image -->
+                                        <div
+                                            class="lg:col-span-2 relative group rounded overflow-hidden border border-white/10 bg-black/20">
+                                            <?php if ($standings_data): ?>
                                                 <div
-                                                    class="lg:col-span-2 relative group rounded overflow-hidden border border-white/10 bg-black/20">
-                                                    <?php if ($standings_data): ?>
-                                                            <div
-                                                                class="overflow-x-auto max-h-[400px] scrollbar-thin scrollbar-thumb-kmnft-green/20 scrollbar-track-transparent">
-                                                                <table class="w-full text-xs text-center border-collapse">
-                                                                    <thead
-                                                                        class="bg-black/60 text-gray-400 font-bold uppercase sticky top-0 backdrop-blur-md z-10 shadow-lg">
-                                                                        <tr>
-                                                                            <th class="py-3 px-2">Rank</th>
-                                                                            <th class="py-3 px-4 text-left">Club</th>
-                                                                            <th class="py-3 px-2">PL</th>
-                                                                            <th class="py-3 px-2">W</th>
-                                                                            <th class="py-3 px-2">D</th>
-                                                                            <th class="py-3 px-2">L</th>
-                                                                            <th class="py-3 px-2">GD</th>
-                                                                            <th class="py-3 px-2">Pts</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody class="text-gray-300">
-                                                                        <?php foreach ($standings_data as $row):
-                                                                            // Logic for highlighting
-                                                                            $is_kamakura = (strpos($row['clubname'], '鎌倉') !== false || stripos($row['clubname'], 'Kamakura') !== false);
-                                                                            $row_bg = $is_kamakura ? 'bg-kmnft-green/10 border-l-2 border-kmnft-green' : 'border-b border-gray-800 hover:bg-white/5';
-                                                                            $text_cls = $is_kamakura ? 'text-white font-bold' : '';
-                                                                            ?>
-                                                                                <tr
-                                                                                    class="<?php echo $row_bg . ' ' . $text_cls; ?> transition-colors duration-200">
-                                                                                    <td class="py-3 px-2"><?php echo esc_html($row['rank']); ?></td>
-                                                                                    <td
-                                                                                        class="py-3 px-4 text-left whitespace-nowrap flex items-center gap-2">
-                                                                                        <?php if ($is_kamakura): ?>
-                                                                                                <span
-                                                                                                    class="w-1.5 h-1.5 rounded-full bg-kmnft-green animate-pulse shadow-[0_0_8px_#39ff14]"></span>
-                                                                                        <?php endif; ?>
-                                                                                        <?php echo esc_html($row['clubname']); ?>
-                                                                                    </td>
-                                                                                    <td class="py-3 px-2 text-gray-500">
-                                                                                        <?php echo esc_html($row['pl']); ?>
-                                                                                    </td>
-                                                                                    <td class="py-3 px-2"><?php echo esc_html($row['w']); ?></td>
-                                                                                    <td class="py-3 px-2"><?php echo esc_html($row['d']); ?></td>
-                                                                                    <td class="py-3 px-2"><?php echo esc_html($row['l']); ?></td>
-                                                                                    <td class="py-3 px-2 font-mono"><?php echo esc_html($row['gd']); ?>
-                                                                                    </td>
-                                                                                    <td
-                                                                                        class="py-3 px-2 font-bold text-kmnft-gold text-sm shadow-black drop-shadow-md">
-                                                                                        <?php echo esc_html($row['pt']); ?>
-                                                                                    </td>
-                                                                                </tr>
-                                                                        <?php endforeach; ?>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                    <?php elseif (!empty($standing->image_url)): ?>
-                                                            <img src="<?php echo esc_url($standing->image_url); ?>" alt="League Standings"
-                                                                class="w-full h-auto object-contain cursor-pointer hover:scale-105 transition duration-500"
-                                                                onclick="openImageModal(this.src)">
-                                                    <?php else: ?>
-                                                            <div class="p-8 text-center text-gray-500 italic">No standings data available.</div>
-                                                    <?php endif; ?>
+                                                    class="overflow-x-auto max-h-[400px] scrollbar-thin scrollbar-thumb-kmnft-green/20 scrollbar-track-transparent">
+                                                    <table class="w-full text-xs text-center border-collapse">
+                                                        <thead
+                                                            class="bg-black/60 text-gray-400 font-bold uppercase sticky top-0 backdrop-blur-md z-10 shadow-lg">
+                                                            <tr>
+                                                                <th class="py-3 px-2">Rank</th>
+                                                                <th class="py-3 px-4 text-left">Club</th>
+                                                                <th class="py-3 px-2">PL</th>
+                                                                <th class="py-3 px-2">W</th>
+                                                                <th class="py-3 px-2">D</th>
+                                                                <th class="py-3 px-2">L</th>
+                                                                <th class="py-3 px-2">GD</th>
+                                                                <th class="py-3 px-2">Pts</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="text-gray-300">
+                                                            <?php foreach ($standings_data as $row):
+                                                                // Logic for highlighting
+                                                                $is_kamakura = (strpos($row['clubname'], '鎌倉') !== false || stripos($row['clubname'], 'Kamakura') !== false);
+                                                                $row_bg = $is_kamakura ? 'bg-kmnft-green/10 border-l-2 border-kmnft-green' : 'border-b border-gray-800 hover:bg-white/5';
+                                                                $text_cls = $is_kamakura ? 'text-white font-bold' : '';
+                                                                ?>
+                                                                <tr
+                                                                    class="<?php echo $row_bg . ' ' . $text_cls; ?> transition-colors duration-200">
+                                                                    <td class="py-3 px-2"><?php echo esc_html($row['rank']); ?></td>
+                                                                    <td
+                                                                        class="py-3 px-4 text-left whitespace-nowrap flex items-center gap-2">
+                                                                        <?php if ($is_kamakura): ?>
+                                                                            <span
+                                                                                class="w-1.5 h-1.5 rounded-full bg-kmnft-green animate-pulse shadow-[0_0_8px_#39ff14]"></span>
+                                                                        <?php endif; ?>
+                                                                        <?php echo esc_html($row['clubname']); ?>
+                                                                    </td>
+                                                                    <td class="py-3 px-2 text-gray-500">
+                                                                        <?php echo esc_html($row['pl']); ?>
+                                                                    </td>
+                                                                    <td class="py-3 px-2"><?php echo esc_html($row['w']); ?></td>
+                                                                    <td class="py-3 px-2"><?php echo esc_html($row['d']); ?></td>
+                                                                    <td class="py-3 px-2"><?php echo esc_html($row['l']); ?></td>
+                                                                    <td class="py-3 px-2 font-mono"><?php echo esc_html($row['gd']); ?>
+                                                                    </td>
+                                                                    <td
+                                                                        class="py-3 px-2 font-bold text-kmnft-gold text-sm shadow-black drop-shadow-md">
+                                                                        <?php echo esc_html($row['pt']); ?>
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endforeach; ?>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
+                                            <?php elseif (!empty($standing->image_url)): ?>
+                                                <img src="<?php echo esc_url($standing->image_url); ?>" alt="League Standings"
+                                                    class="w-full h-auto object-contain cursor-pointer hover:scale-105 transition duration-500"
+                                                    onclick="openImageModal(this.src)">
+                                            <?php else: ?>
+                                                <div class="p-8 text-center text-gray-500 italic">No standings data available.</div>
+                                            <?php endif; ?>
+                                        </div>
 
-                                                <!-- Stats -->
-                                                <div class="space-y-4 lg:col-span-1">
-                                                    <!-- Date Badge -->
-                                                    <div
-                                                        class="border border-gray-600 rounded px-2 py-1 text-xs text-gray-400 mb-0 inline-block">
-                                                        Updated: <?php echo esc_html($standing->announcement_date); ?>
-                                                    </div>
-                                                    <div
-                                                        class="glass-card p-4 rounded bg-kmnft-navy/50 border border-kmnft-green/30 shadow-[0_0_15px_rgba(57,255,20,0.05)]">
-                                                        <h4
-                                                            class="text-xs text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                            <span class="w-2 h-2 rounded-full bg-kmnft-green"></span>
-                                                            My Club Status
-                                                        </h4>
-                                                        <div class="flex items-end gap-4">
-                                                            <div>
-                                                                <div class="text-[10px] text-gray-500">Kamakura Intl. FC</div>
-                                                                <div class="text-3xl font-bold text-white neon-text">
-                                                                    <?php echo esc_html($standing->our_rank); ?><span
-                                                                        class="text-sm text-gray-400 font-normal ml-1">th</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="h-8 w-[1px] bg-gray-700"></div>
-                                                            <div>
-                                                                <div class="text-[10px] text-gray-500">Points</div>
-                                                                <div class="text-2xl font-bold text-kmnft-gold">
-                                                                    <?php echo esc_html($standing->our_points); ?>
-                                                                </div>
-                                                            </div>
+                                        <!-- Stats -->
+                                        <div class="space-y-4 lg:col-span-1">
+                                            <!-- Date Badge -->
+                                            <div
+                                                class="border border-gray-600 rounded px-2 py-1 text-xs text-gray-400 mb-0 inline-block">
+                                                Updated: <?php echo esc_html($standing->announcement_date); ?>
+                                            </div>
+                                            <div
+                                                class="glass-card p-4 rounded bg-kmnft-navy/50 border border-kmnft-green/30 shadow-[0_0_15px_rgba(57,255,20,0.05)]">
+                                                <h4
+                                                    class="text-xs text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-kmnft-green"></span>
+                                                    My Club Status
+                                                </h4>
+                                                <div class="flex items-end gap-4">
+                                                    <div>
+                                                        <div class="text-[10px] text-gray-500">Kamakura Intl. FC</div>
+                                                        <div class="text-3xl font-bold text-white neon-text">
+                                                            <?php echo esc_html($standing->our_rank); ?><span
+                                                                class="text-sm text-gray-400 font-normal ml-1">th</span>
                                                         </div>
                                                     </div>
-
-                                                    <?php if (!empty($standing->memo)): ?>
-                                                            <div class="bg-black/20 p-3 rounded border border-gray-700/50">
-                                                                <h4 class="text-[10px] text-gray-500 uppercase mb-1">Memo</h4>
-                                                                <div class="text-xs text-gray-300 font-mono leading-relaxed">
-                                                                    <?php echo nl2br(esc_html($standing->memo)); ?>
-                                                                </div>
-                                                            </div>
-                                                    <?php endif; ?>
+                                                    <div class="h-8 w-[1px] bg-gray-700"></div>
+                                                    <div>
+                                                        <div class="text-[10px] text-gray-500">Points</div>
+                                                        <div class="text-2xl font-bold text-kmnft-gold">
+                                                            <?php echo esc_html($standing->our_points); ?>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                <?php endforeach; ?>
-                            </div>
 
-                            <?php if (count($standings_history) > 1): ?>
-                                    <div class="text-center mt-4">
-                                        <button id="show-more-standing-history"
-                                            onclick="document.querySelectorAll('.extra-standings').forEach(el => el.classList.remove('hidden')); this.style.display='none';"
-                                            class="text-xs text-kmnft-green hover:text-white underline transition">
-                                            Show All History
-                                        </button>
+                                            <?php if (!empty($standing->memo)): ?>
+                                                <div class="bg-black/20 p-3 rounded border border-gray-700/50">
+                                                    <h4 class="text-[10px] text-gray-500 uppercase mb-1">Memo</h4>
+                                                    <div class="text-xs text-gray-300 font-mono leading-relaxed">
+                                                        <?php echo nl2br(esc_html($standing->memo)); ?>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
-                            <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
+
+                        <?php if (count($standings_history) > 1): ?>
+                            <div class="text-center mt-4">
+                                <button id="show-more-standing-history"
+                                    onclick="document.querySelectorAll('.extra-standings').forEach(el => el.classList.remove('hidden')); this.style.display='none';"
+                                    class="text-xs text-kmnft-green hover:text-white underline transition">
+                                    Show All History
+                                </button>
+                            </div>
+                        <?php endif; ?>
                     </div>
+                </div>
             <?php endif; ?>
 
             <!-- League Schedule Section -->
@@ -981,283 +979,283 @@ if (!$is_logged_in) {
             $schedule_history = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_league_schedule ORDER BY season_year DESC");
             if ($schedule_history):
                 ?>
-                    <div class="glass-card p-6 rounded-lg mb-6">
-                        <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
-                            <h3 class="text-sm font-bold text-gray-300">LEAGUE SCHEDULE / RESULTS</h3>
-                            <button onclick="toggleSection('schedule-content', 'schedule-toggle-icon')"
-                                class="text-gray-400 hover:text-white transition">
-                                <svg id="schedule-toggle-icon" xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div id="schedule-content">
-                            <div class="space-y-10">
-                                <?php
-                                $has_past_seasons = false;
-                                foreach ($schedule_history as $index => $schedule):
-                                    $is_latest = ($index === 0);
-                                    if (!$is_latest)
-                                        $has_past_seasons = true;
+                <div class="glass-card p-6 rounded-lg mb-6">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                        <h3 class="text-sm font-bold text-gray-300">LEAGUE SCHEDULE / RESULTS</h3>
+                        <button onclick="toggleSection('schedule-content', 'schedule-toggle-icon')"
+                            class="text-gray-400 hover:text-white transition">
+                            <svg id="schedule-toggle-icon" xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="schedule-content">
+                        <div class="space-y-10">
+                            <?php
+                            $has_past_seasons = false;
+                            foreach ($schedule_history as $index => $schedule):
+                                $is_latest = ($index === 0);
+                                if (!$is_latest)
+                                    $has_past_seasons = true;
 
-                                    $schedule_data = !empty($schedule->data) ? json_decode($schedule->data, true) : null;
-                                    $stats = !empty($schedule->summary_stats) ? json_decode($schedule->summary_stats, true) : null;
-                                    $summary_text = ($stats && isset($stats['win'])) ? "{$stats['win']}W {$stats['lose']}L {$stats['draw']}D" : '';
+                                $schedule_data = !empty($schedule->data) ? json_decode($schedule->data, true) : null;
+                                $stats = !empty($schedule->summary_stats) ? json_decode($schedule->summary_stats, true) : null;
+                                $summary_text = ($stats && isset($stats['win'])) ? "{$stats['win']}W {$stats['lose']}L {$stats['draw']}D" : '';
 
-                                    // Process sorting and identify next match
-                                    $has_next_match = false;
-                                    if ($schedule_data) {
-                                        $current_ts = current_time('timestamp');
+                                // Process sorting and identify next match
+                                $has_next_match = false;
+                                if ($schedule_data) {
+                                    $current_ts = current_time('timestamp');
 
-                                        // Add timestamp to each row
-                                        foreach ($schedule_data as &$row) {
-                                            $date_str = $row['date'];
-                                            $time_str = $row['time'];
-                                            $dt_parts = explode('/', $date_str);
-                                            if (count($dt_parts) === 2) {
-                                                $month = str_pad($dt_parts[0], 2, '0', STR_PAD_LEFT);
-                                                $day = str_pad($dt_parts[1], 2, '0', STR_PAD_LEFT);
-                                                // Assume season_year is correct year
-                                                $year = $schedule->season_year;
-                                                $full_date_str = "{$year}-{$month}-{$day} {$time_str}";
-                                                $row['_ts'] = strtotime($full_date_str);
-                                            } else {
-                                                $row['_ts'] = 0;
+                                    // Add timestamp to each row
+                                    foreach ($schedule_data as &$row) {
+                                        $date_str = $row['date'];
+                                        $time_str = $row['time'];
+                                        $dt_parts = explode('/', $date_str);
+                                        if (count($dt_parts) === 2) {
+                                            $month = str_pad($dt_parts[0], 2, '0', STR_PAD_LEFT);
+                                            $day = str_pad($dt_parts[1], 2, '0', STR_PAD_LEFT);
+                                            // Assume season_year is correct year
+                                            $year = $schedule->season_year;
+                                            $full_date_str = "{$year}-{$month}-{$day} {$time_str}";
+                                            $row['_ts'] = strtotime($full_date_str);
+                                        } else {
+                                            $row['_ts'] = 0;
+                                        }
+                                    }
+                                    unset($row);
+
+                                    // Identify Next Match
+                                    $closest_diff = null;
+                                    $next_match_idx = -1;
+
+                                    foreach ($schedule_data as $idx => $row) {
+                                        if ($row['_ts'] >= $current_ts) {
+                                            $diff = $row['_ts'] - $current_ts;
+                                            if ($closest_diff === null || $diff < $closest_diff) {
+                                                $closest_diff = $diff;
+                                                $next_match_idx = $idx;
                                             }
                                         }
-                                        unset($row);
-
-                                        // Identify Next Match
-                                        $closest_diff = null;
-                                        $next_match_idx = -1;
-
-                                        foreach ($schedule_data as $idx => $row) {
-                                            if ($row['_ts'] >= $current_ts) {
-                                                $diff = $row['_ts'] - $current_ts;
-                                                if ($closest_diff === null || $diff < $closest_diff) {
-                                                    $closest_diff = $diff;
-                                                    $next_match_idx = $idx;
-                                                }
-                                            }
-                                        }
-
-                                        // Mark the next match row
-                                        if ($next_match_idx !== -1) {
-                                            $schedule_data[$next_match_idx]['_is_next'] = true;
-                                            if ($is_latest)
-                                                $has_next_match = true;
-                                        }
-
-                                        // Sort Descending by Date (Timestamp)
-                                        usort($schedule_data, function ($a, $b) {
-                                            return $b['_ts'] - $a['_ts'];
-                                        });
                                     }
 
-                                    // Container classes
-                                    $container_class = '';
-                                    if (!$is_latest) {
-                                        $container_class = 'past-season hidden';
+                                    // Mark the next match row
+                                    if ($next_match_idx !== -1) {
+                                        $schedule_data[$next_match_idx]['_is_next'] = true;
+                                        if ($is_latest)
+                                            $has_next_match = true;
                                     }
 
-                                    // Accordion logic for past seasons
-                                    $header_class = 'flex items-center justify-between mb-3 px-1';
-                                    $content_class = '';
-                                    $content_style = '';
-                                    if (!$is_latest) {
-                                        $header_class .= ' cursor-pointer hover:bg-white/5 p-2 rounded transition-colors';
-                                        $content_class = 'hidden';
-                                    }
-                                    ?>
-                                        <div class="<?php echo $container_class; ?>">
-                                            <div class="<?php echo $header_class; ?>" <?php if (!$is_latest): ?>onclick="toggleSeason(this)" <?php endif; ?>>
-                                                <div class="flex items-center">
-                                                    <h4
-                                                        class="text-kmnft-green font-bold text-sm tracking-widest border-l-4 border-kmnft-green pl-2">
-                                                        SEASON <?php echo esc_html($schedule->season_year); ?>
-                                                    </h4>
-                                                    <?php if (!$is_latest): ?>
-                                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                                class="h-4 w-4 ml-2 text-gray-400 transform transition-transform duration-200"
-                                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                    d="M19 9l-7 7-7-7" />
-                                                            </svg>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <div class="text-xs font-mono text-gray-400">
-                                                    <?php echo esc_html($summary_text); ?>
-                                                </div>
-                                            </div>
+                                    // Sort Descending by Date (Timestamp)
+                                    usort($schedule_data, function ($a, $b) {
+                                        return $b['_ts'] - $a['_ts'];
+                                    });
+                                }
 
-                                            <?php if ($schedule_data): ?>
-                                                    <div
-                                                        class="<?php echo $content_class; ?> overflow-x-auto scrollbar-thin scrollbar-thumb-kmnft-green/20 scrollbar-track-transparent rounded bg-black/20 border border-white/5">
-                                                        <table class="w-full text-xs text-center border-collapse">
-                                                            <thead class="bg-black/40 text-gray-500 uppercase tracking-wider">
-                                                                <tr>
-                                                                    <th class="py-2 px-3 text-left">Section</th>
-                                                                    <th class="py-2 px-2">Date</th>
-                                                                    <th class="py-2 px-2">Time</th>
-                                                                    <th class="py-2 px-3">Score</th>
-                                                                    <th class="py-2 px-4 text-left">Opponent</th>
-                                                                    <th class="py-2 px-4 text-left">STADIUM</th>
-                                                                    <th class="py-2 px-2">Result</th>
-                                                                    <th class="py-2 px-2">Action</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody class="text-gray-300 divide-y divide-gray-800/50">
-                                                                <?php foreach ($schedule_data as $row):
-                                                                    $is_win = isset($row['is_win']) ? intval($row['is_win']) : -1;
-                                                                    $is_next = !empty($row['_is_next']);
+                                // Container classes
+                                $container_class = '';
+                                if (!$is_latest) {
+                                    $container_class = 'past-season hidden';
+                                }
 
-                                                                    $res_class = '';
-                                                                    $res_label = '-';
-                                                                    if ($is_win === 1) {
-                                                                        $res_class = 'text-kmnft-green font-bold';
-                                                                        $res_label = 'WIN';
-                                                                    } elseif ($is_win === 0) {
-                                                                        $res_class = 'text-red-500 font-bold';
-                                                                        $res_label = 'LOSE';
-                                                                    } elseif ($is_win === 2) {
-                                                                        $res_class = 'text-gray-400 font-bold';
-                                                                        $res_label = 'DRAW';
-                                                                    }
-
-                                                                    // Row Visibility for Latest Season
-                                                                    // Use hidden class instead of inline style
-                                                    
-                                                                    // Highlight style for next match
-                                                                    $row_classes = 'hover:bg-white/5 transition-colors';
-                                                                    if ($is_next) {
-                                                                        $row_classes = 'bg-kmnft-green/10 border-l-4 border-kmnft-green transition-colors';
-                                                                    }
-
-                                                                    // Apply hidden class for non-next matches in latest season
-                                                                    $tr_class = $row_classes;
-                                                                    if ($is_latest && $has_next_match && !$is_next) {
-                                                                        $tr_class .= ' latest-season-hidden hidden';
-                                                                    }
-                                                                    ?>
-                                                                        <tr class="<?php echo $tr_class; ?>">
-                                                                            <td
-                                                                                class="py-3 px-3 text-left <?php echo $is_next ? '' : 'border-r border-white/5'; ?> text-kmnft-gold/80 font-mono">
-                                                                                <?php echo esc_html($row['section']); ?>
-                                                                                <?php if ($is_next): ?>
-                                                                                        <span
-                                                                                            class="text-kmnft-green text-[10px] font-bold ml-2 animate-pulse">NEXT</span>
-                                                                                <?php endif; ?>
-                                                                            </td>
-                                                                            <td class="py-3 px-2"><?php echo esc_html($row['date']); ?></td>
-                                                                            <td class="py-3 px-2 text-gray-500"><?php echo esc_html($row['time']); ?>
-                                                                            </td>
-                                                                            <td class="py-3 px-3 font-mono font-bold tracking-wider">
-                                                                                <?php echo esc_html($row['score']); ?>
-                                                                            </td>
-                                                                            <td class="py-3 px-4 text-left font-medium">
-                                                                                <?php echo esc_html($row['opponent']); ?>
-                                                                            </td>
-                                                                            <td class="py-3 px-4 text-left text-gray-400">
-                                                                                <?php echo esc_html($row['location'] ?? '-'); ?>
-                                                                            </td>
-                                                                            <td class="py-3 px-2 <?php echo $res_class; ?>">
-                                                                                <?php echo $res_label; ?>
-                                                                            </td>
-                                                                            <td class="py-3 px-2">
-                                                                                <?php if (!$is_latest): ?>
-                                                                                        <a href="<?php echo admin_url('admin-post.php?action=kmnft_download_league_schedule_csv&item_id=' . $schedule->id); ?>"
-                                                                                            class="text-xs text-kmnft-green hover:underline">CSV</a>
-                                                                                <?php endif; ?>
-                                                                            </td>
-                                                                        </tr>
-                                                                <?php endforeach; ?>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                    <?php if ($is_latest && $has_next_match): ?>
-                                                            <div class="text-center mt-2">
-                                                                <button onclick="toggleLatestSeason()" id="btn-show-latest"
-                                                                    class="text-xs text-kmnft-green hover:text-white transition-colors border border-kmnft-green/50 px-3 py-1 rounded bg-black/20 hover:bg-black/40">
-                                                                    Show Full Schedule
-                                                                </button>
-                                                            </div>
-                                                    <?php endif; ?>
-                                            <?php else: ?>
-                                                    <div class="text-center py-4 text-gray-500 italic text-xs">No schedule data available.</div>
+                                // Accordion logic for past seasons
+                                $header_class = 'flex items-center justify-between mb-3 px-1';
+                                $content_class = '';
+                                $content_style = '';
+                                if (!$is_latest) {
+                                    $header_class .= ' cursor-pointer hover:bg-white/5 p-2 rounded transition-colors';
+                                    $content_class = 'hidden';
+                                }
+                                ?>
+                                <div class="<?php echo $container_class; ?>">
+                                    <div class="<?php echo $header_class; ?>" <?php if (!$is_latest): ?>onclick="toggleSeason(this)" <?php endif; ?>>
+                                        <div class="flex items-center">
+                                            <h4
+                                                class="text-kmnft-green font-bold text-sm tracking-widest border-l-4 border-kmnft-green pl-2">
+                                                SEASON <?php echo esc_html($schedule->season_year); ?>
+                                            </h4>
+                                            <?php if (!$is_latest): ?>
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                    class="h-4 w-4 ml-2 text-gray-400 transform transition-transform duration-200"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 9l-7 7-7-7" />
+                                                </svg>
                                             <?php endif; ?>
                                         </div>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <?php if ($has_past_seasons): ?>
-                                    <div class="text-center mt-8 pt-4 border-t border-white/10">
-                                        <button onclick="toggleHistory()" id="btn-show-history"
-                                            class="text-xs text-gray-400 hover:text-white transition-colors flex items-center justify-center mx-auto space-x-1">
-                                            <span>Previous Seasons</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </button>
+                                        <div class="text-xs font-mono text-gray-400">
+                                            <?php echo esc_html($summary_text); ?>
+                                        </div>
                                     </div>
-                            <?php endif; ?>
+
+                                    <?php if ($schedule_data): ?>
+                                        <div
+                                            class="<?php echo $content_class; ?> overflow-x-auto scrollbar-thin scrollbar-thumb-kmnft-green/20 scrollbar-track-transparent rounded bg-black/20 border border-white/5">
+                                            <table class="w-full text-xs text-center border-collapse">
+                                                <thead class="bg-black/40 text-gray-500 uppercase tracking-wider">
+                                                    <tr>
+                                                        <th class="py-2 px-3 text-left">Section</th>
+                                                        <th class="py-2 px-2">Date</th>
+                                                        <th class="py-2 px-2">Time</th>
+                                                        <th class="py-2 px-3">Score</th>
+                                                        <th class="py-2 px-4 text-left">Opponent</th>
+                                                        <th class="py-2 px-4 text-left">STADIUM</th>
+                                                        <th class="py-2 px-2">Result</th>
+                                                        <th class="py-2 px-2">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="text-gray-300 divide-y divide-gray-800/50">
+                                                    <?php foreach ($schedule_data as $row):
+                                                        $is_win = isset($row['is_win']) ? intval($row['is_win']) : -1;
+                                                        $is_next = !empty($row['_is_next']);
+
+                                                        $res_class = '';
+                                                        $res_label = '-';
+                                                        if ($is_win === 1) {
+                                                            $res_class = 'text-kmnft-green font-bold';
+                                                            $res_label = 'WIN';
+                                                        } elseif ($is_win === 0) {
+                                                            $res_class = 'text-red-500 font-bold';
+                                                            $res_label = 'LOSE';
+                                                        } elseif ($is_win === 2) {
+                                                            $res_class = 'text-gray-400 font-bold';
+                                                            $res_label = 'DRAW';
+                                                        }
+
+                                                        // Row Visibility for Latest Season
+                                                        // Use hidden class instead of inline style
+                                        
+                                                        // Highlight style for next match
+                                                        $row_classes = 'hover:bg-white/5 transition-colors';
+                                                        if ($is_next) {
+                                                            $row_classes = 'bg-kmnft-green/10 border-l-4 border-kmnft-green transition-colors';
+                                                        }
+
+                                                        // Apply hidden class for non-next matches in latest season
+                                                        $tr_class = $row_classes;
+                                                        if ($is_latest && $has_next_match && !$is_next) {
+                                                            $tr_class .= ' latest-season-hidden hidden';
+                                                        }
+                                                        ?>
+                                                        <tr class="<?php echo $tr_class; ?>">
+                                                            <td
+                                                                class="py-3 px-3 text-left <?php echo $is_next ? '' : 'border-r border-white/5'; ?> text-kmnft-gold/80 font-mono">
+                                                                <?php echo esc_html($row['section']); ?>
+                                                                <?php if ($is_next): ?>
+                                                                    <span
+                                                                        class="text-kmnft-green text-[10px] font-bold ml-2 animate-pulse">NEXT</span>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                            <td class="py-3 px-2"><?php echo esc_html($row['date']); ?></td>
+                                                            <td class="py-3 px-2 text-gray-500"><?php echo esc_html($row['time']); ?>
+                                                            </td>
+                                                            <td class="py-3 px-3 font-mono font-bold tracking-wider">
+                                                                <?php echo esc_html($row['score']); ?>
+                                                            </td>
+                                                            <td class="py-3 px-4 text-left font-medium">
+                                                                <?php echo esc_html($row['opponent']); ?>
+                                                            </td>
+                                                            <td class="py-3 px-4 text-left text-gray-400">
+                                                                <?php echo esc_html($row['location'] ?? '-'); ?>
+                                                            </td>
+                                                            <td class="py-3 px-2 <?php echo $res_class; ?>">
+                                                                <?php echo $res_label; ?>
+                                                            </td>
+                                                            <td class="py-3 px-2">
+                                                                <?php if (!$is_latest): ?>
+                                                                    <a href="<?php echo admin_url('admin-post.php?action=kmnft_download_league_schedule_csv&item_id=' . $schedule->id); ?>"
+                                                                        class="text-xs text-kmnft-green hover:underline">CSV</a>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <?php if ($is_latest && $has_next_match): ?>
+                                            <div class="text-center mt-2">
+                                                <button onclick="toggleLatestSeason()" id="btn-show-latest"
+                                                    class="text-xs text-kmnft-green hover:text-white transition-colors border border-kmnft-green/50 px-3 py-1 rounded bg-black/20 hover:bg-black/40">
+                                                    Show Full Schedule
+                                                </button>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <div class="text-center py-4 text-gray-500 italic text-xs">No schedule data available.</div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
+
+                        <?php if ($has_past_seasons): ?>
+                            <div class="text-center mt-8 pt-4 border-t border-white/10">
+                                <button onclick="toggleHistory()" id="btn-show-history"
+                                    class="text-xs text-gray-400 hover:text-white transition-colors flex items-center justify-center mx-auto space-x-1">
+                                    <span>Previous Seasons</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        <?php endif; ?>
                     </div>
+                </div>
 
-                    <script>
-                        function toggleSeason(header) {
-                            const content = header.nextElementSibling;
-                            const icon = header.querySelector('svg');
-                            if (content && content.classList.contains('hidden')) {
-                                content.classList.remove('hidden');
-                                if (icon) icon.style.transform = 'rotate(180deg)';
-                            } else if (content) {
-                                content.classList.add('hidden');
-                                if (icon) icon.style.transform = 'rotate(0deg)';
+                <script>
+                    function toggleSeason(header) {
+                        const content = header.nextElementSibling;
+                        const icon = header.querySelector('svg');
+                        if (content && content.classList.contains('hidden')) {
+                            content.classList.remove('hidden');
+                            if (icon) icon.style.transform = 'rotate(180deg)';
+                        } else if (content) {
+                            content.classList.add('hidden');
+                            if (icon) icon.style.transform = 'rotate(0deg)';
+                        }
+                    }
+
+                    function toggleLatestSeason() {
+                        const hiddenRows = document.querySelectorAll('.latest-season-hidden');
+                        const btn = document.getElementById('btn-show-latest');
+
+                        hiddenRows.forEach(row => {
+                            row.classList.toggle('hidden');
+                        });
+
+                        if (btn) {
+                            if (btn.innerText.includes('Show Full Schedule')) {
+                                btn.innerText = 'Show Next Match Only';
+                            } else {
+                                btn.innerText = 'Show Full Schedule';
                             }
                         }
+                    }
 
-                        function toggleLatestSeason() {
-                            const hiddenRows = document.querySelectorAll('.latest-season-hidden');
-                            const btn = document.getElementById('btn-show-latest');
+                    function toggleHistory() {
+                        const pastSeasons = document.querySelectorAll('.past-season');
+                        const btn = document.getElementById('btn-show-history');
 
-                            hiddenRows.forEach(row => {
-                                row.classList.toggle('hidden');
-                            });
+                        pastSeasons.forEach(season => {
+                            season.classList.toggle('hidden');
+                        });
 
-                            if (btn) {
-                                if (btn.innerText.includes('Show Full Schedule')) {
-                                    btn.innerText = 'Show Next Match Only';
-                                } else {
-                                    btn.innerText = 'Show Full Schedule';
-                                }
+                        if (btn) {
+                            const span = btn.querySelector('span');
+                            const svg = btn.querySelector('svg');
+                            if (span.innerText === 'Previous Seasons') {
+                                span.innerText = 'Hide Previous Seasons';
+                                svg.style.transform = 'rotate(180deg)';
+                            } else {
+                                span.innerText = 'Previous Seasons';
+                                svg.style.transform = 'rotate(0deg)';
                             }
                         }
-
-                        function toggleHistory() {
-                            const pastSeasons = document.querySelectorAll('.past-season');
-                            const btn = document.getElementById('btn-show-history');
-
-                            pastSeasons.forEach(season => {
-                                season.classList.toggle('hidden');
-                            });
-
-                            if (btn) {
-                                const span = btn.querySelector('span');
-                                const svg = btn.querySelector('svg');
-                                if (span.innerText === 'Previous Seasons') {
-                                    span.innerText = 'Hide Previous Seasons';
-                                    svg.style.transform = 'rotate(180deg)';
-                                } else {
-                                    span.innerText = 'Previous Seasons';
-                                    svg.style.transform = 'rotate(0deg)';
-                                }
-                            }
-                        }
-                    </script>
+                    }
+                </script>
             <?php endif; ?>
 
             <!-- Quick Actions / News Placeholder -->
@@ -1329,56 +1327,56 @@ if (!$is_logged_in) {
 
                     <!-- Plots (Large) -->
                     <?php foreach ($holdings as $holding): ?>
-                            <?php if (is_numeric($holding->zone_x) && is_numeric($holding->zone_y)): ?>
-                                    <?php
-                                    $x = max(0, min(120, floatval($holding->zone_x)));
-                                    $y = max(0, min(64, floatval($holding->zone_y)));
+                        <?php if (is_numeric($holding->zone_x) && is_numeric($holding->zone_y)): ?>
+                            <?php
+                            $x = max(0, min(120, floatval($holding->zone_x)));
+                            $y = max(0, min(64, floatval($holding->zone_y)));
 
-                                    // Map directly
-                                    $left = ($x / 120) * 100;
-                                    $bottom = ($y / 64) * 100;
+                            // Map directly
+                            $left = ($x / 120) * 100;
+                            $bottom = ($y / 64) * 100;
 
-                                    $last4 = substr($holding->token_id, -4);
-                                    $image_url_large = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
+                            $last4 = substr($holding->token_id, -4);
+                            $image_url_large = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
 
-                                    // Tooltip Y Position
-                                    $tooltip_y_class = ($y > 32) ? 'top-full mt-2' : 'bottom-full mb-2';
+                            // Tooltip Y Position
+                            $tooltip_y_class = ($y > 32) ? 'top-full mt-2' : 'bottom-full mb-2';
 
-                                    // Tooltip X Position
-                                    if ($x > 100) {
-                                        // Right edge -> Align Right
-                                        $tooltip_x_class = 'right-0 translate-x-0';
-                                    } elseif ($x < 20) {
-                                        // Left edge -> Align Left
-                                        $tooltip_x_class = 'left-0 translate-x-0';
-                                    } else {
-                                        // Center
-                                        $tooltip_x_class = 'left-1/2 -translate-x-1/2';
-                                    }
-                                    ?>
-                                    <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
-                                        style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;">
+                            // Tooltip X Position
+                            if ($x > 100) {
+                                // Right edge -> Align Right
+                                $tooltip_x_class = 'right-0 translate-x-0';
+                            } elseif ($x < 20) {
+                                // Left edge -> Align Left
+                                $tooltip_x_class = 'left-0 translate-x-0';
+                            } else {
+                                // Center
+                                $tooltip_x_class = 'left-1/2 -translate-x-1/2';
+                            }
+                            ?>
+                            <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
+                                style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;">
 
-                                        <!-- Label (Last 4 Digits) -->
-                                        <span
-                                            class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] md:text-[10px] text-white font-mono bg-black/50 px-1 rounded whitespace-nowrap pointer-events-none">
-                                            <?php echo esc_html($last4); ?>
-                                        </span>
+                                <!-- Label (Last 4 Digits) -->
+                                <span
+                                    class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] md:text-[10px] text-white font-mono bg-black/50 px-1 rounded whitespace-nowrap pointer-events-none">
+                                    <?php echo esc_html($last4); ?>
+                                </span>
 
-                                        <!-- Tooltip -->
-                                        <div
-                                            class="absolute <?php echo $tooltip_y_class . ' ' . $tooltip_x_class; ?> bg-black/90 border border-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 flex flex-col items-center shadow-xl">
-                                            <img src="<?php echo $image_url_large; ?>" alt="Asset"
-                                                class="w-16 h-16 object-cover rounded mb-1 bg-gray-800">
-                                            <div class="font-mono text-[10px] text-gray-300">ID:
-                                                <?php echo esc_html($holding->token_id); ?>
-                                            </div>
-                                            <div class="font-mono text-[10px] text-kmnft-green whitespace-nowrap">(X:<?php echo $x; ?>,
-                                                Y:<?php echo $y; ?>)
-                                            </div>
-                                        </div>
+                                <!-- Tooltip -->
+                                <div
+                                    class="absolute <?php echo $tooltip_y_class . ' ' . $tooltip_x_class; ?> bg-black/90 border border-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 flex flex-col items-center shadow-xl">
+                                    <img src="<?php echo $image_url_large; ?>" alt="Asset"
+                                        class="w-16 h-16 object-cover rounded mb-1 bg-gray-800">
+                                    <div class="font-mono text-[10px] text-gray-300">ID:
+                                        <?php echo esc_html($holding->token_id); ?>
                                     </div>
-                            <?php endif; ?>
+                                    <div class="font-mono text-[10px] text-kmnft-green whitespace-nowrap">(X:<?php echo $x; ?>,
+                                        Y:<?php echo $y; ?>)
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -1671,15 +1669,18 @@ if (!$is_logged_in) {
                 const headerOffset = 96; // 6rem (top-24)
                 const bottomOffset = 24; // Margin from bottom
 
+                // Always reset bottom to auto as we only control top
+                sidebar.style.bottom = 'auto';
+
                 if (sidebarHeight > (windowHeight - headerOffset)) {
-                    // Sidebar is taller than viewport (minus header/margin)
-                    // Stick to bottom
-                    sidebar.style.top = 'auto';
-                    sidebar.style.bottom = `${bottomOffset}px`;
+                    // Sidebar is taller than viewport
+                    // Calculate negative top so bottom sticks when scrolling down
+                    // Formula: ViewportHeight - SidebarHeight - BottomMargin
+                    const topValue = windowHeight - sidebarHeight - bottomOffset;
+                    sidebar.style.top = `${topValue}px`;
                 } else {
                     // Sidebar is shorter than viewport
                     // Stick to top
-                    sidebar.style.bottom = 'auto';
                     sidebar.style.top = `${headerOffset}px`;
                 }
             };
