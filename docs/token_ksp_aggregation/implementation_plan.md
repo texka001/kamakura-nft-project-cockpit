@@ -33,6 +33,35 @@ Token KSP管理画面において、指定した年度（Season）の集計バ�
     *   `updated_at` (DATETIME)
     *   Unique Key: `(user_id, season)`
 
+### KSP Aggregation Logic (Backend)
+
+-   **Logic Location**: `inc/class-kmnft-user-manager.php` -> `process_token_ksp_aggregation`
+-   **Method**: Wash and Replace (Delete all for season, then Insert)
+-   **Token Aggregation**:
+    -   Source: `kmnft_token_ksp`
+    -   Group By: `token_id`
+    -   Sum: `acquisition_point`
+    -   **Update**: Calculate Rank based on Total Points (DESC)
+-   **User Aggregation**:
+    -   Source: `kmnft_holdings` JOIN `kmnft_token_ksp`
+    -   Group By: `user_id`
+    -   Sum: `acquisition_point`
+    -   **Update**: Calculate Rank based on Total Points (DESC)
+
+### CSV Export Logic (Backend)
+-   **Logic Location**: `inc/class-kmnft-user-manager.php`
+-   **Token Export**:
+    -   Fetch from `kmnft_ksp_token_summary`
+    -   **Update**: Include `rank` column in CSV
+-   **User Export**:
+    -   Fetch from `kmnft_ksp_user_summary`
+    -   Join with `wp_users` for login/name
+    -   **Update**: Include `rank` column in CSV
+
+## Ranking Implementation Strategy
+Since MySQL 5.7 (common in WP environments) doesn't always support window functions like `RANK()`, we will calculate rank in PHP or use a variable-based SQL query during insertion.
+**Proposal:** Calculate rank using SQL variables during the INSERT ... SELECT statement.
+
 ### Backend Logic
 `inc/class-kmnft-user-manager.php` を修正します。
 

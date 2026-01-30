@@ -1173,38 +1173,62 @@ class KMNFT_User_Manager
 
         // 1. Transaction Start (Optional/Simulated by order)
 
-        // 2. Token Aggregation (Token x Season)
-        // Wash
-        $wpdb->delete($table_token_summary, array('season' => $season));
-        // Insert
-        $sql_token_agg = $wpdb->prepare(
-            "INSERT INTO $table_token_summary (token_id, season, total_points, updated_at)
-             SELECT token_id, %s, SUM(acquisition_point), NOW()
-             FROM $table_token_ksp
-             WHERE season = %s
-             GROUP BY token_id",
-            $season,
-            $season
-        );
-        $wpdb->query($sql_token_agg);
+        // Wash and Replace: Token Summary
+        $wpdb->query($wpdb->prepare("DELETE FROM {$table_token_summary} WHERE season = %s", $season));
 
-        // 3. User Aggregation (User x Season based on Current Holdings)
-        // Wash
-        $wpdb->delete($table_user_summary, array('season' => $season));
-        // Insert
-        // Join Holdings with TokenKSP(filtered by season)
-        // Note: We only care about users who hold tokens.
-        $sql_user_agg = $wpdb->prepare(
-            "INSERT INTO $table_user_summary (user_id, season, total_points, updated_at)
-             SELECT h.user_id, %s, SUM(tk.acquisition_point), NOW()
-             FROM $table_holdings h
-             JOIN $table_token_ksp tk ON h.token_id = tk.token_id
-             WHERE tk.season = %s
-             GROUP BY h.user_id",
+        // Calculate Rank using variables (Standard Ranking: 1, 1, 3)
+        $wpdb->query("SET @rank := 0, @current_points := NULL, @row_num := 0;");
+        $wpdb->query($wpdb->prepare(
+            "INSERT INTO {$table_token_summary} (token_id, season, total_points, rank, updated_at)
+                 SELECT token_id, season, total_points, rank, NOW()
+                 FROM (
+                     SELECT 
+                        token_id, 
+                        season, 
+                        total_points,
+                        @row_num := @row_num + 1,
+                        @rank := IF(@current_points = total_points, @rank, @row_num) as rank,
+                        @current_points := total_points
+                     FROM (
+                        SELECT token_id, %s as season, SUM(acquisition_point) as total_points
+                        FROM {$table_token_ksp}
+                        WHERE season = %s
+                        GROUP BY token_id
+                        ORDER BY total_points DESC
+                     ) as sub
+                 ) as ranked_sub",
             $season,
             $season
-        );
-        $wpdb->query($sql_user_agg);
+        ));
+
+        // Wash and Replace: User Summary (based on current holdings)
+        $wpdb->query($wpdb->prepare("DELETE FROM {$table_user_summary} WHERE season = %s", $season));
+
+        // Calculate Rank for Users (Standard Ranking: 1, 1, 3)
+        $wpdb->query("SET @rank_user := 0, @current_points_user := NULL, @row_num_user := 0;");
+        $wpdb->query($wpdb->prepare(
+            "INSERT INTO {$table_user_summary} (user_id, season, total_points, rank, updated_at)
+                 SELECT user_id, season, total_points, rank, NOW()
+                 FROM (
+                     SELECT 
+                        user_id, 
+                        season, 
+                        total_points,
+                        @row_num_user := @row_num_user + 1,
+                        @rank_user := IF(@current_points_user = total_points, @rank_user, @row_num_user) as rank,
+                        @current_points_user := total_points
+                     FROM (
+                        SELECT h.user_id, %s as season, SUM(tk.acquisition_point) as total_points
+                        FROM {$table_holdings} h
+                        JOIN {$table_token_ksp} tk ON h.token_id = tk.token_id
+                        WHERE tk.season = %s
+                        GROUP BY h.user_id
+                        ORDER BY total_points DESC
+                     ) as sub
+                 ) as ranked_sub",
+            $season,
+            $season
+        ));
 
         // Calculate counts for messaging
         $token_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_token_summary WHERE season = %s", $season));
@@ -1244,23 +1268,28 @@ class KMNFT_User_Manager
             exit;
         }
 
-        $filename = 'kmnft_token_summary_' . $season . '_' . date('Y-m-d') . '.csv';
+        $filename = 'kmnft_token_summary_' . $season . '_' . date('Ymd') . '.csv';
 
-        // Clear any previous output
-        if (ob_get_level()) {
+        // Clear all output buffers to prevent header corruption
+        while (ob_get_level()) {
             ob_end_clean();
         }
 
-        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Pragma: no-cache');
+        header('Content-Transfer-Encoding: binary');
+        header('Connection: Keep-Alive');
         header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
 
         $fp = fopen('php://output', 'w');
-        fputcsv($fp, array('token_id', 'season', 'total_points', 'updated_at'));
+        fputcsv($fp, array('rank', 'token_id', 'season', 'total_points', 'updated_at'));
 
         foreach ($results as $row) {
             fputcsv($fp, array(
+                $row['rank'],
                 $row['token_id'],
                 $row['season'],
                 $row['total_points'],
@@ -1304,23 +1333,28 @@ class KMNFT_User_Manager
             exit;
         }
 
-        $filename = 'kmnft_user_summary_' . $season . '_' . date('Y-m-d') . '.csv';
+        $filename = 'kmnft_user_summary_' . $season . '_' . date('Ymd') . '.csv';
 
-        // Clear any previous output
-        if (ob_get_level()) {
+        // Clear all output buffers to prevent header corruption
+        while (ob_get_level()) {
             ob_end_clean();
         }
 
-        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Pragma: no-cache');
+        header('Content-Transfer-Encoding: binary');
+        header('Connection: Keep-Alive');
         header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
 
         $fp = fopen('php://output', 'w');
-        fputcsv($fp, array('user_id', 'user_login', 'display_name', 'season', 'total_points', 'updated_at'));
+        fputcsv($fp, array('rank', 'user_id', 'user_login', 'display_name', 'season', 'total_points', 'updated_at'));
 
         foreach ($results as $row) {
             fputcsv($fp, array(
+                $row['rank'],
                 $row['user_id'],
                 $row['user_login'],
                 $row['display_name'],
@@ -1347,6 +1381,7 @@ class KMNFT_User_Manager
             token_id varchar(100) NOT NULL,
             season varchar(20) NOT NULL,
             total_points int(11) NOT NULL DEFAULT 0,
+            rank int(11) DEFAULT 0,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
             UNIQUE KEY token_season (token_id, season)
@@ -1360,6 +1395,7 @@ class KMNFT_User_Manager
             user_id bigint(20) unsigned NOT NULL,
             season varchar(20) NOT NULL,
             total_points int(11) NOT NULL DEFAULT 0,
+            rank int(11) DEFAULT 0,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
             UNIQUE KEY user_season (user_id, season)
@@ -1638,7 +1674,7 @@ class KMNFT_User_Manager
                 $('#goal_images_hidden').val(urls.join(','));
             }
 
-                                                $('#upload_goal_image_btn').click(function (e) {
+                                                                                        $('#upload_goal_image_btn').click(function (e) {
                 e.preventDefault();
                 if (mediaUploader) {
                     mediaUploader.open();
@@ -1667,7 +1703,7 @@ class KMNFT_User_Manager
                 $('#goal-images-container').empty();
                 updateHiddenInput();
             });
-                                            });
+                                                                                    });
         </script>
         <?php
     }
