@@ -1245,7 +1245,13 @@ class KMNFT_User_Manager
         }
 
         $filename = 'kmnft_token_summary_' . $season . '_' . date('Y-m-d') . '.csv';
-        header('Content-Type: text/csv');
+
+        // Clear any previous output
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Pragma: no-cache');
         header('Expires: 0');
@@ -1299,7 +1305,13 @@ class KMNFT_User_Manager
         }
 
         $filename = 'kmnft_user_summary_' . $season . '_' . date('Y-m-d') . '.csv';
-        header('Content-Type: text/csv');
+
+        // Clear any previous output
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Pragma: no-cache');
         header('Expires: 0');
@@ -1626,7 +1638,7 @@ class KMNFT_User_Manager
                 $('#goal_images_hidden').val(urls.join(','));
             }
 
-                                        $('#upload_goal_image_btn').click(function (e) {
+                                                $('#upload_goal_image_btn').click(function (e) {
                 e.preventDefault();
                 if (mediaUploader) {
                     mediaUploader.open();
@@ -1655,7 +1667,7 @@ class KMNFT_User_Manager
                 $('#goal-images-container').empty();
                 updateHiddenInput();
             });
-                                    });
+                                            });
         </script>
         <?php
     }
