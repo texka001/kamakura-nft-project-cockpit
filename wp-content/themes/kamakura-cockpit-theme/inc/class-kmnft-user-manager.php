@@ -27,6 +27,8 @@ class KMNFT_User_Manager
         add_action('admin_post_kmnft_delete_token_ksp', array($this, 'process_token_ksp_delete'));
         add_action('admin_post_kmnft_delete_token_ksp_by_date', array($this, 'process_token_ksp_delete_by_date'));
         add_action('admin_post_kmnft_aggregate_token_ksp', array($this, 'process_token_ksp_aggregation'));
+        add_action('admin_post_kmnft_export_token_summary', array($this, 'process_token_summary_export'));
+        add_action('admin_post_kmnft_export_user_summary', array($this, 'process_user_summary_export'));
 
         // Match Results Actions
         add_action('admin_post_kmnft_save_match', array($this, 'process_match_save'));
@@ -329,11 +331,21 @@ class KMNFT_User_Manager
             <?php if (isset($_GET['status'])): ?>
                 <?php if ($_GET['status'] === 'success'): ?>
                     <div class="notice notice-success is-dismissible">
-                        <p><strong>Success!</strong> <?php echo intval($_GET['count']); ?> records processed successfully.</p>
+                        <?php if (isset($_GET['msg'])): ?>
+                            <p><strong>Success!</strong> <?php echo esc_html($_GET['msg']); ?></p>
+                        <?php else: ?>
+                            <p><strong>Success!</strong> <?php echo isset($_GET['count']) ? intval($_GET['count']) : 0; ?> records processed
+                                successfully.</p>
+                        <?php endif; ?>
                     </div>
                 <?php elseif ($_GET['status'] === 'deleted'): ?>
                     <div class="notice notice-success is-dismissible">
-                        <p><strong>Success!</strong> <?php echo intval($_GET['count']); ?> records deleted.</p>
+                        <?php if (isset($_GET['msg'])): ?>
+                            <p><strong>Success!</strong> <?php echo esc_html($_GET['msg']); ?></p>
+                        <?php else: ?>
+                            <p><strong>Success!</strong> <?php echo isset($_GET['count']) ? intval($_GET['count']) : 0; ?> records deleted.
+                            </p>
+                        <?php endif; ?>
                     </div>
                 <?php elseif ($_GET['status'] === 'error'): ?>
                     <div class="notice notice-error is-dismissible">
@@ -343,25 +355,61 @@ class KMNFT_User_Manager
                 <?php endif; ?>
             <?php endif; ?>
 
-            <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px; border-left: 4px solid #2271b1;">
+            <div
+                style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px; border-left: 4px solid #2271b1;">
                 <h2>Aggregation Batch (集計バッチ)</h2>
                 <p>Run the aggregation process to calculate total KSP for Tokens and Users for a specific Season.</p>
-                <p><strong>Note:</strong> This is a "Wash & Replace" operation. Existing summary data for the specified Season will be deleted and recreated.</p>
+                <p><strong>Note:</strong> This is a "Wash & Replace" operation. Existing summary data for the specified Season
+                    will be deleted and recreated.</p>
                 <p>ユーザー集計仕様: <strong>現在の保有トークン</strong>に基づき、指定年度の獲得ポイントを合算します。</p>
 
-                <form action="<?php echo admin_url('admin-post.php'); ?>" method="post" onsubmit="return confirm('Start aggregation for this season? This may take a few seconds.');">
+                <form action="<?php echo admin_url('admin-post.php'); ?>" method="post"
+                    onsubmit="return confirm('Start aggregation for this season? This may take a few seconds.');">
                     <input type="hidden" name="action" value="kmnft_aggregate_token_ksp">
                     <?php wp_nonce_field('kmnft_token_ksp_aggregate_nonce', 'kmnft_nonce'); ?>
                     <table class="form-table">
                         <tr>
                             <th scope="row"><label for="agg_season">Season (Year)</label></th>
                             <td>
-                                <input type="text" name="season" id="agg_season" class="regular-text" placeholder="e.g. 2026" required value="<?php echo date('Y'); ?>">
+                                <input type="text" name="season" id="agg_season" class="regular-text" placeholder="e.g. 2026"
+                                    required value="<?php echo date('Y'); ?>">
                             </td>
                         </tr>
                     </table>
                     <?php submit_button('Run Aggregation', 'primary'); ?>
                 </form>
+            </div>
+
+            <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px;">
+                <h2>Export Aggregated KSP (集計結果エクスポート)</h2>
+                <p>Download the aggregated KSP data for a specific Season.</p>
+                <div style="display: flex; align-items: flex-end; gap: 20px;">
+                    <div>
+                        <label for="export_season_input"
+                            style="display:block; margin-bottom: 5px; font-weight:bold;">Season</label>
+                        <input type="text" id="export_season_input" class="regular-text" placeholder="e.g. 2026"
+                            value="<?php echo date('Y'); ?>">
+                    </div>
+                    <div>
+                        <form action="<?php echo admin_url('admin-post.php'); ?>" method="post" style="display:inline-block;">
+                            <input type="hidden" name="action" value="kmnft_export_token_summary">
+                            <input type="hidden" name="season" id="hidden_season_token">
+                            <?php wp_nonce_field('kmnft_export_token_summary_nonce', 'kmnft_nonce'); ?>
+                            <input type="submit" name="submit" id="submit_token_export" class="button button-secondary"
+                                value="Export Token Summary"
+                                onclick="document.getElementById('hidden_season_token').value = document.getElementById('export_season_input').value;">
+                        </form>
+                        <form action="<?php echo admin_url('admin-post.php'); ?>" method="post"
+                            style="display:inline-block; margin-left: 10px;">
+                            <input type="hidden" name="action" value="kmnft_export_user_summary">
+                            <input type="hidden" name="season" id="hidden_season_user">
+                            <?php wp_nonce_field('kmnft_export_user_summary_nonce', 'kmnft_nonce'); ?>
+                            <input type="submit" name="submit" id="submit_user_export" class="button button-secondary"
+                                value="Export User Summary"
+                                onclick="document.getElementById('hidden_season_user').value = document.getElementById('export_season_input').value;">
+                        </form>
+                    </div>
+                </div>
             </div>
 
             <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px;">
@@ -1124,7 +1172,7 @@ class KMNFT_User_Manager
         $table_user_summary = $wpdb->prefix . 'kmnft_ksp_user_summary';
 
         // 1. Transaction Start (Optional/Simulated by order)
-        
+
         // 2. Token Aggregation (Token x Season)
         // Wash
         $wpdb->delete($table_token_summary, array('season' => $season));
@@ -1135,7 +1183,8 @@ class KMNFT_User_Manager
              FROM $table_token_ksp
              WHERE season = %s
              GROUP BY token_id",
-            $season, $season
+            $season,
+            $season
         );
         $wpdb->query($sql_token_agg);
 
@@ -1152,7 +1201,8 @@ class KMNFT_User_Manager
              JOIN $table_token_ksp tk ON h.token_id = tk.token_id
              WHERE tk.season = %s
              GROUP BY h.user_id",
-            $season, $season
+            $season,
+            $season
         );
         $wpdb->query($sql_user_agg);
 
@@ -1162,10 +1212,112 @@ class KMNFT_User_Manager
 
         $msg = sprintf(
             'Aggregation for Season %s completed. (Tokens: %d, Users: %d)',
-            esc_html($season), intval($token_count), intval($user_count)
+            esc_html($season),
+            intval($token_count),
+            intval($user_count)
         );
 
         wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=success&msg=' . urlencode($msg)));
+        exit;
+    }
+
+    public function process_token_summary_export()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        check_admin_referer('kmnft_export_token_summary_nonce', 'kmnft_nonce');
+
+        $season = isset($_POST['season']) ? sanitize_text_field($_POST['season']) : '';
+        if (empty($season)) {
+            wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=error&msg=Season is required'));
+            exit;
+        }
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'kmnft_ksp_token_summary';
+
+        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE season = %s ORDER BY total_points DESC", $season), ARRAY_A);
+
+        if (empty($results)) {
+            wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=error&msg=No data found for season ' . esc_attr($season)));
+            exit;
+        }
+
+        $filename = 'kmnft_token_summary_' . $season . '_' . date('Y-m-d') . '.csv';
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $fp = fopen('php://output', 'w');
+        fputcsv($fp, array('token_id', 'season', 'total_points', 'updated_at'));
+
+        foreach ($results as $row) {
+            fputcsv($fp, array(
+                $row['token_id'],
+                $row['season'],
+                $row['total_points'],
+                $row['updated_at']
+            ));
+        }
+        fclose($fp);
+        exit;
+    }
+
+    public function process_user_summary_export()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        check_admin_referer('kmnft_export_user_summary_nonce', 'kmnft_nonce');
+
+        $season = isset($_POST['season']) ? sanitize_text_field($_POST['season']) : '';
+        if (empty($season)) {
+            wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=error&msg=Season is required'));
+            exit;
+        }
+
+        global $wpdb;
+        $summary_table = $wpdb->prefix . 'kmnft_ksp_user_summary';
+        $users_table = $wpdb->users;
+
+        // Join with users table to get login name
+        $sql = $wpdb->prepare("
+            SELECT s.*, u.user_login, u.display_name 
+            FROM $summary_table s
+            LEFT JOIN $users_table u ON s.user_id = u.ID
+            WHERE s.season = %s
+            ORDER BY s.total_points DESC
+        ", $season);
+
+        $results = $wpdb->get_results($sql, ARRAY_A);
+
+        if (empty($results)) {
+            wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=error&msg=No data found for season ' . esc_attr($season)));
+            exit;
+        }
+
+        $filename = 'kmnft_user_summary_' . $season . '_' . date('Y-m-d') . '.csv';
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $fp = fopen('php://output', 'w');
+        fputcsv($fp, array('user_id', 'user_login', 'display_name', 'season', 'total_points', 'updated_at'));
+
+        foreach ($results as $row) {
+            fputcsv($fp, array(
+                $row['user_id'],
+                $row['user_login'],
+                $row['display_name'],
+                $row['season'],
+                $row['total_points'],
+                $row['updated_at']
+            ));
+        }
+        fclose($fp);
         exit;
     }
 
@@ -1463,47 +1615,47 @@ class KMNFT_User_Manager
             </div>
         </div>
         <script>
-            jQuery(document).ready(function ($) {
+            jQuery(documen                        t).ready(funct                  ion($) {
                 var mediaUploader;
 
                 function updateHiddenInput() {
-                    var urls = [];
-                    $('#goal-images-container img').each(function () {
-                        urls.push($(this).attr('src'));
-                    });
-                    $('#goal_images_hidden').val(urls.join(','));
-                }
+                var urls = [];
+                $('#goal-images-container img').each(function () {
+                    urls.push($(this).attr('src'));
+                });
+                $('#goal_images_hidden').val(urls.join(','));
+            }
 
-                $('#upload_goal_image_btn').click(function (e) {
-                    e.preventDefault();
-                    if (mediaUploader) {
-                        mediaUploader.open();
-                        return;
-                    }
-                    mediaUploader = wp.media.frames.file_frame = wp.media({
-                        title: 'Choose Goal Image',
-                        button: {
-                            text: 'Choose Image'
-                        },
-                        multiple: true
-                    });
-
-                    mediaUploader.on('select', function () {
-                        var selection = mediaUploader.state().get('selection');
-                        selection.each(function (attachment) {
-                            attachment = attachment.toJSON();
-                            $('#goal-images-container').append('<div style="position:relative; width:80px; height:80px;"><img src="' + attachment.url + '" style="width:100%; height:100%; object-fit:cover; border:1px solid #ccc;"></div>');
-                        });
-                        updateHiddenInput();
-                    });
+                                        $('#upload_goal_image_btn').click(function (e) {
+                e.preventDefault();
+                if (mediaUploader) {
                     mediaUploader.open();
+                    return;
+                }
+                mediaUploader = wp.media.frames.file_frame = wp.media({
+                    title: 'Choose Goal Image',
+                    button: {
+                        text: 'Choose Image'
+                    },
+                    multiple: true
                 });
 
-                $('#clear_goal_images_btn').click(function () {
-                    $('#goal-images-container').empty();
+                mediaUploader.on('select', function () {
+                    var selection = mediaUploader.state().get('selection');
+                    selection.each(function (attachment) {
+                        attachment = attachment.toJSON();
+                        $('#goal-images-container').append('<div style="position:relative; width:80px; height:80px;"><img src="' + attachment.url + '" style="width:100%; height:100%; object-fit:cover; border:1px solid #ccc;"></div>');
+                    });
                     updateHiddenInput();
                 });
+                mediaUploader.open();
             });
+
+            $('#clear_goal_images_btn').click(function () {
+                $('#goal-images-container').empty();
+                updateHiddenInput();
+            });
+                                    });
         </script>
         <?php
     }

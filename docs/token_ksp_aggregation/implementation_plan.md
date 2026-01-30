@@ -49,6 +49,12 @@ Token KSP管理画面において、指定した年度（Season）の集計バ�
         *   `INSERT INTO ... SELECT h.user_id, %s as season, SUM(tk.acquisition_point) as total_points FROM kmnft_holdings h JOIN kmnft_token_ksp tk ON h.token_id = tk.token_id WHERE tk.season = %s GROUP BY h.user_id`
     *   **完了後**: 元の画面にリダイレクトし、完了メッセージを表示。
 
+3.  **CSVエクスポート**: 追加機能
+    *   **UI**: 「Export Aggregated KSP」セクションを追加。Token Summary用とUser Summary用の2つのボタン（フォーム）を用意。年度指定可能。
+    *   **Logic**:
+        *   `admin_post_kmnft_export_token_summary`: `kmnft_ksp_token_summary` から指定年度のデータをCSV出力。
+        *   `admin_post_kmnft_export_user_summary`: `kmnft_ksp_user_summary` から指定年度のデータをCSV出力。ユーザーIDに紐づくユーザー名（user_login）も結合して出力すると親切。
+
 ## Verification Plan
 
 ### Automated/Code Verification
