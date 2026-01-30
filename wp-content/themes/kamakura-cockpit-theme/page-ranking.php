@@ -21,8 +21,15 @@ $selected_season = isset($_GET['season']) ? sanitize_text_field($_GET['season'])
 // Fetch Token Ranking (Top 30)
 $token_ranking = array();
 if ($selected_season) {
+    $table_holdings = $wpdb->prefix . 'kmnft_holdings';
     $token_ranking = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM $table_token_summary WHERE season = %s ORDER BY total_points DESC LIMIT 30",
+        "SELECT s.*, h.zone_x, h.zone_y 
+         FROM $table_token_summary s
+         LEFT JOIN $table_holdings h ON s.token_id = h.token_id
+         WHERE s.season = %s 
+         GROUP BY s.token_id
+         ORDER BY s.total_points DESC 
+         LIMIT 30",
         $selected_season
     ));
 }
@@ -172,7 +179,7 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                                 $rank_color = ($rank_num == 1) ? 'text-kmnft-gold' : (($rank_num == 2) ? 'text-gray-300' : (($rank_num == 3) ? 'text-amber-600' : 'text-gray-500'));
                                 ?>
                                 <tr class="hover:bg-white/5 transition <?php echo $row_class; ?> cursor-pointer group/row" 
-                                    onclick="openTokenModal('<?php echo esc_js($item->token_id); ?>', '<?php echo esc_js($rank_num); ?>', '<?php echo esc_js(number_format($item->total_points)); ?>')">
+                                    onclick="openTokenModal('<?php echo esc_js($item->token_id); ?>', '<?php echo esc_js($rank_num); ?>', '<?php echo esc_js(number_format($item->total_points)); ?>', '<?php echo esc_js($item->zone_x); ?>', '<?php echo esc_js($item->zone_y); ?>')">
                                     <td class="px-6 py-4">
                                         <span class="font-bold <?php echo $rank_color; ?>">#<?php echo $rank_num; ?></span>
                                     </td>
@@ -252,7 +259,7 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
 
     <!-- Token Detail Modal -->
     <div id="token-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-        <div class="glass-card max-w-xl w-full rounded-2xl overflow-hidden relative animate-in zoom-in duration-300">
+        <div class="glass-card max-w-2xl w-full rounded-2xl overflow-hidden relative animate-in zoom-in duration-300">
             <button onclick="closeTokenModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/50 overflow-hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -260,20 +267,28 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             </button>
             <div class="flex flex-col md:flex-row h-full">
                 <!-- Image Section -->
-                <div class="w-full md:w-2/3 bg-black/40 aspect-square">
+                <div class="w-full md:w-3/5 bg-black/40 aspect-square">
                     <img id="modal-token-image" src="" alt="Token NFT" class="w-full h-full object-contain shadow-2xl">
                 </div>
                 <!-- Info Section -->
-                <div class="w-full md:w-1/3 p-6 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/10 bg-kmnft-navy/40">
+                <div class="w-full md:w-2/5 p-6 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/10 bg-kmnft-navy/40 overflow-hidden">
                     <div class="space-y-6">
                         <div>
                             <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Token ID</div>
-                            <div id="modal-token-id" class="text-2xl font-bold font-mono text-white">#000000</div>
+                            <div id="modal-token-id" class="text-xl md:text-2xl font-bold font-mono text-white break-all">#000000</div>
                         </div>
                         <div class="grid grid-cols-1 gap-4">
-                            <div>
-                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season Rank</div>
-                                <div id="modal-token-rank" class="text-3xl font-bold neon-text">#1</div>
+                            <div class="flex gap-8">
+                                <div>
+                                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season Rank</div>
+                                    <div id="modal-token-rank" class="text-3xl font-bold neon-text">#1</div>
+                                </div>
+                                <div id="modal-token-coord-container">
+                                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Coordinates</div>
+                                    <div class="text-xl font-bold text-gray-300 font-mono">
+                                        X:<span id="modal-token-x">0</span> Y:<span id="modal-token-y">0</span>
+                                    </div>
+                                </div>
                             </div>
                             <div>
                                 <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total KSP</div>
@@ -324,10 +339,20 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
         const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
         const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
 
-        function openTokenModal(tokenId, rank, points) {
+        function openTokenModal(tokenId, rank, points, x, y) {
             document.getElementById('modal-token-id').textContent = '#' + tokenId;
             document.getElementById('modal-token-rank').textContent = '#' + rank;
             document.getElementById('modal-token-points').innerHTML = points + '<span class="text-xs text-gray-500 ml-1">PT</span>';
+            
+            const coordContainer = document.getElementById('modal-token-coord-container');
+            if (x !== '' && y !== '') {
+                document.getElementById('modal-token-x').textContent = x;
+                document.getElementById('modal-token-y').textContent = y;
+                coordContainer.classList.remove('hidden');
+            } else {
+                coordContainer.classList.add('hidden');
+            }
+
             const img = document.getElementById('modal-token-image');
             img.src = imageBaseUrl + tokenId + '.png';
             img.onerror = function() {

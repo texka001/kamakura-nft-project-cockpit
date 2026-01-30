@@ -4,13 +4,13 @@
 
 ## 実施内容
 
-### 1. ランキングページテンプレートの作成
-- [page-ranking.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-ranking.php) を新規作成しました。
+### 1. ランキングページテンプレートの作成 & UI改善
+- [page-ranking.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-ranking.php) を更新しました。
+- **サムネイルの拡大**: 一覧表示の画像を `w-14 h-14` に拡大し、視認性を向上させました。
+- **詳細モーダルの実装**: NFTをクリックすると、拡大画像とともに「順位」と「獲得ポイント」が確認できるモーダルが表示されます。
 - **トークン別ランキング**: `wp_kmnft_ksp_token_summary` から Top 30 を取得。
 - **ユーザー別ランキング**: `wp_kmnft_ksp_user_summary` を `wp_users` と JOIN して Top 30 を取得。
 - **タブ切り替え機能**: JavaScript を使用し、リロードなしでトークン/ユーザーランキングを切り替え可能です。
-- **シーズン選択**: データベースに存在するシーズンを自動抽出し、ドロップダウンで選択可能です（デフォルトは最新シーズン）。
-- **デザイン**: コクピット画面と統一感のあるダークモード、ネオングリーンのアクセント、グラスモフィズムを採用しました。
 
 ### 2. コクピット画面へのリンク追加
 - [page-dashboard.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-dashboard.php) のヘッダーに「RANKING」リンクを追加しました。
@@ -21,5 +21,5 @@
 
 ## スクリーンショットイメージ（実装イメージ）
 - **タブ切り替え**: 上部のボタンでトークンとユーザーのランキングが切り替わります。
-- **ランク表示**: 1位〜3位には特別なカラー（Gold, Silver, Bronze）が適用されます。
-- **カレントユーザー表示**: ログイン中のユーザーがランキングに含まれる場合、ハイライト表示されます。
+- **順位・ポイントの表示**: モーダル内で、そのNFTの現在の順位と累計ポイントがひと目でわかります。
+- **カレントユーザー表示**: ユーザーランキングでは、自分がランクインしている場合にハイライトされます。
