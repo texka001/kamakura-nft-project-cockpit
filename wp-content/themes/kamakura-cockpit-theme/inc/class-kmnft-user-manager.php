@@ -26,6 +26,7 @@ class KMNFT_User_Manager
         add_action('admin_post_kmnft_export_token_ksp', array($this, 'process_token_ksp_export'));
         add_action('admin_post_kmnft_delete_token_ksp', array($this, 'process_token_ksp_delete'));
         add_action('admin_post_kmnft_delete_token_ksp_by_date', array($this, 'process_token_ksp_delete_by_date'));
+        add_action('admin_post_kmnft_aggregate_token_ksp', array($this, 'process_token_ksp_aggregation'));
 
         // Match Results Actions
         add_action('admin_post_kmnft_save_match', array($this, 'process_match_save'));
@@ -52,6 +53,7 @@ class KMNFT_User_Manager
         $this->ensure_standings_table();
         $this->ensure_league_schedule_table();
         $this->ensure_token_ksp_table();
+        $this->ensure_ksp_summary_tables();
     }
 
     public function enqueue_admin_scripts()
@@ -340,6 +342,27 @@ class KMNFT_User_Manager
                     </div>
                 <?php endif; ?>
             <?php endif; ?>
+
+            <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px; border-left: 4px solid #2271b1;">
+                <h2>Aggregation Batch (集計バッチ)</h2>
+                <p>Run the aggregation process to calculate total KSP for Tokens and Users for a specific Season.</p>
+                <p><strong>Note:</strong> This is a "Wash & Replace" operation. Existing summary data for the specified Season will be deleted and recreated.</p>
+                <p>ユーザー集計仕様: <strong>現在の保有トークン</strong>に基づき、指定年度の獲得ポイントを合算します。</p>
+
+                <form action="<?php echo admin_url('admin-post.php'); ?>" method="post" onsubmit="return confirm('Start aggregation for this season? This may take a few seconds.');">
+                    <input type="hidden" name="action" value="kmnft_aggregate_token_ksp">
+                    <?php wp_nonce_field('kmnft_token_ksp_aggregate_nonce', 'kmnft_nonce'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="agg_season">Season (Year)</label></th>
+                            <td>
+                                <input type="text" name="season" id="agg_season" class="regular-text" placeholder="e.g. 2026" required value="<?php echo date('Y'); ?>">
+                            </td>
+                        </tr>
+                    </table>
+                    <?php submit_button('Run Aggregation', 'primary'); ?>
+                </form>
+            </div>
 
             <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px;">
                 <h2>Batch Import Token KSP</h2>
@@ -1079,6 +1102,105 @@ class KMNFT_User_Manager
         }
 
         exit;
+    }
+
+    public function process_token_ksp_aggregation()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        check_admin_referer('kmnft_token_ksp_aggregate_nonce', 'kmnft_nonce');
+
+        $season = isset($_POST['season']) ? sanitize_text_field($_POST['season']) : '';
+        if (empty($season)) {
+            wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=error&msg=Season is required'));
+            exit;
+        }
+
+        global $wpdb;
+        $table_token_ksp = $wpdb->prefix . 'kmnft_token_ksp';
+        $table_holdings = $wpdb->prefix . 'kmnft_holdings';
+        $table_token_summary = $wpdb->prefix . 'kmnft_ksp_token_summary';
+        $table_user_summary = $wpdb->prefix . 'kmnft_ksp_user_summary';
+
+        // 1. Transaction Start (Optional/Simulated by order)
+        
+        // 2. Token Aggregation (Token x Season)
+        // Wash
+        $wpdb->delete($table_token_summary, array('season' => $season));
+        // Insert
+        $sql_token_agg = $wpdb->prepare(
+            "INSERT INTO $table_token_summary (token_id, season, total_points, updated_at)
+             SELECT token_id, %s, SUM(acquisition_point), NOW()
+             FROM $table_token_ksp
+             WHERE season = %s
+             GROUP BY token_id",
+            $season, $season
+        );
+        $wpdb->query($sql_token_agg);
+
+        // 3. User Aggregation (User x Season based on Current Holdings)
+        // Wash
+        $wpdb->delete($table_user_summary, array('season' => $season));
+        // Insert
+        // Join Holdings with TokenKSP(filtered by season)
+        // Note: We only care about users who hold tokens.
+        $sql_user_agg = $wpdb->prepare(
+            "INSERT INTO $table_user_summary (user_id, season, total_points, updated_at)
+             SELECT h.user_id, %s, SUM(tk.acquisition_point), NOW()
+             FROM $table_holdings h
+             JOIN $table_token_ksp tk ON h.token_id = tk.token_id
+             WHERE tk.season = %s
+             GROUP BY h.user_id",
+            $season, $season
+        );
+        $wpdb->query($sql_user_agg);
+
+        // Calculate counts for messaging
+        $token_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_token_summary WHERE season = %s", $season));
+        $user_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_user_summary WHERE season = %s", $season));
+
+        $msg = sprintf(
+            'Aggregation for Season %s completed. (Tokens: %d, Users: %d)',
+            esc_html($season), intval($token_count), intval($user_count)
+        );
+
+        wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=success&msg=' . urlencode($msg)));
+        exit;
+    }
+
+    private function ensure_ksp_summary_tables()
+    {
+        global $wpdb;
+        $charset_collate = $wpdb->get_charset_collate();
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+        // Token Summary
+        $table_ksp_token_summary = $wpdb->prefix . 'kmnft_ksp_token_summary';
+        $sql_ksp_token_summary = "CREATE TABLE $table_ksp_token_summary (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            token_id varchar(100) NOT NULL,
+            season varchar(20) NOT NULL,
+            total_points int(11) NOT NULL DEFAULT 0,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            UNIQUE KEY token_season (token_id, season)
+        ) $charset_collate;";
+        dbDelta($sql_ksp_token_summary);
+
+        // User Summary
+        $table_ksp_user_summary = $wpdb->prefix . 'kmnft_ksp_user_summary';
+        $sql_ksp_user_summary = "CREATE TABLE $table_ksp_user_summary (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            user_id bigint(20) unsigned NOT NULL,
+            season varchar(20) NOT NULL,
+            total_points int(11) NOT NULL DEFAULT 0,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            UNIQUE KEY user_season (user_id, season)
+        ) $charset_collate;";
+        dbDelta($sql_ksp_user_summary);
     }
 
     private function ensure_token_ksp_table()

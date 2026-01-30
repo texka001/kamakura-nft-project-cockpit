@@ -87,5 +87,33 @@ class KMNFT_DB_Migration
 			KEY token_id (token_id)
 		) $charset_collate;";
 		dbDelta($sql_token_ksp);
+
+		// 6. Token KSP Summary (By Token)
+		// Aggregated points per token for a specific season
+		$table_ksp_token_summary = $wpdb->prefix . 'kmnft_ksp_token_summary';
+		$sql_ksp_token_summary = "CREATE TABLE $table_ksp_token_summary (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			token_id varchar(100) NOT NULL,
+			season varchar(20) NOT NULL,
+			total_points int(11) NOT NULL DEFAULT 0,
+			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY  (id),
+			UNIQUE KEY token_season (token_id, season)
+		) $charset_collate;";
+		dbDelta($sql_ksp_token_summary);
+
+		// 7. Token KSP Summary (By User)
+		// Aggregated points per user based on current holdings for a specific season
+		$table_ksp_user_summary = $wpdb->prefix . 'kmnft_ksp_user_summary';
+		$sql_ksp_user_summary = "CREATE TABLE $table_ksp_user_summary (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			user_id bigint(20) unsigned NOT NULL,
+			season varchar(20) NOT NULL,
+			total_points int(11) NOT NULL DEFAULT 0,
+			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY  (id),
+			UNIQUE KEY user_season (user_id, season)
+		) $charset_collate;";
+		dbDelta($sql_ksp_user_summary);
 	}
 }
