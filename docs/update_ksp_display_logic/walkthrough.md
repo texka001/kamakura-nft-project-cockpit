@@ -31,6 +31,7 @@ KSP（Kamakura Stadium Points）の表示を、全体の通算合計ではなく
 - [x] 現状の表示ロジックの調査
 - [x] 実装計画の作成と承認
 - [x] KMNFT_User_Manager クラスの拡張 (`get_user_ksp_summary`)
+- [x] SQLクエリの修正 (MySQL 8の予約語 `rank` へのバックティック追加)
 - [x] ダッシュボード表示の更新 (`page-dashboard.php`)
 - [x] Deployment to Local WP
 - [x] Git Commit
