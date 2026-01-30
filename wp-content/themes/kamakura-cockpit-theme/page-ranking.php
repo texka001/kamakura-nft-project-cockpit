@@ -171,28 +171,24 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                                 $row_class = ($rank_num <= 3) ? 'bg-kmnft-green/5' : '';
                                 $rank_color = ($rank_num == 1) ? 'text-kmnft-gold' : (($rank_num == 2) ? 'text-gray-300' : (($rank_num == 3) ? 'text-amber-600' : 'text-gray-500'));
                                 ?>
-                                <tr class="hover:bg-white/5 transition <?php echo $row_class; ?>">
+                                <tr class="hover:bg-white/5 transition <?php echo $row_class; ?> cursor-pointer group/row" 
+                                    onclick="openTokenModal('<?php echo esc_js($item->token_id); ?>', '<?php echo esc_js($rank_num); ?>', '<?php echo esc_js(number_format($item->total_points)); ?>')">
                                     <td class="px-6 py-4">
-                                        <span class="font-bold <?php echo $rank_color; ?>">#
-                                            <?php echo $rank_num; ?>
-                                        </span>
+                                        <span class="font-bold <?php echo $rank_color; ?>">#<?php echo $rank_num; ?></span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded border border-gray-700 overflow-hidden bg-gray-900">
-                                                <img src="<?php echo KMNFT_IMAGE_BASE_URL . esc_attr($item->token_id) . '.png'; ?>"
-                                                    alt="<?php echo esc_attr($item->token_id); ?>"
-                                                    class="w-full h-full object-cover"
-                                                    onerror="this.src='<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';this.style.opacity='0.5';">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-14 h-14 rounded border border-gray-700 overflow-hidden bg-gray-900 shadow-lg group-hover/row:border-kmnft-green transition duration-300">
+                                                <img src="<?php echo KMNFT_IMAGE_BASE_URL . esc_attr($item->token_id) . '.png'; ?>" 
+                                                     alt="<?php echo esc_attr($item->token_id); ?>" 
+                                                     class="w-full h-full object-cover group-hover/row:scale-110 transition duration-500"
+                                                     onerror="this.src='<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';this.style.opacity='0.5';">
                                             </div>
-                                            <span class="font-mono text-white">#
-                                                <?php echo esc_html($item->token_id); ?>
-                                            </span>
+                                            <span class="font-mono text-white text-base">#<?php echo esc_html($item->token_id); ?></span>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 text-right font-bold text-kmnft-green font-mono">
-                                        <?php echo number_format($item->total_points); ?> <span
-                                            class="text-[10px] text-gray-500 ml-1 uppercase">pt</span>
+                                    <td class="px-6 py-4 text-right font-bold text-kmnft-green font-mono text-base">
+                                        <?php echo number_format($item->total_points); ?> <span class="text-[10px] text-gray-500 ml-1 uppercase">pt</span>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -200,7 +196,7 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                     </tbody>
                 </table>
             </div>
-            <p class="text-[10px] text-gray-500 px-2 italic">* Displays top 30 tokens for the selected season.</p>
+            <p class="text-[10px] text-gray-500 px-2 italic">* Displays top 30 tokens for the selected season. (Click row for details)</p>
         </div>
 
         <!-- User Ranking Table -->
@@ -217,39 +213,32 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                     <tbody class="divide-y divide-white/5">
                         <?php if (empty($user_ranking)): ?>
                             <tr>
-                                <td colspan="3" class="px-6 py-10 text-center text-gray-500 italic">No data available for
-                                    this season.</td>
+                                <td colspan="3" class="px-6 py-10 text-center text-gray-500 italic">No data available for this season.</td>
                             </tr>
                         <?php else: ?>
-                            <?php foreach ($user_ranking as $index => $item):
+                            <?php foreach ($user_ranking as $index => $item): 
                                 $rank_num = $index + 1;
                                 $is_current = ($is_logged_in && $current_user->ID == $item->user_id);
                                 $row_class = $is_current ? 'bg-kmnft-green/10 border-l-2 border-kmnft-green' : (($rank_num <= 3) ? 'bg-kmnft-green/5' : '');
                                 $rank_color = ($rank_num == 1) ? 'text-kmnft-gold' : (($rank_num == 2) ? 'text-gray-300' : (($rank_num == 3) ? 'text-amber-600' : 'text-gray-500'));
-                                ?>
+                            ?>
                                 <tr class="hover:bg-white/5 transition <?php echo $row_class; ?>">
                                     <td class="px-6 py-4">
-                                        <span class="font-bold <?php echo $rank_color; ?>">#
-                                            <?php echo $rank_num; ?>
-                                        </span>
+                                        <span class="font-bold <?php echo $rank_color; ?>">#<?php echo $rank_num; ?></span>
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex flex-col">
-                                            <span class="text-white font-bold">
+                                            <span class="text-white font-bold text-base">
                                                 <?php echo esc_html($item->display_name); ?>
                                                 <?php if ($is_current): ?>
-                                                    <span
-                                                        class="ml-2 text-[8px] bg-kmnft-green text-black px-1 rounded uppercase">YOU</span>
+                                                    <span class="ml-2 text-[8px] bg-kmnft-green text-black px-1 rounded uppercase">YOU</span>
                                                 <?php endif; ?>
                                             </span>
-                                            <span class="text-[10px] text-gray-500 font-mono">ID:
-                                                <?php echo esc_html($item->user_login); ?>
-                                            </span>
+                                            <span class="text-[10px] text-gray-500 font-mono">ID: <?php echo esc_html($item->user_login); ?></span>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 text-right font-bold text-kmnft-green font-mono">
-                                        <?php echo number_format($item->total_points); ?> <span
-                                            class="text-[10px] text-gray-500 ml-1 uppercase">pt</span>
+                                    <td class="px-6 py-4 text-right font-bold text-kmnft-green font-mono text-base">
+                                        <?php echo number_format($item->total_points); ?> <span class="text-[10px] text-gray-500 ml-1 uppercase">pt</span>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -261,14 +250,50 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
         </div>
     </main>
 
+    <!-- Token Detail Modal -->
+    <div id="token-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+        <div class="glass-card max-w-xl w-full rounded-2xl overflow-hidden relative animate-in zoom-in duration-300">
+            <button onclick="closeTokenModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/50 overflow-hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="flex flex-col md:flex-row h-full">
+                <!-- Image Section -->
+                <div class="w-full md:w-2/3 bg-black/40 aspect-square">
+                    <img id="modal-token-image" src="" alt="Token NFT" class="w-full h-full object-contain shadow-2xl">
+                </div>
+                <!-- Info Section -->
+                <div class="w-full md:w-1/3 p-6 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/10 bg-kmnft-navy/40">
+                    <div class="space-y-6">
+                        <div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Token ID</div>
+                            <div id="modal-token-id" class="text-2xl font-bold font-mono text-white">#000000</div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season Rank</div>
+                                <div id="modal-token-rank" class="text-3xl font-bold neon-text">#1</div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total KSP</div>
+                                <div id="modal-token-points" class="text-3xl font-bold text-kmnft-green font-mono">0<span class="text-xs text-gray-500 ml-1">PT</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tap background to close -->
+        <div class="absolute inset-0 -z-10" onclick="closeTokenModal()"></div>
+    </div>
+
     <footer class="mt-auto py-10 border-t border-gray-800 text-center">
         <div class="text-[10px] text-gray-600 uppercase tracking-widest mb-2">Developed by</div>
         <div class="text-sm font-bold text-gray-400">KAMAKURA STADIUM NFT PROJECT</div>
         <div class="mt-4 flex justify-center space-x-6">
-            <a href="<?php echo home_url('/dashboard'); ?>"
-                class="text-[10px] text-gray-500 hover:text-white transition">Cockpit</a>
-            <a href="<?php echo home_url('/contact'); ?>"
-                class="text-[10px] text-gray-500 hover:text-white transition">Contact</a>
+            <a href="<?php echo home_url('/dashboard'); ?>" class="text-[10px] text-gray-500 hover:text-white transition">Cockpit</a>
+            <a href="<?php echo home_url('/contact'); ?>" class="text-[10px] text-gray-500 hover:text-white transition">Contact</a>
         </div>
     </footer>
 
@@ -294,6 +319,33 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                 userBtn.classList.add('tab-active');
                 userBtn.classList.remove('text-gray-500');
             }
+        }
+
+        const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
+        const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
+
+        function openTokenModal(tokenId, rank, points) {
+            document.getElementById('modal-token-id').textContent = '#' + tokenId;
+            document.getElementById('modal-token-rank').textContent = '#' + rank;
+            document.getElementById('modal-token-points').innerHTML = points + '<span class="text-xs text-gray-500 ml-1">PT</span>';
+            const img = document.getElementById('modal-token-image');
+            img.src = imageBaseUrl + tokenId + '.png';
+            img.onerror = function() {
+                this.src = fallbackImage;
+                this.style.opacity = '0.5';
+            };
+            
+            const modal = document.getElementById('token-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeTokenModal() {
+            const modal = document.getElementById('token-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
         }
     </script>
 </body>

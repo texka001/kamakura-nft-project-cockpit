@@ -1,31 +1,22 @@
-# ランキング画面実装計画
+# ランキング画面UI改善計画
 
-年度別のKSP（Kamakura Support Points）保有状況を可視化するため、トークン別およびユーザー別のランキング画面を新規に作成します。
+ランキング画面の視認性とインタラクティブ性を向上させるため、以下の改善を実施します。
 
 ## 変更内容
 
 ### [テーマ] kamakura-cockpit-theme
 
-#### [NEW] [page-ranking.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-ranking.php)
-- 新規ページテンプレート。
-- `wp_kmnft_ksp_token_summary` テーブルからトークン別ランキング（Top 30）を取得。
-- `wp_kmnft_ksp_user_summary` テーブルからユーザー別ランキング（Top 30）を取得。
-- Tailwind CSS を使用して、2つのランキングをタブで切り替えられるUIを実装。
-- 最新のシーズンデータをデフォルトで表示。
-
-#### [MODIFY] [page-dashboard.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-dashboard.php)
-- ヘッダーメニューに「RANKING」へのリンクを追加。
-- リンク先は `/ranking`（または作成したページのパーマリンク）とする。
+#### [MODIFY] [page-ranking.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-ranking.php)
+- **NFTサムネイルの拡大**: 一覧画面のサムネイルサイズを `w-8 h-8` から `w-14 h-14` に変更。
+- **詳細モーダルの追加**:
+    - NFTをクリックした際に拡大表示するモーダルを実装。
+    - モーダル内には、画像に加えて「Token ID」「順位」「獲得ポイント」を表示。
+- **インタラクションの追加**:
+    - ランキングの行または画像にホバーエフェクトとクリックイベントを追加。
 
 ## 検証計画
 
-### 自動テスト
-- 特になし（既存のユニットテストフレームワークがないため）。
-
 ### 手動確認
-1. **ページ遷移確認**: コクピット画面上部の「RANKING」リンクをクリックし、ランキングページへ遷移することを確認。
-2. **ランキング表示確認**: 
-    - トークンランキングタブに Top 30 のデータが表示されていること。
-    - ユーザーランキングタブに Top 30 のデータが表示されていること。
-3. **タブ切り替え確認**: タブをクリックして表示内容が正しく切り替わることを確認。
-4. **デザイン確認**: コクピット画面のトンマナ（ダークモード、ネオングリーン）に合致していることを確認。
+1. **視認性確認**: ランキング一覧の画像が大きくなり、見やすくなっていることを確認。
+2. **モーダル動作確認**: 画像をクリックして詳細モーダルが開くこと、および内容（画像、順位、ポイント）が正しいことを確認。
+3. **モーダル閉鎖確認**: 閉じるボタンまたは背景クリックでモーダルが閉じることを確認。
