@@ -501,9 +501,21 @@ if (!$is_logged_in) {
             <?php if ($is_logged_in): ?>
                 <div class="glass-card p-6 rounded-lg">
                     <div class="flex items-center justify-between mb-6">
-                        <h2
-                            class="text-lg font-bold text-white tracking-wide border-b border-kmnft-green pb-1 inline-block">
-                            OWNED ASSETS</h2>
+                        <div class="flex items-center gap-4">
+                            <h2
+                                class="text-lg font-bold text-white tracking-wide border-b border-kmnft-green pb-1 inline-block">
+                                OWNED ASSETS</h2>
+                            <a href="https://kamakura-stadium-nft.com/" target="_blank"
+                                class="inline-flex items-center gap-1.5 px-3 py-1 border border-kmnft-green/50 text-kmnft-green text-[10px] font-bold rounded hover:bg-kmnft-green hover:text-black transition duration-200 group uppercase tracking-wider">
+                                <span>アセットを追加購入</span>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-2.5 w-2.5 transform group-hover:translate-x-0.5 transition" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </a>
+                        </div>
                         <span class="text-xs text-gray-500">
                             <?php echo count($holdings); ?> ASSETS
                         </span>
@@ -570,19 +582,7 @@ if (!$is_logged_in) {
                             No Assets Found. Please contact admin.
                         </div>
                     <?php endif; ?>
-                    <div class="mt-8 text-center">
-                        <a href="https://kamakura-stadium-nft.com/" target="_blank"
-                            class="inline-flex items-center gap-2 px-6 py-2 border border-kmnft-green/50 text-kmnft-green text-xs font-bold rounded hover:bg-kmnft-green hover:text-black transition duration-200 group uppercase tracking-wider">
-                            <span>アセットを追加購入</span>
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="h-3 w-3 transform group-hover:translate-x-1 transition" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </a>
-                        <p class="text-[10px] text-gray-500 mt-2">公式ストアへ移動します</p>
-                    </div>
+
                 </div>
             <?php endif; ?>
 
