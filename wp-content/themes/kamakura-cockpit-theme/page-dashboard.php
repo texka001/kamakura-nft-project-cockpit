@@ -1305,8 +1305,9 @@ if (!$is_logged_in) {
             </button>
             <div class="flex flex-col md:flex-row h-full">
                 <!-- Image Section -->
-                <div class="w-full md:w-3/5 bg-black/40 aspect-square">
-                    <img id="modal-token-image" src="" alt="Token NFT" class="w-full h-full object-contain">
+                <div class="w-full md:w-3/5 aspect-square">
+                    <img id="modal-token-image" src="" alt="Token NFT"
+                        class="w-full h-full object-contain brightness-[1.1]">
                 </div>
                 <!-- Info Section -->
                 <div
