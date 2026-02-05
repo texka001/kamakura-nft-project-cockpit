@@ -456,7 +456,7 @@ if (!$is_logged_in) {
                                 ?>
                                 <div class="absolute w-1.5 h-1.5 bg-kmnft-gold rounded-full shadow-[0_0_4px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2"
                                     style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
-                                    onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>')"
+                                    onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>', '<?php echo esc_js($latest_season_label); ?>')"
                                     title="ID: <?php echo esc_attr($holding->token_id); ?> (X:<?php echo $x; ?>, Y:<?php echo $y; ?>)">
                                 </div>
                             <?php endif; ?>
@@ -574,7 +574,7 @@ if (!$is_logged_in) {
                                 $zy = isset($holding->zone_y) ? $holding->zone_y : '';
                                 ?>
                                 <div class="asset-item group relative glass-card rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer <?php echo $is_hidden; ?>"
-                                    onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($zx); ?>', '<?php echo esc_js($zy); ?>')">
+                                    onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($zx); ?>', '<?php echo esc_js($zy); ?>', '<?php echo esc_js($latest_season_label); ?>')">
                                     <!-- Image -->
                                     <div class="aspect-square w-full bg-gray-900 relative">
                                         <img src="<?php echo $image_url; ?>" alt="Asset <?php echo esc_attr($holding->token_id); ?>"
@@ -1313,32 +1313,42 @@ if (!$is_logged_in) {
                 <div
                     class="w-full md:w-2/5 p-6 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/10 bg-gray-900/60 overflow-hidden">
                     <div class="space-y-6">
+                        <!-- Row 1: Token ID -->
                         <div>
                             <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Token ID</div>
                             <div id="modal-token-id"
                                 class="text-xl md:text-2xl font-bold font-mono text-white break-all">#000000</div>
                         </div>
-                        <div class="grid grid-cols-1 gap-4">
-                            <div class="flex gap-8">
-                                <div>
-                                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season Rank
-                                    </div>
-                                    <div id="modal-token-rank" class="text-3xl font-bold text-kmnft-green neon-text">#1
-                                    </div>
-                                </div>
-                                <div id="modal-token-coord-container">
-                                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Coordinates
-                                    </div>
-                                    <div class="text-xl font-bold text-gray-300 font-mono">
-                                        X:<span id="modal-token-x">0</span> Y:<span id="modal-token-y">0</span>
-                                    </div>
-                                </div>
+
+                        <!-- Row 2: Coordinates (2 column grid) -->
+                        <div id="modal-token-coord-container" class="grid grid-cols-2 gap-4">
+                            <div>
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">X-Coordinate</div>
+                                <div id="modal-token-x" class="text-xl font-bold text-gray-300 font-mono">0</div>
                             </div>
                             <div>
-                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total KSP</div>
-                                <div id="modal-token-points" class="text-3xl font-bold text-kmnft-gold font-mono">
-                                    0<span class="text-xs text-gray-500 ml-1">PT</span></div>
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Y-Coordinate</div>
+                                <div id="modal-token-y" class="text-xl font-bold text-gray-300 font-mono">0</div>
                             </div>
+                        </div>
+
+                        <!-- Row 3: Total KSP -->
+                        <div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total KSP</div>
+                            <div id="modal-token-points" class="text-3xl font-bold text-kmnft-gold font-mono">
+                                0<span class="text-xs text-gray-500 ml-1">PT</span></div>
+                        </div>
+
+                        <!-- Row 4: Season Rank -->
+                        <div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season Rank</div>
+                            <div id="modal-token-rank" class="text-3xl font-bold text-kmnft-green neon-text">#1</div>
+                        </div>
+
+                        <!-- Row 5: Season (Year) -->
+                        <div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season</div>
+                            <div id="modal-token-season" class="text-xl font-bold text-gray-400 font-mono">-</div>
                         </div>
                     </div>
                 </div>
@@ -1405,7 +1415,7 @@ if (!$is_logged_in) {
                             ?>
                             <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
                                 style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
-                                onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>')">
+                                onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>', '<?php echo esc_js($latest_season_label); ?>')">
 
                                 <!-- Label (Last 4 Digits) -->
                                 <span
@@ -1440,19 +1450,23 @@ if (!$is_logged_in) {
     <script>
         const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
         const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
+        const latestSeasonLabel = '<?php echo esc_js($latest_season_label); ?>';
 
-        function openTokenModal(tokenId, rank, points, x, y) {
+        function openTokenModal(tokenId, rank, points, x, y, season) {
             document.getElementById('modal-token-id').textContent = '#' + tokenId;
             document.getElementById('modal-token-rank').textContent = rank ? '#' + rank : '-';
             document.getElementById('modal-token-points').innerHTML = (points || '0') + '<span class="text-xs text-gray-500 ml-1">PT</span>';
+            document.getElementById('modal-token-season').textContent = season || '-';
 
             const coordContainer = document.getElementById('modal-token-coord-container');
             if (x !== undefined && y !== undefined && x !== '' && y !== '') {
                 document.getElementById('modal-token-x').textContent = x;
                 document.getElementById('modal-token-y').textContent = y;
                 coordContainer.classList.remove('hidden');
+                coordContainer.classList.add('grid');
             } else {
                 coordContainer.classList.add('hidden');
+                coordContainer.classList.remove('grid');
             }
 
             const img = document.getElementById('modal-token-image');
@@ -1486,7 +1500,7 @@ if (!$is_logged_in) {
             if (url.includes(imageBaseUrl)) {
                 const tokenId = url.replace(imageBaseUrl, '').replace('.png', '');
                 // We don't have rank/points here easily, but we can at least show the ID
-                openTokenModal(tokenId, '-', '0', '', '');
+                openTokenModal(tokenId, '-', '0', '', '', latestSeasonLabel);
                 return;
             }
 
