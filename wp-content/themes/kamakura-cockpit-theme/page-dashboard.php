@@ -1448,20 +1448,19 @@ if (!$is_logged_in) {
     </div>
 
     <script>
-        <script>
-            const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
-            const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
+        const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
+        const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
 
-            function openTokenModal(tokenId, rank, points, x, y) {
-                document.getElementById('modal-token-id').textContent = '#' + tokenId;
+        function openTokenModal(tokenId, rank, points, x, y) {
+            document.getElementById('modal-token-id').textContent = '#' + tokenId;
             document.getElementById('modal-token-rank').textContent = rank ? '#' + rank : '-';
             document.getElementById('modal-token-points').innerHTML = (points || '0') + '<span class="text-xs text-gray-500 ml-1">PT</span>';
 
             const coordContainer = document.getElementById('modal-token-coord-container');
             if (x !== undefined && y !== undefined && x !== '' && y !== '') {
                 document.getElementById('modal-token-x').textContent = x;
-            document.getElementById('modal-token-y').textContent = y;
-            coordContainer.classList.remove('hidden');
+                document.getElementById('modal-token-y').textContent = y;
+                coordContainer.classList.remove('hidden');
             } else {
                 coordContainer.classList.add('hidden');
             }
@@ -1470,7 +1469,7 @@ if (!$is_logged_in) {
             img.src = imageBaseUrl + tokenId + '.png';
             img.onerror = function () {
                 this.src = fallbackImage;
-            this.style.opacity = '0.5';
+                this.style.opacity = '0.5';
             };
 
             const modal = document.getElementById('token-modal');
@@ -1479,7 +1478,7 @@ if (!$is_logged_in) {
             document.body.style.overflow = 'hidden';
         }
 
-            function closeTokenModal() {
+        function closeTokenModal() {
             const modal = document.getElementById('token-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -1490,14 +1489,14 @@ if (!$is_logged_in) {
             }, 200);
         }
 
-            // Keep openImageModal for backward compatibility and general images
-            function openImageModal(url) {
+        // Keep openImageModal for backward compatibility and general images
+        function openImageModal(url) {
             // If it's a token image URL, try to extract ID and show as token
             if (url.includes(imageBaseUrl)) {
                 const tokenId = url.replace(imageBaseUrl, '').replace('.png', '');
-            // We don't have rank/points here easily, but we can at least show the ID
-            openTokenModal(tokenId, '-', '0', '', '');
-            return;
+                // We don't have rank/points here easily, but we can at least show the ID
+                openTokenModal(tokenId, '-', '0', '', '');
+                return;
             }
 
             // Otherwise, show as a simple image in the token modal but hide the info panel
@@ -1510,8 +1509,8 @@ if (!$is_logged_in) {
             const imgSection = document.querySelector('#token-modal .md\\:w-3\\/5');
             if (infoSection && imgSection) {
                 infoSection.classList.add('hidden');
-            imgSection.classList.remove('md:w-3/5');
-            imgSection.classList.add('w-full');
+                imgSection.classList.remove('md:w-3/5');
+                imgSection.classList.add('w-full');
             }
 
             modal.classList.remove('hidden');
@@ -1519,48 +1518,48 @@ if (!$is_logged_in) {
             document.body.style.overflow = 'hidden';
         }
 
-            // Modify closeTokenModal to restore layout
-            const originalCloseTokenModal = closeTokenModal;
-            closeTokenModal = function() {
-                originalCloseTokenModal();
+        // Modify closeTokenModal to restore layout
+        const originalCloseTokenModal = closeTokenModal;
+        closeTokenModal = function () {
+            originalCloseTokenModal();
             const infoSection = document.querySelector('#token-modal .md\\:w-2\\/5');
             const imgSection = document.querySelector('#token-modal .md\\:w-3\\/5');
             if (infoSection && imgSection) {
                 infoSection.classList.remove('hidden');
-            imgSection.classList.add('md:w-3/5');
-            imgSection.classList.remove('w-full');
+                imgSection.classList.add('md:w-3/5');
+                imgSection.classList.remove('w-full');
             }
         };
 
-            function openMapModal() {
+        function openMapModal() {
             const modal = document.getElementById('map-modal');
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
 
-            function closeMapModal() {
+        function closeMapModal() {
             const modal = document.getElementById('map-modal');
             modal.classList.add('hidden');
             document.body.style.overflow = 'auto';
         }
 
-            // Close on Escape key
-            document.addEventListener('keydown', function (event) {
+        // Close on Escape key
+        document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 closeImageModal();
-            closeMapModal();
-            closePasswordModal();
+                closeMapModal();
+                closePasswordModal();
             }
         });
 
-            function toggleSection(contentId, iconId) {
+        function toggleSection(contentId, iconId) {
             const content = document.getElementById(contentId);
             const icon = document.getElementById(iconId);
             if (content) content.classList.toggle('hidden');
             if (icon) icon.classList.toggle('rotate-180');
         }
 
-            function showAllAssets() {
+        function showAllAssets() {
             const hiddenAssets = document.querySelectorAll('.asset-item.hidden-asset');
             hiddenAssets.forEach(el => {
                 el.classList.remove('hidden');
@@ -1571,12 +1570,12 @@ if (!$is_logged_in) {
             if (btnLess) btnLess.style.display = 'inline-block';
         }
 
-            function showLessAssets() {
+        function showLessAssets() {
             const allAssets = document.querySelectorAll('.asset-item');
             allAssets.forEach((el, index) => {
                 if (index >= 5) {
-                el.classList.add('hidden');
-            el.classList.add('hidden-asset'); // Ensure marker class is kept
+                    el.classList.add('hidden');
+                    el.classList.add('hidden-asset'); // Ensure marker class is kept
                 }
             });
             const btnMore = document.getElementById('show-more-assets');
@@ -1585,7 +1584,7 @@ if (!$is_logged_in) {
             if (btnLess) btnLess.style.display = 'none';
         }
 
-            function showAllMatches() {
+        function showAllMatches() {
             const hiddenMatches = document.querySelectorAll('.match-item.hidden-match');
             hiddenMatches.forEach(el => {
                 el.classList.remove('hidden');
@@ -1596,12 +1595,12 @@ if (!$is_logged_in) {
             if (btnLess) btnLess.style.display = 'inline-block';
         }
 
-            function showLessMatches() {
+        function showLessMatches() {
             const allMatches = document.querySelectorAll('.match-item');
             allMatches.forEach((el, index) => {
                 if (index >= 3) {
-                el.classList.add('hidden');
-            el.classList.add('hidden-match');
+                    el.classList.add('hidden');
+                    el.classList.add('hidden-match');
                 }
             });
             const btnMore = document.getElementById('show-more-matches');
@@ -1610,56 +1609,56 @@ if (!$is_logged_in) {
             if (btnLess) btnLess.style.display = 'none';
         }
 
-            function togglePrize(id) {
+        function togglePrize(id) {
             const el = document.getElementById('prize-memo-' + id);
             const icon = document.getElementById('prize-icon-' + id);
             if (el) el.classList.toggle('hidden');
             if (icon) icon.classList.toggle('rotate-180');
         }
 
-            function openPasswordModal() {
-                document.getElementById('password-modal').classList.remove('hidden');
+        function openPasswordModal() {
+            document.getElementById('password-modal').classList.remove('hidden');
         }
 
-            function closePasswordModal() {
-                document.getElementById('password-modal').classList.add('hidden');
+        function closePasswordModal() {
+            document.getElementById('password-modal').classList.add('hidden');
         }
 
-            // --- User Icon Upload ---
-            const dashboardNonce = "<?php echo wp_create_nonce('kmnft_dashboard_nonce'); ?>";
+        // --- User Icon Upload ---
+        const dashboardNonce = "<?php echo wp_create_nonce('kmnft_dashboard_nonce'); ?>";
 
-            function uploadUserIcon(input) {
+        function uploadUserIcon(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-            const spinner = document.getElementById('avatar-spinner');
+                const spinner = document.getElementById('avatar-spinner');
 
-            // Show Spinner
-            spinner.classList.remove('hidden');
+                // Show Spinner
+                spinner.classList.remove('hidden');
 
-            const formData = new FormData();
-            formData.append('action', 'kmnft_upload_user_icon');
-            formData.append('file', file);
-            formData.append('nonce', dashboardNonce);
+                const formData = new FormData();
+                formData.append('action', 'kmnft_upload_user_icon');
+                formData.append('file', file);
+                formData.append('nonce', dashboardNonce);
 
-            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-                method: 'POST',
-            body: formData
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    body: formData
                 })
                     .then(response => response.json())
                     .then(data => {
-                spinner.classList.add('hidden');
-            if (data.success) {
-                // Update Image
-                document.getElementById('user-avatar-img').src = data.data.url;
+                        spinner.classList.add('hidden');
+                        if (data.success) {
+                            // Update Image
+                            document.getElementById('user-avatar-img').src = data.data.url;
                             // alert('Icon updated!');
                         } else {
-                alert('Error: ' + (data.data.message || 'Upload failed'));
+                            alert('Error: ' + (data.data.message || 'Upload failed'));
                         }
                     })
                     .catch(error => {
-                spinner.classList.add('hidden');
-            console.error('Error:', error);
-            alert('Upload error occurred.');
+                        spinner.classList.add('hidden');
+                        console.error('Error:', error);
+                        alert('Upload error occurred.');
                     });
             }
         }
@@ -1785,29 +1784,29 @@ if (!$is_logged_in) {
             const handleResize = () => {
                 // Only active on desktop (md breakpoint approx 768px)
                 if (window.innerWidth < 768) {
-                sidebar.style.top = '';
-            sidebar.style.bottom = '';
-            return;
+                    sidebar.style.top = '';
+                    sidebar.style.bottom = '';
+                    return;
                 }
 
-            const windowHeight = window.innerHeight;
-            const sidebarHeight = sidebar.scrollHeight;
-            const headerOffset = 96; // 6rem (top-24)
-            const bottomOffset = 24; // Margin from bottom
+                const windowHeight = window.innerHeight;
+                const sidebarHeight = sidebar.scrollHeight;
+                const headerOffset = 96; // 6rem (top-24)
+                const bottomOffset = 24; // Margin from bottom
 
-            // Always reset bottom to auto as we only control top
-            sidebar.style.bottom = 'auto';
+                // Always reset bottom to auto as we only control top
+                sidebar.style.bottom = 'auto';
 
                 if (sidebarHeight > (windowHeight - headerOffset)) {
                     // Sidebar is taller than viewport
                     // Calculate negative top so bottom sticks when scrolling down
                     // Formula: ViewportHeight - SidebarHeight - BottomMargin
                     const topValue = windowHeight - sidebarHeight - bottomOffset;
-            sidebar.style.top = `${topValue}px`;
+                    sidebar.style.top = `${topValue}px`;
                 } else {
-                // Sidebar is shorter than viewport
-                // Stick to top
-                sidebar.style.top = `${headerOffset}px`;
+                    // Sidebar is shorter than viewport
+                    // Stick to top
+                    sidebar.style.top = `${headerOffset}px`;
                 }
             };
 
