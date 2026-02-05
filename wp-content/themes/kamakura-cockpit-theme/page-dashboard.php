@@ -1456,6 +1456,7 @@ if (!$is_logged_in) {
             }
 
             const img = document.getElementById('modal-token-image');
+            img.style.opacity = '1'; // Reset opacity
             img.src = imageBaseUrl + tokenId + '.png';
             img.onerror = function () {
                 this.src = fallbackImage;
@@ -1536,7 +1537,7 @@ if (!$is_logged_in) {
         // Close on Escape key
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
-                closeImageModal();
+                closeTokenModal();
                 closeMapModal();
                 closePasswordModal();
             }
