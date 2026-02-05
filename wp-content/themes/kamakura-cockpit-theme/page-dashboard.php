@@ -12,6 +12,9 @@ $rank = 'GUEST';
 $holdings = array();
 $ksp_balance = '-';
 $ksp_total_val = 0; // Initialize to avoid undefined variable error for guests
+$ksp_by_season = array();
+$tokens_ksp_summary = array();
+$latest_rank = 0;
 $avatar_url = ''; // Will handle default below
 
 if ($is_logged_in) {
@@ -23,10 +26,6 @@ if ($is_logged_in) {
     $holdings = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}kmnft_holdings WHERE user_id = %d", $current_user->ID));
 
     // Fetch Annual KSP Summary (from aggregate table)
-    $ksp_by_season = array();
-    $ksp_total_val = 0;
-    $latest_rank = 0;
-
     if (class_exists('KMNFT_User_Manager')) {
         $kmnft_manager = new KMNFT_User_Manager();
         $ksp_by_season = $kmnft_manager->get_user_ksp_summary($current_user->ID);
@@ -41,7 +40,6 @@ if ($is_logged_in) {
     $ksp_balance = number_format($ksp_total_val);
 
     // Fetch Token Level KSP Summary for Holdings
-    $tokens_ksp_summary = array();
     if (!empty($holdings) && !empty($ksp_by_season)) {
         $latest_season_label = $ksp_by_season[0]->season;
         $token_ids = array_map(function ($h) {
