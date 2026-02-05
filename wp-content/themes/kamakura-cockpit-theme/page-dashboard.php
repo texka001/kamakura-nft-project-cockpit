@@ -11,6 +11,7 @@ global $wpdb;
 $rank = 'GUEST';
 $holdings = array();
 $ksp_balance = '-';
+$ksp_total_val = 0; // Initialize to avoid undefined variable error for guests
 $avatar_url = ''; // Will handle default below
 
 if ($is_logged_in) {
@@ -1414,30 +1415,30 @@ if (!$is_logged_in) {
                                 $tooltip_x_class = 'left-1/2 -translate-x-1/2';
                             }
                             ?>
-                                    <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
-                                        style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
-                                        onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>')">
+                            <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
+                                style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
+                                onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>')">
 
-                                        <!-- Label (Last 4 Digits) -->
-                                        <span
-                                            class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] md:text-[10px] text-white font-mono bg-black/50 px-1 rounded whitespace-nowrap pointer-events-none">
-                                            <?php echo esc_html($last4); ?>
-                                        </span>
+                                <!-- Label (Last 4 Digits) -->
+                                <span
+                                    class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] md:text-[10px] text-white font-mono bg-black/50 px-1 rounded whitespace-nowrap pointer-events-none">
+                                    <?php echo esc_html($last4); ?>
+                                </span>
 
-                                        <!-- Tooltip -->
-                                        <div
-                                            class="absolute <?php echo $tooltip_y_class . ' ' . $tooltip_x_class; ?> bg-black/90 border border-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 flex flex-col items-center shadow-xl">
-                                            <img src="<?php echo $image_url_large; ?>" alt="Asset"
-                                                class="w-16 h-16 object-cover rounded mb-1 bg-gray-800">
-                                            <div class="font-mono text-[10px] text-gray-300">ID:
-                                                <?php echo esc_html($holding->token_id); ?>
-                                            </div>
-                                            <div class="font-mono text-[10px] text-kmnft-green whitespace-nowrap">(X:<?php echo $x; ?>,
-                                                Y:<?php echo $y; ?>)
-                                            </div>
-                                        </div>
+                                <!-- Tooltip -->
+                                <div
+                                    class="absolute <?php echo $tooltip_y_class . ' ' . $tooltip_x_class; ?> bg-black/90 border border-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 flex flex-col items-center shadow-xl">
+                                    <img src="<?php echo $image_url_large; ?>" alt="Asset"
+                                        class="w-16 h-16 object-cover rounded mb-1 bg-gray-800">
+                                    <div class="font-mono text-[10px] text-gray-300">ID:
+                                        <?php echo esc_html($holding->token_id); ?>
                                     </div>
-                            <?php endif; ?>
+                                    <div class="font-mono text-[10px] text-kmnft-green whitespace-nowrap">(X:<?php echo $x; ?>,
+                                        Y:<?php echo $y; ?>)
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
             </div>
