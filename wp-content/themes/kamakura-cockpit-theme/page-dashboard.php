@@ -587,41 +587,30 @@ if (!$is_logged_in) {
 
                                     <!-- Overlay Info -->
                                     <div class="absolute bottom-0 left-0 w-full p-3">
-                                        <div class="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">Token ID</div>
-                                        <div class="text-xs font-mono text-kmnft-green truncate">
-                                            <?php echo esc_html($holding->token_id); ?>
-                                        </div>
+
 
                                         <?php
                                         $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
                                         if ($token_ksp_data):
                                             ?>
-                                            <div class="flex items-center justify-between mt-1 pt-1 border-t border-white/10">
-                                                <div class="flex items-center gap-1">
-                                                    <span class="text-[9px] text-gray-500 font-bold uppercase">KSP</span>
-                                                    <span
-                                                        class="text-[10px] font-mono text-white"><?php echo number_format($token_ksp_data->total_points); ?></span>
+                                            <div class="flex flex-col gap-1.5 mt-1 border-t border-white/10 pt-2">
+                                                <div class="flex items-baseline justify-between">
+                                                    <span class="text-[8px] text-gray-500 font-bold uppercase tracking-wider">KSP</span>
+                                                    <div class="text-base font-mono font-bold text-white leading-none">
+                                                        <?php echo number_format($token_ksp_data->total_points); ?><span
+                                                            class="text-[9px] ml-0.5 text-gray-400 font-normal">pt</span>
+                                                    </div>
                                                 </div>
-                                                <div class="flex items-center gap-1">
-                                                    <span class="text-[9px] text-gray-500 font-bold uppercase">Rank</span>
+                                                <div class="flex items-baseline justify-between">
                                                     <span
-                                                        class="text-[10px] font-mono text-kmnft-gold"><?php echo $token_ksp_data->rank > 0 ? '#' . esc_html($token_ksp_data->rank) : '-'; ?></span>
+                                                        class="text-[8px] text-gray-500 font-bold uppercase tracking-wider">RANK</span>
+                                                    <div class="text-base font-mono font-bold text-kmnft-gold leading-none">
+                                                        <?php echo $token_ksp_data->rank > 0 ? '#' . esc_html($token_ksp_data->rank) : '-'; ?>
+                                                    </div>
                                                 </div>
                                             </div>
                                         <?php endif; ?>
-                                        <?php if (!empty($holding->zone_x) && !empty($holding->zone_y)): ?>
-                                            <div class="flex items-center mt-1 space-x-2">
-                                                <span
-                                                    class="text-[10px] text-gray-500 bg-gray-900 px-1 rounded border border-gray-700">X:<?php echo esc_html($holding->zone_x); ?></span>
-                                                <span
-                                                    class="text-[10px] text-gray-500 bg-gray-900 px-1 rounded border border-gray-700">Y:<?php echo esc_html($holding->zone_y); ?></span>
-                                            </div>
-                                        <?php elseif (!empty($holding->zone_code)): ?>
-                                            <div
-                                                class="mt-1 text-[10px] text-gray-500 bg-gray-900 px-1 rounded border border-gray-700 inline-block">
-                                                <?php echo esc_html($holding->zone_code); ?>
-                                            </div>
-                                        <?php endif; ?>
+
                                     </div>
                                 </div>
                             <?php endforeach; ?>
