@@ -39,13 +39,14 @@ if ($is_logged_in) {
 
     $ksp_balance = number_format($ksp_total_val);
 
-    // Fetch Token Level KSP Summary for Holdings
+    // Fetch Token Level KSP Summary and History for Holdings
     if (!empty($holdings) && !empty($ksp_by_season)) {
         $latest_season_label = $ksp_by_season[0]->season;
         $token_ids = array_map(function ($h) {
             return $h->token_id;
         }, $holdings);
         $tokens_ksp_summary = $kmnft_manager->get_tokens_ksp_summary($token_ids, $latest_season_label);
+        $tokens_ksp_history = $kmnft_manager->get_tokens_ksp_history($token_ids);
     }
 }
 
@@ -1348,7 +1349,10 @@ if (!$is_logged_in) {
                         <!-- Row 5: Season (Year) -->
                         <div>
                             <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season</div>
-                            <div id="modal-token-season" class="text-xl font-bold text-gray-400 font-mono">-</div>
+                            <select id="modal-token-season-select"
+                                class="w-full bg-gray-800 border border-white/10 rounded px-2 py-1 text-sm font-bold text-gray-300 font-mono outline-none focus:border-kmnft-green transition"
+                                onchange="updateModalSeasonData()">
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -1451,12 +1455,35 @@ if (!$is_logged_in) {
         const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
         const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
         const latestSeasonLabel = '<?php echo esc_js($latest_season_label); ?>';
+        const tokensHistory = <?php echo json_encode(!empty($tokens_ksp_history) ? $tokens_ksp_history : new stdClass()); ?>;
+
+        let currentTokenId = null;
 
         function openTokenModal(tokenId, rank, points, x, y, season) {
+            currentTokenId = tokenId;
             document.getElementById('modal-token-id').textContent = '#' + tokenId;
-            document.getElementById('modal-token-rank').textContent = rank ? '#' + rank : '-';
+
+            const seasonSelect = document.getElementById('modal-token-season-select');
+            seasonSelect.innerHTML = '';
+            const history = tokensHistory[tokenId] || [];
+
+            if (history.length > 0) {
+                history.forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h.season;
+                    opt.innerText = h.season;
+                    if (h.season === season) opt.selected = true;
+                    seasonSelect.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.value = season || '-';
+                opt.innerText = season || '-';
+                seasonSelect.appendChild(opt);
+            }
+
             document.getElementById('modal-token-points').innerHTML = (points || '0') + '<span class="text-xs text-gray-500 ml-1">PT</span>';
-            document.getElementById('modal-token-season').textContent = season || '-';
+            document.getElementById('modal-token-rank').textContent = rank ? '#' + rank : '-';
 
             const coordContainer = document.getElementById('modal-token-coord-container');
             if (x !== undefined && y !== undefined && x !== '' && y !== '') {
@@ -1481,6 +1508,18 @@ if (!$is_logged_in) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.style.overflow = 'hidden';
+        }
+
+        function updateModalSeasonData() {
+            if (!currentTokenId) return;
+            const selectedSeason = document.getElementById('modal-token-season-select').value;
+            const history = tokensHistory[currentTokenId] || [];
+            const data = history.find(h => h.season === selectedSeason);
+
+            if (data) {
+                document.getElementById('modal-token-points').innerHTML = data.points + '<span class="text-xs text-gray-500 ml-1">PT</span>';
+                document.getElementById('modal-token-rank').textContent = (data.rank !== '-') ? '#' + data.rank : '-';
+            }
         }
 
         function closeTokenModal() {
