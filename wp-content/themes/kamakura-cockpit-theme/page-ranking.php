@@ -37,6 +37,15 @@ if ($selected_season) {
          LIMIT 30",
         $selected_season
     ));
+
+    // Fetch history for these tokens
+    if (!empty($token_ranking) && class_exists('KMNFT_User_Manager')) {
+        $kmnft_manager = new KMNFT_User_Manager();
+        $token_ids = array_map(function ($item) {
+            return $item->token_id;
+        }, $token_ranking);
+        $tokens_ksp_history = $kmnft_manager->get_tokens_ksp_history($token_ids);
+    }
 }
 
 // Fetch User Ranking (Top 30)
@@ -108,7 +117,8 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
     <header class="w-full h-16 glass-card flex items-center justify-between px-6 fixed top-0 z-50">
         <div class="flex items-center space-x-4">
             <a href="<?php echo home_url('/dashboard'); ?>"
-                class="text-kmnft-green font-bold tracking-widest text-lg hover:opacity-80 transition">KAMAKURA STADIUM NFT PORTAL(β)</a>
+                class="text-kmnft-green font-bold tracking-widest text-lg hover:opacity-80 transition">KAMAKURA STADIUM
+                NFT PORTAL(β)</a>
         </div>
         <div class="flex items-center space-x-4 ml-auto">
             <a href="<?php echo home_url('/dashboard'); ?>"
@@ -183,7 +193,7 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                                 $rank_color = ($rank_num == 1) ? 'text-kmnft-gold' : (($rank_num == 2) ? 'text-gray-300' : (($rank_num == 3) ? 'text-amber-600' : 'text-gray-500'));
                                 ?>
                                 <tr class="hover:bg-white/5 transition <?php echo $row_class; ?> cursor-pointer group/row"
-                                    onclick="openTokenModal('<?php echo esc_js($item->token_id); ?>', '<?php echo esc_js($rank_num); ?>', '<?php echo esc_js(number_format($item->total_points)); ?>', '<?php echo esc_js($item->zone_x); ?>', '<?php echo esc_js($item->zone_y); ?>')">
+                                    onclick="openTokenModal('<?php echo esc_js($item->token_id); ?>', '<?php echo esc_js($rank_num); ?>', '<?php echo esc_js(number_format($item->total_points)); ?>', '<?php echo esc_js($item->zone_x); ?>', '<?php echo esc_js($item->zone_y); ?>', '<?php echo esc_js($selected_season); ?>')">
                                     <td class="px-6 py-4">
                                         <span class="font-bold <?php echo $rank_color; ?>">#<?php echo $rank_num; ?></span>
                                     </td>
@@ -292,38 +302,53 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             </button>
             <div class="flex flex-col md:flex-row h-full">
                 <!-- Image Section -->
-                <div class="w-full md:w-3/5 bg-black/40 aspect-square">
-                    <img id="modal-token-image" src="" alt="Token NFT" class="w-full h-full object-contain shadow-2xl">
+                <div class="w-full md:w-3/5 aspect-square">
+                    <img id="modal-token-image" src="" alt="Token NFT"
+                        class="w-full h-full object-contain brightness-[1.1]">
                 </div>
                 <!-- Info Section -->
                 <div
-                    class="w-full md:w-2/5 p-6 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/10 bg-kmnft-navy/40 overflow-hidden">
+                    class="w-full md:w-2/5 p-6 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/10 bg-gray-900/60 overflow-hidden">
                     <div class="space-y-6">
+                        <!-- Row 1: Token ID -->
                         <div>
                             <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Token ID</div>
                             <div id="modal-token-id"
                                 class="text-xl md:text-2xl font-bold font-mono text-white break-all">#000000</div>
                         </div>
-                        <div class="grid grid-cols-1 gap-4">
-                            <div class="flex gap-8">
-                                <div>
-                                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season Rank
-                                    </div>
-                                    <div id="modal-token-rank" class="text-3xl font-bold neon-text">#1</div>
-                                </div>
-                                <div id="modal-token-coord-container">
-                                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Coordinates
-                                    </div>
-                                    <div class="text-xl font-bold text-gray-300 font-mono">
-                                        X:<span id="modal-token-x">0</span> Y:<span id="modal-token-y">0</span>
-                                    </div>
-                                </div>
+
+                        <!-- Row 2: Coordinates (2 column grid) -->
+                        <div id="modal-token-coord-container" class="grid grid-cols-2 gap-4">
+                            <div>
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">X-Coordinate</div>
+                                <div id="modal-token-x" class="text-xl font-bold text-gray-300 font-mono">0</div>
                             </div>
                             <div>
-                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total KSP</div>
-                                <div id="modal-token-points" class="text-3xl font-bold text-kmnft-green font-mono">
-                                    0<span class="text-xs text-gray-500 ml-1">PT</span></div>
+                                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Y-Coordinate</div>
+                                <div id="modal-token-y" class="text-xl font-bold text-gray-300 font-mono">0</div>
                             </div>
+                        </div>
+
+                        <!-- Row 3: Total KSP -->
+                        <div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total KSP</div>
+                            <div id="modal-token-points" class="text-3xl font-bold text-kmnft-gold font-mono">
+                                0<span class="text-xs text-gray-500 ml-1">PT</span></div>
+                        </div>
+
+                        <!-- Row 4: Season Rank -->
+                        <div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season Rank</div>
+                            <div id="modal-token-rank" class="text-3xl font-bold text-kmnft-green neon-text">#1</div>
+                        </div>
+
+                        <!-- Row 5: Season (Year) -->
+                        <div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season</div>
+                            <select id="modal-token-season-select"
+                                class="w-full bg-gray-800 border border-white/10 rounded px-2 py-1 text-sm font-bold text-gray-300 font-mono outline-none focus:border-kmnft-green transition"
+                                onchange="updateModalSeasonData()">
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -370,22 +395,49 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
 
         const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
         const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
+        const tokensHistory = <?php echo json_encode(!empty($tokens_ksp_history) ? $tokens_ksp_history : new stdClass()); ?>;
 
-        function openTokenModal(tokenId, rank, points, x, y) {
+        let currentTokenId = null;
+
+        function openTokenModal(tokenId, rank, points, x, y, season) {
+            currentTokenId = tokenId;
             document.getElementById('modal-token-id').textContent = '#' + tokenId;
-            document.getElementById('modal-token-rank').textContent = '#' + rank;
-            document.getElementById('modal-token-points').innerHTML = points + '<span class="text-xs text-gray-500 ml-1">PT</span>';
+
+            const seasonSelect = document.getElementById('modal-token-season-select');
+            seasonSelect.innerHTML = '';
+            const history = tokensHistory[tokenId] || [];
+
+            if (history.length > 0) {
+                history.forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h.season;
+                    opt.innerText = h.season;
+                    if (h.season === season) opt.selected = true;
+                    seasonSelect.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.value = season || '-';
+                opt.innerText = season || '-';
+                seasonSelect.appendChild(opt);
+            }
+
+            document.getElementById('modal-token-points').innerHTML = (points || '0') + '<span class="text-xs text-gray-500 ml-1">PT</span>';
+            document.getElementById('modal-token-rank').textContent = rank ? '#' + rank : '-';
 
             const coordContainer = document.getElementById('modal-token-coord-container');
-            if (x !== '' && y !== '') {
+            if (x !== undefined && y !== undefined && x !== '' && y !== '') {
                 document.getElementById('modal-token-x').textContent = x;
                 document.getElementById('modal-token-y').textContent = y;
                 coordContainer.classList.remove('hidden');
+                coordContainer.classList.add('grid');
             } else {
                 coordContainer.classList.add('hidden');
+                coordContainer.classList.remove('grid');
             }
 
             const img = document.getElementById('modal-token-image');
+            img.style.opacity = '1'; // Reset opacity
             img.src = imageBaseUrl + tokenId + '.png';
             img.onerror = function () {
                 this.src = fallbackImage;
@@ -396,6 +448,18 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.style.overflow = 'hidden';
+        }
+
+        function updateModalSeasonData() {
+            if (!currentTokenId) return;
+            const selectedSeason = document.getElementById('modal-token-season-select').value;
+            const history = tokensHistory[currentTokenId] || [];
+            const data = history.find(h => h.season === selectedSeason);
+
+            if (data) {
+                document.getElementById('modal-token-points').innerHTML = data.points + '<span class="text-xs text-gray-500 ml-1">PT</span>';
+                document.getElementById('modal-token-rank').textContent = (data.rank !== '-') ? '#' + data.rank : '-';
+            }
         }
 
         function closeTokenModal() {

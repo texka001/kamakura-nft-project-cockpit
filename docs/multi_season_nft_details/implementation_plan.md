@@ -19,6 +19,14 @@ NFT詳細モーダルにおいて、過去のシーズンを含むKSPとラン�
 - HTML: モーダル内の年度表示を静的テキストから `<select>` 要素に変更します。
 - JS: `openTokenModal` 関数を更新し、履歴データに基づいてプルダウンの選択肢を生成・更新し、選択されたシーズンのポイントとランクを動的に反映させるロジックを追加します。
 
+### [Component Name] Ranking Page
+
+#### [MODIFY] [page-ranking.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-ranking.php)
+
+- PHP: ランキング一覧に表示される全トークンのシーズン履歴データを `get_tokens_ksp_history` を使って取得します。
+- HTML/CSS: モーダルのHTML構造とCSSクラスを `page-dashboard.php` と完全に一致するように更新します（画像セクション 3/5, 情報セクション 2/5 のレスポンシブレイアウト等）。
+- JS: `tokensHistory` データの保持、`openTokenModal` の更新、および `updateModalSeasonData` 関数の実装を行い、Dashboardと同じ動的表示切り替えを実現します。
+
 ## Verification Plan
 
 ### Automated Tests
