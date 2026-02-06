@@ -1,4 +1,4 @@
-login_id,email,password,display_name,initial_ksp
-k779000010,testuser01@example.com,pass1234,Kamakura Fan 01,5000
-k779000020,testuser02@example.com,pass1234,Shonan Supporter,2500
-k779000030,testuser03@example.com,pass1234,New Owner,500
+login_id,email,password,display_name
+k779000010,testuser01@example.com,pass1234,Kamakura Fan 01
+k779000020,testuser02@example.com,pass1234,Shonan Supporter
+k779000030,testuser03@example.com,pass1234,New Owner

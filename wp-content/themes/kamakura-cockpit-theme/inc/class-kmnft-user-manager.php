@@ -178,7 +178,7 @@ class KMNFT_User_Manager
 
                 <h3>CSVフォーマット仕様</h3>
                 <p><strong>カラム順:</strong> <code>login_id</code>, <code>email</code>, <code>password</code>,
-                    <code>display_name</code>, <code>initial_ksp</code>
+                    <code>display_name</code>
                 </p>
                 <p><em>注意: このインポート処理によってユーザーが作成・更新されても、メール通知は<strong>送信されません</strong>。</em></p>
                 <p><em>注意: CSVの1行目はヘッダー行として扱われ、<strong>無視されます</strong>。データは2行目から記述してください。</em></p>
@@ -645,18 +645,10 @@ class KMNFT_User_Manager
         header('Content-Disposition: attachment; filename="kmnft_users_export_' . date('Y-m-d') . '.csv"');
 
         $fp = fopen('php://output', 'w');
-        fputcsv($fp, array('login_id', 'email', 'display_name', 'rank', 'current_ksp')); // Header
+        fputcsv($fp, array('login_id', 'email', 'password', 'display_name')); // Header
 
         foreach ($users as $user) {
-            // Get Rank
-            $rank = $wpdb->get_var($wpdb->prepare("SELECT rank_current FROM {$wpdb->prefix}kmnft_user_meta WHERE user_id = %d", $user->ID));
-            $rank = $rank ? $rank : 'STARTER';
-
-            // Get KSP
-            $ksp = $wpdb->get_var($wpdb->prepare("SELECT SUM(amount) FROM {$wpdb->prefix}kmnft_ksp_ledger WHERE user_id = %d", $user->ID));
-            $ksp = $ksp ? $ksp : 0;
-
-            fputcsv($fp, array($user->user_login, $user->user_email, $user->display_name, $rank, $ksp));
+            fputcsv($fp, array($user->user_login, $user->user_email, '', $user->display_name));
         }
 
         fclose($fp);
@@ -733,7 +725,6 @@ class KMNFT_User_Manager
                     $email = sanitize_email($data[1]);
                     $password = $data[2];
                     $display_name = sanitize_text_field($data[3]);
-                    $ksp = intval($data[4]);
 
                     // Create/Update WP User
                     $user_id = username_exists($login_id);
@@ -752,15 +743,7 @@ class KMNFT_User_Manager
 
                         global $wpdb;
 
-                        // Update Initial KSP (Log if new)
-                        $has_ksp = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$wpdb->prefix}kmnft_ksp_ledger WHERE user_id = %d", $user_id));
-                        if (!$has_ksp && $ksp > 0) {
-                            $wpdb->insert(
-                                $wpdb->prefix . 'kmnft_ksp_ledger',
-                                array('user_id' => $user_id, 'amount' => $ksp, 'transaction_type' => 'ADJUSTMENT', 'season' => '2026', 'description' => 'Initial Import'),
-                                array('%d', '%d', '%s', '%s', '%s')
-                            );
-                        }
+
                         $row_count++;
                     }
                 }
@@ -1767,13 +1750,13 @@ class KMNFT_User_Manager
         </div>
         <script>     jQuery(documen                                       t).re                                 ady(funct              ion($) { var mediaUploader; function updateHiddenInput() { var urls = []; $('#goal-images-container img').each(function () { urls.push($(this).attr('src')); }); $('#goal_images_hidden').val(urls.join(',')); }
 
-                                                                                                                                                                                                                                                                                        $('#upload_goal_image_btn').click(functi                                                 on(e) {
+                                                                                                                                                                                                                                                                                                                        $('#upload_goal_image_btn').click(functi                                                 on(e) {
                 e.preventDefaul                         t();
-                                            if(mediaUploader) {
+                                                                            if(mediaUploader) {
                     mediaUploader.open();
                     return;
                 }
-                                                                                                                                                                                                                mediaUploader = wp.media.frames.file_frame = wp.media({
+                                                                                                                                                                                                                                                mediaUploader = wp.media.frames.file_frame = wp.media({
                     title: 'Choose Goal Image',
                     button: {
                         text: 'Choose Image'
@@ -1796,7 +1779,7 @@ class KMNFT_User_Manager
                 $('#goal-images-container').empty();
                 updateHiddenInput();
             });
-                                                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                                                                                    });
         </script>
         <?php
     }
@@ -1887,6 +1870,7 @@ class KMNFT_User_Manager
         $sql = "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             announcement_date date NOT NULL,
+            display_title varchar(255) DEFAULT '' NOT NULL,
             data longtext NOT NULL,
             image_url varchar(255) DEFAULT '' NOT NULL,
             memo text DEFAULT '' NOT NULL,
@@ -1974,6 +1958,13 @@ class KMNFT_User_Manager
                             </td>
                         </tr>
                         <tr>
+                            <th><label for="display_title">Display Title</label></th>
+                            <td><input type="text" name="display_title" id="display_title" class="regular-text"
+                                    value="<?php echo $edit_item ? esc_attr($edit_item->display_title) : ''; ?>"
+                                    placeholder="e.g. 第3節終了時点">
+                            </td>
+                        </tr>
+                        <tr>
                             <th><label for="csv_file">CSV File</label></th>
                             <td>
                                 <input type="file" name="csv_file" id="csv_file" accept=".csv" <?php echo $edit_item ? '' : 'required'; ?>>
@@ -2013,6 +2004,7 @@ class KMNFT_User_Manager
                     <thead>
                         <tr>
                             <th>Date</th>
+                            <th>Display Title</th>
                             <th>Teams</th>
                             <th>Our Rank</th>
                             <th>Our Points</th>
@@ -2029,6 +2021,7 @@ class KMNFT_User_Manager
                                 ?>
                                 <tr>
                                     <td><?php echo esc_html($item->announcement_date); ?></td>
+                                    <td><?php echo esc_html($item->display_title); ?></td>
                                     <td><?php echo $count; ?> Teams</td>
                                     <td><?php echo esc_html($item->our_rank); ?></td>
                                     <td><?php echo esc_html($item->our_points); ?></td>
@@ -2071,6 +2064,7 @@ class KMNFT_User_Manager
 
         $id = isset($_POST['item_id']) ? intval($_POST['item_id']) : 0;
         $date = sanitize_text_field($_POST['announcement_date']);
+        $display_title = sanitize_text_field($_POST['display_title']);
         $memo = sanitize_textarea_field($_POST['memo']);
 
         $data_json = '';
@@ -2133,12 +2127,13 @@ class KMNFT_User_Manager
 
         $data_to_save = array(
             'announcement_date' => $date,
+            'display_title' => $display_title,
             'data' => $data_json,
             'our_rank' => $our_rank,
             'our_points' => $our_points,
             'memo' => $memo
         );
-        $format = array('%s', '%s', '%d', '%d', '%s');
+        $format = array('%s', '%s', '%s', '%d', '%d', '%s');
 
         if ($id > 0) {
             $wpdb->update($table_name, $data_to_save, array('id' => $id), $format, array('%d'));
