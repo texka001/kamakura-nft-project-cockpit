@@ -37,6 +37,7 @@ class KMNFT_User_Manager
         // Standings Actions
         add_action('admin_post_kmnft_save_standings', array($this, 'process_standings_save'));
         add_action('admin_post_kmnft_delete_standings', array($this, 'process_standings_delete'));
+        add_action('admin_post_kmnft_download_standings', array($this, 'process_standings_download'));
 
         // League Schedule Actions
         add_action('admin_post_kmnft_save_league_schedule', array($this, 'process_league_schedule_save'));
@@ -1767,13 +1768,13 @@ class KMNFT_User_Manager
                 var mediaUploader;
                 function updateHiddenInput() { var urls = []; $('#goal-images-container img').each(function () { urls.push($(this).attr('src')); }); $('#goal_images_hidden').val(urls.join(',')); }
 
-                                                                                                                                                                                                                                        $('#upload_goal_image_btn').click(functi                                     on(e) {
+                                                                                                                                                                                                                                                        $('#upload_goal_image_btn').click(functi                                     on(e) {
                     e.preventDefault();
                     if(mediaUploader) {
                         mediaUploader.open();
                         return;
                     }
-                                                                                                                                                                mediaUploader = wp.media.frames.file_frame = wp.media({
+                                                                                                                                                                                mediaUploader = wp.media.frames.file_frame = wp.media({
                         title: 'Choose Goal Image',
                         button: {
                             text: 'Choose Image'
@@ -1796,7 +1797,7 @@ class KMNFT_User_Manager
                 $('#goal-images-container').empty();
                 updateHiddenInput();
             });
-                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                    });
         </script>
         <?php
     }
@@ -2028,6 +2029,8 @@ class KMNFT_User_Manager
                                     <td>
                                         <a href="<?php echo admin_url('admin.php?page=kmnft-standings&action=edit&id=' . $item->id); ?>"
                                             class="button button-small">Edit</a>
+                                        <a href="<?php echo admin_url('admin-post.php?action=kmnft_download_standings&id=' . $item->id); ?>"
+                                            class="button button-small">Download</a>
                                         <form action="<?php echo admin_url('admin-post.php'); ?>" method="post"
                                             onsubmit="return confirm('Delete?');" style="display:inline;">
                                             <input type="hidden" name="action" value="kmnft_delete_standings">
@@ -2153,6 +2156,57 @@ class KMNFT_User_Manager
         $wpdb->delete($table_name, array('id' => $id));
 
         wp_redirect(admin_url('admin.php?page=kmnft-standings&status=deleted'));
+        exit;
+    }
+
+    public function process_standings_download()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+
+        if (!isset($_GET['id'])) {
+            wp_die('ID missing');
+        }
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'kmnft_standings';
+        $item = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", intval($_GET['id'])));
+
+        if (!$item) {
+            wp_die('Record not found');
+        }
+
+        $data = json_decode($item->data, true);
+        if (!is_array($data)) {
+            wp_die('Data error');
+        }
+
+        $filename = 'standings_' . $item->announcement_date . '.csv';
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $output = fopen('php://output', 'w');
+
+        // Header
+        fputcsv($output, array('rank', 'clubname', 'PL', 'W', 'D', 'L', 'GD', 'PT'));
+
+        // Data rows
+        foreach ($data as $row) {
+            fputcsv($output, array(
+                $row['rank'],
+                $row['clubname'],
+                $row['pl'],
+                $row['w'],
+                $row['d'],
+                $row['l'],
+                $row['gd'],
+                $row['pt']
+            ));
+        }
+
+        fclose($output);
         exit;
     }
 
