@@ -172,6 +172,35 @@ class KMNFT_User_Manager
                 <?php endif; ?>
             <?php endif; ?>
 
+            <?php
+            $skipped_users = get_transient('kmnft_import_skipped_users');
+            if ($skipped_users):
+                delete_transient('kmnft_import_skipped_users');
+                ?>
+                <div class="notice notice-warning is-dismissible">
+                    <p><strong>Notice:</strong> The following <?php echo count($skipped_users); ?> users were skipped because they
+                        already exist (LoginID or Email duplication).</p>
+                    <table class="wp-list-table widefat fixed striped" style="margin-bottom: 10px;">
+                        <thead>
+                            <tr>
+                                <th>Login ID</th>
+                                <th>Email</th>
+                                <th>Display Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($skipped_users as $user): ?>
+                                <tr>
+                                    <td><?php echo esc_html($user['login_id']); ?></td>
+                                    <td><?php echo esc_html($user['email']); ?></td>
+                                    <td><?php echo esc_html($user['display_name']); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+
             <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px;">
                 <h2>Batch Import Users</h2>
                 <p>Upload a CSV file to bulk import/update users and their NFT holdings.</p>
@@ -717,26 +746,33 @@ class KMNFT_User_Manager
             $handle = fopen($_FILES['csv_file']['tmp_name'], 'r');
             if ($handle !== FALSE) {
                 $header = fgetcsv($handle);
-                // Format: login_id, email, password, display_name, initial_ksp
+                // Format: login_id, email, password, display_name
 
                 $row_count = 0;
+                $skipped_users = array();
                 while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
                     $login_id = sanitize_user($data[0]);
                     $email = sanitize_email($data[1]);
                     $password = $data[2];
                     $display_name = sanitize_text_field($data[3]);
 
-                    // Create/Update WP User
+                    // Skip if User exists
                     $user_id = username_exists($login_id);
                     if (!$user_id) {
                         $user_id = email_exists($email);
                     }
 
-                    if (!$user_id) {
-                        $user_id = wp_create_user($login_id, $password, $email);
-                    } else {
-                        wp_update_user(array('ID' => $user_id, 'user_pass' => $password, 'user_email' => $email));
+                    if ($user_id) {
+                        $skipped_users[] = array(
+                            'login_id' => $login_id,
+                            'email' => $email,
+                            'display_name' => $display_name
+                        );
+                        continue;
                     }
+
+                    // Create WP User (Only New)
+                    $user_id = wp_create_user($login_id, $password, $email);
 
                     if (!is_wp_error($user_id)) {
                         wp_update_user(array('ID' => $user_id, 'display_name' => $display_name));
@@ -748,6 +784,11 @@ class KMNFT_User_Manager
                     }
                 }
                 fclose($handle);
+
+                if (!empty($skipped_users)) {
+                    set_transient('kmnft_import_skipped_users', $skipped_users, 60);
+                }
+
                 wp_redirect(admin_url('admin.php?page=kmnft-user-import&status=success&count=' . $row_count));
                 exit;
             }
@@ -1750,13 +1791,13 @@ class KMNFT_User_Manager
         </div>
         <script>     jQuery(documen                                       t).re                                 ady(funct              ion($) { var mediaUploader; function updateHiddenInput() { var urls = []; $('#goal-images-container img').each(function () { urls.push($(this).attr('src')); }); $('#goal_images_hidden').val(urls.join(',')); }
 
-                                                                                                                                                                                                                                                                                                                        $('#upload_goal_image_btn').click(functi                                                 on(e) {
+                                                                                                                                                                                                                                                                                                                                        $('#upload_goal_image_btn').click(functi                                                 on(e) {
                 e.preventDefaul                         t();
-                                                                            if(mediaUploader) {
+                                                                                            if(mediaUploader) {
                     mediaUploader.open();
                     return;
                 }
-                                                                                                                                                                                                                                                mediaUploader = wp.media.frames.file_frame = wp.media({
+                                                                                                                                                                                                                                                                mediaUploader = wp.media.frames.file_frame = wp.media({
                     title: 'Choose Goal Image',
                     button: {
                         text: 'Choose Image'
@@ -1779,7 +1820,7 @@ class KMNFT_User_Manager
                 $('#goal-images-container').empty();
                 updateHiddenInput();
             });
-                                                                                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                                                                                                    });
         </script>
         <?php
     }
