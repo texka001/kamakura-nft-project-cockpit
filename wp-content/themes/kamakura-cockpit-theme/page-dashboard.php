@@ -1759,7 +1759,7 @@ if (!$is_logged_in) {
         <div class="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center space-y-6">
 
             <!-- Links Container -->
-            <div class="flex items-center space-x-8">
+            <div class="flex flex-wrap justify-center items-center gap-x-8 gap-y-6">
                 <!-- HP Link -->
                 <a href="https://kamakura-inter.com/" target="_blank" rel="noopener noreferrer"
                     class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
@@ -1815,6 +1815,46 @@ if (!$is_logged_in) {
                         </svg>
                     </div>
                     <span class="text-xs font-bold tracking-wider">INSTAGRAM</span>
+                </a>
+
+                <!-- LINE -->
+                <a href="https://page.line.me/346jwclp" target="_blank" rel="noopener noreferrer"
+                    class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
+                    <div
+                        class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M24 10.3c0-4.646-4.925-8.303-11-8.303S2 5.654 2 10.3c0 4.164 3.904 7.643 9.172 8.213L10.518 21.01c-.134.425.105.787.525.787.199 0 .375-.075.525-.225l3.413-1.95c.15-.113.3-.113.45-.113.15 0 .263.037.412.113l.038.037c5.287-1.013 8.924-4.5 8.924-9.359zM10.151 13.91H7.838c-.375 0-.675-.3-.675-.675V8.164c0-.375.3-.675.675-.675s.675.3.675.675v4.388h1.638c.375 0 .675.3.675.675s-.3.682-.675.682zm3.188-.675c0 .375-.3.675-.675.675s-.675-.3-.675-.675V8.164c0-.375.3-.675.675-.675s.675.3.675.675v5.071zm4.838 0c0 .375-.3.675-.675.675h-2.1c-.375 0-.675-.3-.675-.675V8.164c0-.375.3-.675.675-.675s.675.3.675.675v3.825l1.463-1.5c.262-.262.675-.262.937 0 .262.262.262.675 0 .937L16.489 11.23l1.463 1.5c.206.206.244.506.237.505zm3.187-1.012c0 .375-.3.675-.675.675h-2.1c-.375 0-.675-.3-.675-.675V8.164c0-.375.3-.675.675-.675h2.1c.375 0 .675.3.675.675s-.3.675-.675.675h-1.425v1.2h1.425c.375 0 .675.3.675.675s-.3.675-.675.675h-1.425v1.2h1.425c.375 0 .675.3.675.675s-.3.675-.675.682z" />
+                        </svg>
+                    </div>
+                    <span class="text-xs font-bold tracking-wider">LINE</span>
+                </a>
+
+                <!-- YouTube -->
+                <a href="https://www.youtube.com/channel/UCxt6P4I8nhwMW7ZtOKyt_AQ" target="_blank"
+                    rel="noopener noreferrer"
+                    class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
+                    <div
+                        class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                        </svg>
+                    </div>
+                    <span class="text-xs font-bold tracking-wider">YOUTUBE</span>
+                </a>
+
+                <!-- NOTE -->
+                <a href="https://note.com/kamakura_inter" target="_blank" rel="noopener noreferrer"
+                    class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
+                    <div
+                        class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M19.062 10.438a2.625 2.625 0 1 0 0-5.25c-.237 0-.462.038-.674.094a2.623 2.623 0 0 0-.825 3.931 2.631 2.631 0 0 0 1.499 1.225zM16.488 15.75c0 .544-.225 1.04-.593 1.387l-.956.894-.956-.894c-.368-.344-.593-.84-.593-1.387V6.3a2.625 2.625 0 0 0-5.25 0v11.55c0 2.062 1.688 3.75 3.75 3.75h6.3c2.062 0 3.75-1.688 3.75-3.75V15.75c0-.962-.788-1.75-1.75-1.75s-1.75.788-1.75 1.75h-.002zm-8.4 0c0 .544-.225 1.04-.593 1.387l-.956.894-.956-.894c-.368-.344-.593-.84-.593-1.387V6.3a2.625 2.625 0 0 0-5.25 0v11.55c0 2.062 1.688 3.75 3.75 3.75h2.1c2.062 0 3.75-1.688 3.75-3.75V15.75c0-.962-.788-1.75-1.75-1.75s-1.75.788-1.75 1.75h-.002z" />
+                        </svg>
+                    </div>
+                    <span class="text-xs font-bold tracking-wider">NOTE</span>
                 </a>
             </div>
 
