@@ -265,34 +265,38 @@ if (!$is_logged_in) {
                     class="absolute -right-4 -top-4 w-24 h-24 bg-kmnft-green opacity-10 rounded-full blur-xl group-hover:opacity-20 transition">
                 </div>
                 <h3 class="text-xs text-gray-500 uppercase tracking-widest mb-1">KSP Status</h3>
-                <div class="text-4xl font-bold text-white neon-text">
-                    <?php echo number_format($ksp_total_val); ?><span class="text-xs ml-1">pt</span>
-                </div>
 
-                <?php if (!empty($ksp_by_season) && count($ksp_by_season) > 0): ?>
-                    <div class="mt-4 space-y-2">
-                        <?php
-                        // First item is typically the latest season due to ORDER BY season DESC
-                        $latest_season = $ksp_by_season[0];
-                        ?>
-                        <div class="flex justify-between items-end border-b border-white/10 pb-2">
-                            <div>
-                                <div class="text-[10px] text-kmnft-green font-bold uppercase tracking-wider mb-1">
-                                    <?php echo esc_html($latest_season->season); ?> Season
-                                </div>
+                <?php
+                $latest_season = (!empty($ksp_by_season) && count($ksp_by_season) > 0) ? $ksp_by_season[0] : null;
+                ?>
+
+                <?php if ($latest_season): ?>
+                    <div class="text-[10px] text-kmnft-green font-bold uppercase tracking-wider mb-1 mt-4">
+                        <?php echo esc_html($latest_season->season); ?> Season
+                    </div>
+                <?php endif; ?>
+
+                <div class="flex justify-between items-end <?php echo $latest_season ? 'mb-0' : ''; ?>">
+                    <div class="text-4xl font-bold text-white neon-text leading-none">
+                        <?php echo number_format($ksp_total_val); ?><span
+                            class="text-xs ml-1 text-gray-400 font-normal">pt</span>
+                    </div>
+                    <?php if ($latest_season): ?>
+                        <div class="text-right">
+                            <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+                                Rank
                             </div>
-                            <div class="text-right">
-                                <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
-                                    Rank
-                                </div>
-                                <div class="text-xl font-mono text-kmnft-gold leading-none">
-                                    <?php echo $latest_season->rank > 0 ? esc_html($latest_season->rank) : '-'; ?><span
-                                        class="text-[10px] ml-0.5">位</span>
-                                </div>
+                            <div class="text-xl font-mono text-kmnft-gold leading-none">
+                                <?php echo $latest_season->rank > 0 ? esc_html($latest_season->rank) : '-'; ?><span
+                                    class="text-[10px] ml-0.5">位</span>
                             </div>
                         </div>
+                    <?php endif; ?>
+                </div>
 
-                        <?php if (count($ksp_by_season) > 1): ?>
+                <?php if ($latest_season): ?>
+                    <?php if (count($ksp_by_season) > 1): ?>
+                        <div class="mt-4 pt-2 border-t border-white/10">
                             <details class="group/details">
                                 <summary
                                     class="cursor-pointer text-xs text-gray-500 hover:text-white transition flex items-center gap-1 list-none outline-none">
@@ -317,8 +321,8 @@ if (!$is_logged_in) {
                                     <?php endfor; ?>
                                 </div>
                             </details>
-                        <?php endif; ?>
-                    </div>
+                        </div>
+                    <?php endif; ?>
                 <?php else: ?>
                     <div class="text-xs text-kmnft-green mt-2 flex items-center">
                         <span class="w-2 h-2 bg-kmnft-green rounded-full mr-2 animate-pulse"></span>
@@ -1251,18 +1255,18 @@ if (!$is_logged_in) {
                     </div>
                 </div>
 
-                <script>                function toggleSeason(header) { const content = header.nextElementSibling; const icon = header.querySelector('svg'); if (content && content.classList.contains('hidden')) { content.classList.remove('hidden'); if (icon) icon.style.transform = 'rotate(180deg)'; } else if (content) { content.classList.add('hidden'); if (icon) icon.style.transform = 'rotate(0deg)'; } }
-                    function toggleLatestSeason() {
-                        const hiddenRows = document.querySelectorAll('.latest-season-hidden'); const btn = document.getElementById('btn-show-latest');
-                        hiddenRows.forEach(row => { row.classList.toggle('hidden'); });
-                        if (btn) { if (btn.innerText.includes('Show Full Schedule')) { btn.innerText = 'Show Next Match Only'; } else { btn.innerText = 'Show Full Schedule'; } }
-                    }
-                    function toggleHistory() {
-                        const pastSeasons = document.querySelectorAll('.past-season'); const btn = document.getElementById('btn-show-history');
-                        pastSeasons.forEach(season => { season.classList.toggle('hidden'); });
-                        if (btn) { const span = btn.querySelector('span'); const svg = btn.querySelector('svg'); if (span.innerText === 'Previous Seasons') { span.innerText = 'Hide Previous Seasons'; svg.style.transform = 'rotate(180deg)'; } else { span.innerText = 'Previous Seasons'; svg.style.transform = 'rotate(0deg)'; } }
-                    }
-                </script>
+                <script>                function toggleSeason(header) { const content = header.nextElementSibling; const icon = header.querySelector('svg'); if (content && content.classList.contains('hidden')) { content.classList.remove('hidden'); if (icon) icon.style.transform = 'rotate(180deg)'; } else if (content) { content.classList.add('hidden'); if (icon) icon.style.transform = 'rotate(0deg)';                     } }
+                        function toggleLatestSeason() {
+                            const hiddenRows = document.querySelectorAll('.latest-season-hidden'); const btn = document.getElementById('btn-show-latest');
+                            hiddenRows.forEach(row => { row.classList.toggle('hidden'); });
+                            if (btn) { if (btn.innerText.includes('Show Full Schedule')) { btn.innerText = 'Show Next Match Only'; } else { btn.innerText = 'Show Full Schedule'; } }
+                        }
+                        function toggleHistory() {
+                            const pastSeasons = document.querySelectorAll('.past-season'); const btn = document.getElementById('btn-show-history');
+                            pastSeasons.forEach(season => { season.classList.toggle('hidden'); });
+                            if (btn) { const span = btn.querySelector('span'); const svg = btn.querySelector('svg'); if (span.innerText === 'Previous Seasons') { span.innerText = 'Hide Previous Seasons'; svg.style.transform = 'rotate(180deg)'; } else { span.innerText = 'Previous Seasons'; svg.style.transform = 'rotate(0deg)'; } }
+                        }
+                    </script>
             <?php endif; ?>
 
             <!-- Quick Actions / News Placeholder -->
@@ -1386,61 +1390,61 @@ if (!$is_logged_in) {
 
                     <!-- Plots (Large) -->
                     <?php foreach ($holdings as $holding): ?>
-                        <?php if (is_numeric($holding->zone_x) && is_numeric($holding->zone_y)): ?>
-                            <?php
-                            $x = max(0, min(120, floatval($holding->zone_x)));
-                            $y = max(0, min(64, floatval($holding->zone_y)));
+                            <?php if (is_numeric($holding->zone_x) && is_numeric($holding->zone_y)): ?>
+                                    <?php
+                                    $x = max(0, min(120, floatval($holding->zone_x)));
+                                    $y = max(0, min(64, floatval($holding->zone_y)));
 
-                            // Map directly
-                            $left = ($x / 120) * 100;
-                            $bottom = ($y / 64) * 100;
+                                    // Map directly
+                                    $left = ($x / 120) * 100;
+                                    $bottom = ($y / 64) * 100;
 
-                            $last4 = substr($holding->token_id, -4);
-                            $image_url_large = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
+                                    $last4 = substr($holding->token_id, -4);
+                                    $image_url_large = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
 
-                            $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
-                            $pts = $token_ksp_data ? number_format($token_ksp_data->total_points) : '0';
-                            $rnk = ($token_ksp_data && $token_ksp_data->rank > 0) ? $token_ksp_data->rank : '';
+                                    $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
+                                    $pts = $token_ksp_data ? number_format($token_ksp_data->total_points) : '0';
+                                    $rnk = ($token_ksp_data && $token_ksp_data->rank > 0) ? $token_ksp_data->rank : '';
 
-                            // Tooltip Y Position
-                            $tooltip_y_class = ($y > 32) ? 'top-full mt-2' : 'bottom-full mb-2';
+                                    // Tooltip Y Position
+                                    $tooltip_y_class = ($y > 32) ? 'top-full mt-2' : 'bottom-full mb-2';
 
-                            // Tooltip X Position
-                            if ($x > 100) {
-                                // Right edge -> Align Right
-                                $tooltip_x_class = 'right-0 translate-x-0';
-                            } elseif ($x < 20) {
-                                // Left edge -> Align Left
-                                $tooltip_x_class = 'left-0 translate-x-0';
-                            } else {
-                                // Center
-                                $tooltip_x_class = 'left-1/2 -translate-x-1/2';
-                            }
-                            ?>
-                            <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
-                                style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
-                                onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>', '<?php echo esc_js($latest_season_label); ?>')">
+                                    // Tooltip X Position
+                                    if ($x > 100) {
+                                        // Right edge -> Align Right
+                                        $tooltip_x_class = 'right-0 translate-x-0';
+                                    } elseif ($x < 20) {
+                                        // Left edge -> Align Left
+                                        $tooltip_x_class = 'left-0 translate-x-0';
+                                    } else {
+                                        // Center
+                                        $tooltip_x_class = 'left-1/2 -translate-x-1/2';
+                                    }
+                                    ?>
+                                    <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
+                                        style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
+                                        onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>', '<?php echo esc_js($latest_season_label); ?>')">
 
-                                <!-- Label (Last 4 Digits) -->
-                                <span
-                                    class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] md:text-[10px] text-white font-mono bg-black/50 px-1 rounded whitespace-nowrap pointer-events-none">
-                                    <?php echo esc_html($last4); ?>
-                                </span>
+                                        <!-- Label (Last 4 Digits) -->
+                                        <span
+                                            class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] md:text-[10px] text-white font-mono bg-black/50 px-1 rounded whitespace-nowrap pointer-events-none">
+                                            <?php echo esc_html($last4); ?>
+                                        </span>
 
-                                <!-- Tooltip -->
-                                <div
-                                    class="absolute <?php echo $tooltip_y_class . ' ' . $tooltip_x_class; ?> bg-black/90 border border-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 flex flex-col items-center shadow-xl">
-                                    <img src="<?php echo $image_url_large; ?>" alt="Asset"
-                                        class="w-16 h-16 object-cover rounded mb-1 bg-gray-800">
-                                    <div class="font-mono text-[10px] text-gray-300">ID:
-                                        <?php echo esc_html($holding->token_id); ?>
+                                        <!-- Tooltip -->
+                                        <div
+                                            class="absolute <?php echo $tooltip_y_class . ' ' . $tooltip_x_class; ?> bg-black/90 border border-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 flex flex-col items-center shadow-xl">
+                                            <img src="<?php echo $image_url_large; ?>" alt="Asset"
+                                                class="w-16 h-16 object-cover rounded mb-1 bg-gray-800">
+                                            <div class="font-mono text-[10px] text-gray-300">ID:
+                                                <?php echo esc_html($holding->token_id); ?>
+                                            </div>
+                                            <div class="font-mono text-[10px] text-kmnft-green whitespace-nowrap">(X:<?php echo $x; ?>,
+                                                Y:<?php echo $y; ?>)
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="font-mono text-[10px] text-kmnft-green whitespace-nowrap">(X:<?php echo $x; ?>,
-                                        Y:<?php echo $y; ?>)
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
+                            <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
             </div>
