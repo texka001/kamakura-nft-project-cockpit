@@ -328,8 +328,8 @@ if (!$is_logged_in) {
             </div>
 
             <!-- Profile / Rank -->
-            <div class="glass-card p-6 rounded-lg relative">
-                <h3 class="text-xs text-gray-500 uppercase tracking-widest mb-4">Owner Profile</h3>
+            <div class="glass-card p-4 rounded-lg relative">
+                <h3 class="text-[10px] text-gray-500 uppercase tracking-widest mb-3">Owner Profile</h3>
 
                 <!-- Avatar Upload Section -->
                 <?php
@@ -350,9 +350,9 @@ if (!$is_logged_in) {
                     $avatar_url = 'https://ui-avatars.com/api/?name=Guest&background=333&color=fff';
                 }
                 ?>
-                <div class="absolute top-6 right-6 group">
+                <div class="absolute top-4 right-4 group">
                     <?php if ($is_logged_in): ?>
-                        <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-kmnft-gold cursor-pointer relative"
+                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-kmnft-gold cursor-pointer relative"
                             onclick="document.getElementById('user-icon-input').click()">
                             <img id="user-avatar-img" src="<?php echo esc_url($avatar_url); ?>" alt="User Avatar"
                                 class="w-full h-full object-cover">
@@ -363,8 +363,8 @@ if (!$is_logged_in) {
                         </div>
                         <!-- Spinner -->
                         <div id="avatar-spinner"
-                            class="hidden absolute top-0 left-0 w-16 h-16 rounded-full bg-black/60 flex items-center justify-center">
-                            <svg class="animate-spin h-6 w-6 text-kmnft-green" xmlns="http://www.w3.org/2000/svg"
+                            class="hidden absolute top-0 left-0 w-12 h-12 rounded-full bg-black/60 flex items-center justify-center">
+                            <svg class="animate-spin h-5 w-5 text-kmnft-green" xmlns="http://www.w3.org/2000/svg"
                                 fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                                 </circle>
@@ -376,35 +376,35 @@ if (!$is_logged_in) {
                         <input type="file" id="user-icon-input" class="hidden" accept="image/png, image/jpeg"
                             onchange="uploadUserIcon(this)">
                     <?php else: ?>
-                        <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-600 relative">
+                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-600 relative">
                             <img src="<?php echo esc_url($avatar_url); ?>" alt="Guest Avatar"
                                 class="w-full h-full object-cover opacity-50">
                         </div>
                     <?php endif; ?>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-3">
 
                     <div>
-                        <div class="text-xs text-gray-400">User ID</div>
-                        <div class="text-lg font-bold text-white font-mono">
+                        <div class="text-[10px] text-gray-400">User ID</div>
+                        <div class="text-base font-bold text-white font-mono">
                             <?php echo $is_logged_in ? esc_html($current_user->user_login) : ' - '; ?>
                         </div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-400">Nickname</div>
-                        <div class="text-lg font-bold text-kmnft-gold">
+                        <div class="text-[10px] text-gray-400">Nickname</div>
+                        <div class="text-base font-bold text-kmnft-gold">
                             <?php echo $is_logged_in ? esc_html($current_user->display_name) : 'Guest User'; ?>
                         </div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-400">Registered ID</div>
+                        <div class="text-[10px] text-gray-400">Registered ID</div>
                         <?php if ($is_logged_in): ?>
-                            <div class="text-sm font-mono">
+                            <div class="text-xs font-mono">
                                 <?php echo esc_html($current_user->user_email); ?>
                             </div>
                             <button onclick="openPasswordModal()"
-                                class="mt-2 text-[10px] text-gray-500 hover:text-white underline transition">
+                                class="mt-1 text-[9px] text-gray-500 hover:text-white underline transition">
                                 Change Password
                             </button>
                         <?php else: ?>
