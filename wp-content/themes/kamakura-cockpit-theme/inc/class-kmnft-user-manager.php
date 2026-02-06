@@ -1768,13 +1768,13 @@ class KMNFT_User_Manager
                 var mediaUploader;
                 function updateHiddenInput() { var urls = []; $('#goal-images-container img').each(function () { urls.push($(this).attr('src')); }); $('#goal_images_hidden').val(urls.join(',')); }
 
-                                                                                                                                                                                                                                                        $('#upload_goal_image_btn').click(functi                                     on(e) {
+                                                                                                                                                                                                                                                                $('#upload_goal_image_btn').click(functi                                     on(e) {
                     e.preventDefault();
                     if(mediaUploader) {
                         mediaUploader.open();
                         return;
                     }
-                                                                                                                                                                                mediaUploader = wp.media.frames.file_frame = wp.media({
+                                                                                                                                                                                        mediaUploader = wp.media.frames.file_frame = wp.media({
                         title: 'Choose Goal Image',
                         button: {
                             text: 'Choose Image'
@@ -1797,7 +1797,7 @@ class KMNFT_User_Manager
                 $('#goal-images-container').empty();
                 updateHiddenInput();
             });
-                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                            });
         </script>
         <?php
     }
@@ -2188,6 +2188,7 @@ class KMNFT_User_Manager
         header('Content-Disposition: attachment; filename="' . $filename . '"');
 
         $output = fopen('php://output', 'w');
+        fwrite($output, "\xEF\xBB\xBF"); // UTF-8 BOM for Excel
 
         // Header
         fputcsv($output, array('rank', 'clubname', 'PL', 'W', 'D', 'L', 'GD', 'PT'));
