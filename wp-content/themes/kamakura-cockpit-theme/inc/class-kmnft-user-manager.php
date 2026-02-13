@@ -1853,7 +1853,7 @@ class KMNFT_User_Manager
 
                     mediaUploader.on('select', function () {
                         var selection = mediaUploader.state().get('selection');
-                        var currentVal = $('#goal_images_textarea').val().trim();
+                        var currentVal = $('#goal_images_textarea').val();
                         var newUrls = [];
 
                         selection.each(function (attachment) {
@@ -1862,8 +1862,11 @@ class KMNFT_User_Manager
                         });
 
                         if (newUrls.length > 0) {
-                            var separator = currentVal === "" ? "" : (currentVal.endsWith("\n") ? "" : ", ");
-                            $('#goal_images_textarea').val(currentVal + separator + newUrls.join(', '));
+                            // If there's existing text and it doesn't end with a newline, add one
+                            if (currentVal.length > 0 && !currentVal.match(/\n$/)) {
+                                currentVal += "\n";
+                            }
+                            $('#goal_images_textarea').val(currentVal + newUrls.join(', '));
                             updatePreview();
                         }
                     });
