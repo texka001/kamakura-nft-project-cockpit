@@ -62,11 +62,15 @@ $has_more = ($initial_limit < $total_count);
                 KAMAKURA STADIUM NFT PORTAL(β)
             </a>
         </div>
-        <div>
+        <div class="flex items-center space-x-4 ml-auto">
             <a href="<?php echo home_url('/dashboard'); ?>"
-                class="px-4 py-1 border border-white/50 text-white rounded text-xs hover:bg-white hover:text-black transition">
-                BACK TO DASHBOARD
-            </a>
+                class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">DASHBOARD</a>
+            <a href="<?php echo home_url('/points'); ?>"
+                class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">POINTS</a>
+            <a href="<?php echo home_url('/ranking'); ?>"
+                class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">RANKING</a>
+            <a href="<?php echo home_url('/contact'); ?>"
+                class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">CONTACT</a>
         </div>
     </header>
 
