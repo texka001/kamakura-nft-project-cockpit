@@ -140,12 +140,45 @@ $is_logged_in = is_user_logged_in();
         <!-- Point History Table -->
         <div class="glass-card rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm whitespace-nowrap md:whitespace-normal">
+                <table id="points-table" class="w-full text-left text-sm whitespace-nowrap md:whitespace-normal">
                     <thead class="bg-white/5 text-gray-400 uppercase text-[10px] tracking-widest">
                         <tr>
-                            <th class="px-4 py-3 font-medium">Date</th>
-                            <th class="px-4 py-3 font-medium">Token ID</th>
-                            <th class="px-4 py-3 font-medium text-right">Points</th>
+                            <th class="px-4 py-3 font-medium cursor-pointer hover:text-kmnft-green transition group"
+                                onclick="sortTable(0, 'date')">
+                                <div class="flex items-center gap-1">
+                                    Date
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-3 w-3 opacity-0 group-hover:opacity-100 transition" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="px-4 py-3 font-medium cursor-pointer hover:text-kmnft-green transition group"
+                                onclick="sortTable(1, 'number')">
+                                <div class="flex items-center gap-1">
+                                    Token ID
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-3 w-3 opacity-0 group-hover:opacity-100 transition" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="px-4 py-3 font-medium text-right cursor-pointer hover:text-kmnft-green transition group"
+                                onclick="sortTable(2, 'number')">
+                                <div class="flex items-center justify-end gap-1">
+                                    Points
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-3 w-3 opacity-0 group-hover:opacity-100 transition" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                    </svg>
+                                </div>
+                            </th>
                             <th class="px-4 py-3 font-medium">Reason 1</th>
                             <th class="px-4 py-3 font-medium">Reason 2</th>
                         </tr>
@@ -160,7 +193,10 @@ $is_logged_in = is_user_logged_in();
                             <?php foreach ($point_history as $item):
                                 $image_url = KMNFT_IMAGE_BASE_URL . esc_attr($item->token_id) . '.png';
                                 ?>
-                                <tr class="hover:bg-white/5 transition group/row">
+                                <tr class="hover:bg-white/5 transition group/row"
+                                    data-date="<?php echo esc_attr($item->acquisition_date); ?>"
+                                    data-token="<?php echo esc_attr($item->token_id); ?>"
+                                    data-points="<?php echo esc_attr($item->acquisition_point); ?>">
                                     <td class="px-4 py-4 text-xs font-mono text-gray-400">
                                         <?php echo esc_html($item->acquisition_date); ?>
                                     </td>
@@ -173,14 +209,12 @@ $is_logged_in = is_user_logged_in();
                                                     class="w-full h-full object-cover group-hover/row:scale-110 transition duration-500"
                                                     onerror="this.src='<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';this.style.opacity='0.5';">
                                             </div>
-                                            <span class="font-mono text-white text-sm">#
-                                                <?php echo esc_html($item->token_id); ?>
-                                            </span>
+                                            <span
+                                                class="font-mono text-white text-sm">#<?php echo esc_html($item->token_id); ?></span>
                                         </div>
                                     </td>
                                     <td class="px-4 py-4 text-right font-bold text-kmnft-green font-mono">
-                                        +
-                                        <?php echo number_format($item->acquisition_point); ?>
+                                        +<?php echo number_format($item->acquisition_point); ?>
                                     </td>
                                     <td class="px-4 py-4 text-xs text-gray-300">
                                         <?php echo esc_html($item->reason_1); ?>
@@ -195,7 +229,7 @@ $is_logged_in = is_user_logged_in();
                 </table>
             </div>
         </div>
-        <p class="text-[10px] text-gray-500 mt-4 px-2 italic">* ポイントの明細はシーズンごとに集計されます。</p>
+        <p class="text-[10px] text-gray-500 mt-4 px-2 italic">* ポイントの明細はシーズンごとに集計されます。項目名をクリックすると並び替えができます。</p>
     </main>
 
     <footer class="mt-auto py-10 border-t border-gray-800 text-center">
@@ -208,6 +242,50 @@ $is_logged_in = is_user_logged_in();
                 class="text-[10px] text-gray-500 hover:text-white transition">Contact</a>
         </div>
     </footer>
+
+    <script>
+        let currentSortCol = -1;
+        let isAsc = true;
+
+        function sortTable(colIndex, type) {
+            const table = document.getElementById("points-table");
+            const tbody = table.querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+
+            if (rows.length <= 1 && rows[0].cells.length === 1) return; // Empty message row
+
+            if (currentSortCol === colIndex) {
+                isAsc = !isAsc;
+            } else {
+                isAsc = true;
+                currentSortCol = colIndex;
+            }
+
+            rows.sort((a, b) => {
+                let valA, valB;
+
+                if (colIndex === 0) { // Date
+                    valA = a.getAttribute('data-date');
+                    valB = b.getAttribute('data-date');
+                } else if (colIndex === 1) { // Token ID
+                    valA = parseInt(a.getAttribute('data-token'));
+                    valB = parseInt(b.getAttribute('data-token'));
+                } else if (colIndex === 2) { // Points
+                    valA = parseInt(a.getAttribute('data-points'));
+                    valB = parseInt(b.getAttribute('data-points'));
+                }
+
+                if (type === 'number') {
+                    return isAsc ? valA - valB : valB - valA;
+                } else {
+                    return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                }
+            });
+
+            // Re-append rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+    </script>
 
 </body>
 
