@@ -1,12 +1,10 @@
-# Point History Page Implementation
+# Task: 管理画面のアクセス制限 (Admin Access Restriction)
 
-- [x] Research KSP data structure and existing methods
-- [x] Create Implementation Plan
-- [x] Implement `page-points.php`
-- [x] Update header links
-- [x] Add sorting functionality to the table
-- [x] Implement NFT detail modal (same as dashboard)
-- [x] Display season-based summary (Total KSP & Rank)
-- [x] Link Dashboard KSP to Point History page
-- [x] 各ページに日英併記の説明文を追加（ポイント明細、ランキング）
-- [x] Verify implementation
+一般ユーザー（購読者）がWordPressの管理画面に入れないようにし、フロントエンドのマイページにリダイレクトさせる。
+
+## Tasks
+- [x] 一般ユーザーの管理画面アクセス制限の実装
+    - [x] `functions.php` にリダイレクト処理を追加
+    - [x] `functions.php` にツールバー非表示処理を追加
+- [x] 動作確認（管理者以外でのアクセス時に正しくリダイレクトされるか）
+- [x] デプロイとドキュメント更新

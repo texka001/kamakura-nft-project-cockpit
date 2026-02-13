@@ -156,3 +156,24 @@ function kmnft_get_remote_thumbnail($remote_url, $token_id)
 
 	return $file_url;
 }
+
+/**
+ * Restrict admin dashboard access for non-admin users.
+ * Redirects subscribers to the dashboard page and hides the admin bar.
+ */
+add_action('admin_init', function () {
+	if (defined('DOING_AJAX') && DOING_AJAX) {
+		return;
+	}
+	if (!current_user_can('manage_options')) {
+		wp_redirect(home_url('/dashboard/'));
+		exit;
+	}
+});
+
+add_filter('show_admin_bar', function ($show) {
+	if (!current_user_can('manage_options')) {
+		return false;
+	}
+	return $show;
+});
