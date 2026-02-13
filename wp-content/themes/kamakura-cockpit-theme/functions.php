@@ -58,6 +58,7 @@ function kmnft_create_core_pages()
 		'dashboard' => 'KMNFT Dashboard',
 		'contact' => 'KMNFT Contact',
 		'nft-gallery' => 'KMNFT Full Gallery',
+		'points' => 'KMNFT Point History',
 	);
 
 	foreach ($pages as $slug => $template_name) {
