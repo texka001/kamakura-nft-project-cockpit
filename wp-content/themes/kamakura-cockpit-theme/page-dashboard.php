@@ -1901,17 +1901,17 @@ if (!$is_logged_in) {
             <!-- Default Icons Grid -->
             <div class="mb-6">
                 <h4 class="text-sm text-gray-400 mb-3">デフォルトアイコン</h4>
-                <div class="grid grid-cols-4 gap-4">
+                <div class="grid grid-cols-5 gap-3">
                     <?php
                     $default_icons = kmnft_get_default_icons();
                     foreach ($default_icons as $icon_file):
                         $icon_url = get_template_directory_uri() . '/assets/images/default-icons/' . $icon_file;
                         ?>
-                            <div class="aspect-square rounded-lg overflow-hidden border-2 border-gray-700 hover:border-kmnft-green transition cursor-pointer group"
-                                onclick="selectDefaultIcon('<?php echo esc_js($icon_file); ?>')">
-                                <img src="<?php echo esc_url($icon_url); ?>" alt="Default Icon"
-                                    class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition">
-                            </div>
+                        <div class="aspect-square rounded-lg overflow-hidden border-2 border-gray-700 hover:border-kmnft-green transition cursor-pointer group"
+                            onclick="selectDefaultIcon('<?php echo esc_js($icon_file); ?>')">
+                            <img src="<?php echo esc_url($icon_url); ?>" alt="Default Icon"
+                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition">
+                        </div>
                     <?php endforeach; ?>
                 </div>
             </div>
