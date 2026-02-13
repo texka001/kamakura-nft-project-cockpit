@@ -1,40 +1,39 @@
-# Goal Imagesの複数行登録（ゴール別管理）の実装計画
+# 実装計画 - ゴール画像入力ロジックの改善
 
-ゴール（得点）ごとに画像を管理できるようにするため、「Goal Images」の入力形式を「1行 = 1ゴール」に変更します。1つのゴールに複数の画像がある場合は、同じ行内でカンマ区切りで管理します。
+「画像を追加」ボタンをクリックして画像を選択した際、不要なカンマが挿入される問題を修正し、改行を優先した追記ロジックに変更します。
+
+## ユーザーレビューが必要な項目
+なし
 
 ## 変更内容
 
-### [テーマ] kamakura-cockpit-theme
+### 1. 管理画面 JS の修正
+`inc/class-kmnft-user-manager.php` 内のメディアアップローダー選択後のロジックを修正します。
 
 #### [MODIFY] [class-kmnft-user-manager.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/inc/class-kmnft-user-manager.php)
+- 現状、既存の値の末尾を `trim()` してからカンマまたは改行を追加していますが、これを変更します。
+- 既存の値が空でない場合、末尾に改行がない場合は改行を追加してから、新しい画像URLを追加するようにします。
+- 1回の選択アクションで複数の画像を選んだ場合は、それらの間には引き続きカンマを使用します。
 
-- **管理画面 UI (`render_match_results_page`)**:
-  - `goal_images` を hidden input から `textarea` に変更します。
-  - プレースホルダーと説明文を「1行 = 1ゴール」「複数画像はカンマ区切り」というルールに合わせて更新します。
-- **JavaScript 処理**:
-  - メディアアップローダーで画像を選択した際、現在選択されている画像URLを `textarea` に（カンマ区切りで）追記するよう修正します。
-  - プレビュー表示 (`#goal-images-container`) は、`textarea` の内容をリアルタイムまたは変更時に反映して表示するように調整します。
-- **保存処理 (`process_match_save`)**:
-  - `goal_images` の正規化ロジックを追加します（空行の削除、各行内のトリミングなど）。
-- **一覧表示 (`Existing Matches`)**:
-  - 改行とカンマの両方を区切り文字として扱い、すべての画像を一覧表示できるように修正します。
+```javascript
+// 修正イメージ
+var currentVal = $('#goal_images_textarea').val();
+if (newUrls.length > 0) {
+    if (currentVal.length > 0 && !currentVal.match(/\n\s*$/)) {
+        currentVal += "\n";
+    }
+    $('#goal_images_textarea').val(currentVal + newUrls.join(', '));
+    updatePreview();
+}
+```
 
-#### [MODIFY] [page-dashboard.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-dashboard.php)
+## 検証計画
 
-- **画像パース処理**:
-  - `goal_images` をまず改行で分割し、ゴールごとの画像個別の配列を作成します。
-- **画像レンダリング**:
-  - 各画像がどのゴール（1点目、2点目...）に属するかを正確に判定し、正しいゴール番号バッジと動画リンクを紐付けます。
+### 自動テスト
+なし
 
----
-
-## 検証方法
-
-### 手動検証
-1. 管理画面で「Goal Images」に複数行のデータを入力する。
-   - 1行目: 画像AのURL, 画像BのURL
-   - 2行目: 画像CのURL
-2. プレビューが正しく更新されるか確認する。
-3. 保存後、ダッシュボードを確認する。
-   - 画像A、画像Bには「1」のバッジが表示され、1点目の動画リンクが紐付いていること。
-   - 画像Cには「2」のバッジが表示され、2点目の動画リンクが紐付いていること。
+### 手動確認
+1. 管理画面の試合結果編集画面で「画像を追加」をクリック。
+2. 1枚選択 -> textarea に追加されることを確認。
+3. 再度クリックして別の枚数を選択 -> **改行されて**追加されることを確認（カンマがつかないこと）。
+4. textarea の最後に手動で改行を入れてからボタンを押す -> 不要な空行が増えず、正しく追記されることを確認。
