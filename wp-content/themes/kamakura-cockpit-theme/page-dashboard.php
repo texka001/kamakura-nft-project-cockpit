@@ -808,8 +808,8 @@ if (!$is_logged_in) {
                                                             ?>
                                                             <?php
                                                             $video_url = isset($goal_videos[$seq - 1]) ? $goal_videos[$seq - 1] : '';
-                                                            $clickable_class = !empty($video_url) ? 'cursor-pointer' : '';
-                                                            $video_onclick = !empty($video_url) ? 'onclick="window.open(\'' . esc_js($video_url) . '\', \'_blank\'); return false;"' : '';
+                                                            $clickable_class = ($is_logged_in && !empty($video_url)) ? 'cursor-pointer' : '';
+                                                            $video_onclick = ($is_logged_in && !empty($video_url)) ? 'onclick="window.open(\'' . esc_js($video_url) . '\', \'_blank\'); return false;"' : '';
                                                             ?>
                                                             <div class="absolute w-4 h-4 bg-red-500 rounded-full border border-white flex items-center justify-center text-[8px] text-white font-bold z-10 -translate-x-1/2 translate-y-1/2 shadow-lg hover:scale-125 transition <?php echo $clickable_class; ?>"
                                                                 style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
@@ -859,8 +859,8 @@ if (!$is_logged_in) {
                                                     // idx here is image index, we want goal index
                                                     $goal_idx = $img_data['goal_num'] - 1;
                                                     $video_url = isset($goal_videos[$goal_idx]) ? $goal_videos[$goal_idx] : '';
-                                                    $clickable_class = !empty($video_url) ? 'cursor-pointer' : 'pointer-events-none';
-                                                    $video_onclick = !empty($video_url) ? 'onclick="window.open(\'' . esc_js($video_url) . '\', \'_blank\');"' : '';
+                                                    $clickable_class = ($is_logged_in && !empty($video_url)) ? 'cursor-pointer' : 'pointer-events-none';
+                                                    $video_onclick = ($is_logged_in && !empty($video_url)) ? 'onclick="window.open(\'' . esc_js($video_url) . '\', \'_blank\');"' : '';
                                                     ?>
                                                     <div
                                                         class="relative group aspect-video rounded overflow-hidden border border-white/10 <?php echo $is_hidden ? 'hidden extra-images-' . $match->id : ''; ?>">
