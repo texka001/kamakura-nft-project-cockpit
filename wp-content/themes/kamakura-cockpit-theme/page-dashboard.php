@@ -362,7 +362,7 @@ if (!$is_logged_in) {
                 <div class="absolute top-4 right-4 group">
                     <?php if ($is_logged_in): ?>
                         <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-kmnft-gold cursor-pointer relative"
-                            onclick="document.getElementById('user-icon-input').click()">
+                            onclick="openIconSelectionModal()">
                             <img id="user-avatar-img" src="<?php echo esc_url($avatar_url); ?>" alt="User Avatar"
                                 class="w-full h-full object-cover">
                             <div
@@ -1787,6 +1787,59 @@ if (!$is_logged_in) {
                     });
             }
         }
+
+        // --- Icon Selection Modal ---
+        function openIconSelectionModal() {
+            const modal = document.getElementById('icon-selection-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeIconSelectionModal() {
+            const modal = document.getElementById('icon-selection-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        function selectDefaultIcon(iconFilename) {
+            const spinner = document.getElementById('avatar-spinner');
+            spinner.classList.remove('hidden');
+            closeIconSelectionModal();
+
+            const formData = new FormData();
+            formData.append('action', 'kmnft_select_default_icon');
+            formData.append('icon', iconFilename);
+            formData.append('nonce', dashboardNonce);
+
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    spinner.classList.add('hidden');
+                    if (data.success) {
+                        // Update Image
+                        document.getElementById('user-avatar-img').src = data.data.url;
+                    } else {
+                        alert('Error: ' + (data.data.message || 'Selection failed'));
+                    }
+                })
+                .catch(error => {
+                    spinner.classList.add('hidden');
+                    console.error('Error:', error);
+                    alert('Selection error occurred.');
+                });
+        }
+
+        // Close icon selection modal on Escape key
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeIconSelectionModal();
+            }
+        });
     </script>
 
     <!-- Password Change Modal -->
@@ -1829,6 +1882,55 @@ if (!$is_logged_in) {
             </form>
         </div>
     </div>
+
+    <!-- Icon Selection Modal -->
+    <div id="icon-selection-modal"
+        class="fixed inset-0 z-[100] bg-black/90 hidden flex items-center justify-center p-4 backdrop-blur-sm"
+        onclick="closeIconSelectionModal()">
+        <div class="relative w-full max-w-2xl bg-gray-900 border border-gray-700 rounded-lg p-6 shadow-2xl"
+            onclick="event.stopPropagation()">
+            <button onclick="closeIconSelectionModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h3 class="text-xl font-bold text-white mb-6">プロファイル画像を選択</h3>
+
+            <!-- Default Icons Grid -->
+            <div class="mb-6">
+                <h4 class="text-sm text-gray-400 mb-3">デフォルトアイコン</h4>
+                <div class="grid grid-cols-4 gap-4">
+                    <?php
+                    $default_icons = kmnft_get_default_icons();
+                    foreach ($default_icons as $icon_file):
+                        $icon_url = get_template_directory_uri() . '/assets/images/default-icons/' . $icon_file;
+                        ?>
+                            <div class="aspect-square rounded-lg overflow-hidden border-2 border-gray-700 hover:border-kmnft-green transition cursor-pointer group"
+                                onclick="selectDefaultIcon('<?php echo esc_js($icon_file); ?>')">
+                                <img src="<?php echo esc_url($icon_url); ?>" alt="Default Icon"
+                                    class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition">
+                            </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Local Upload Button -->
+            <div class="border-t border-gray-700 pt-6">
+                <button onclick="document.getElementById('user-icon-input').click(); closeIconSelectionModal();"
+                    class="w-full py-3 bg-kmnft-green/20 border border-kmnft-green text-kmnft-green font-bold uppercase rounded hover:bg-kmnft-green hover:text-black transition flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    ローカルから選択
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="w-full bg-black/80 backdrop-blur-md border-t border-gray-800 py-8 mt-12">
         <div class="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center space-y-6">

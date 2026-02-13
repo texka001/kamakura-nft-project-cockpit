@@ -7,6 +7,7 @@ class KMNFT_Dashboard_Ajax
     public function __construct()
     {
         add_action('wp_ajax_kmnft_upload_user_icon', array($this, 'handle_upload_user_icon'));
+        add_action('wp_ajax_kmnft_select_default_icon', array($this, 'handle_select_default_icon'));
         add_action('wp_ajax_kmnft_load_more_gallery', array($this, 'handle_load_more_gallery'));
         add_action('wp_ajax_nopriv_kmnft_load_more_gallery', array($this, 'handle_load_more_gallery')); // Allow public access
     }
@@ -162,5 +163,54 @@ class KMNFT_Dashboard_Ajax
         } else {
             wp_send_json_error(array('message' => $movefile['error']));
         }
+    }
+
+    /**
+     * Handle Default Icon Selection
+     */
+    public function handle_select_default_icon()
+    {
+        // 1. Verify Nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'kmnft_dashboard_nonce')) {
+            wp_send_json_error(array('message' => 'Invalid nonce.'));
+        }
+
+        // 2. Check User Login
+        if (!is_user_logged_in()) {
+            wp_send_json_error(array('message' => 'Not logged in.'));
+        }
+
+        $user_id = get_current_user_id();
+
+        // 3. Validate Icon Path
+        $icon_filename = isset($_POST['icon']) ? sanitize_file_name($_POST['icon']) : '';
+
+        if (empty($icon_filename)) {
+            wp_send_json_error(array('message' => 'No icon specified.'));
+        }
+
+        // 4. Security: Ensure icon is in the allowed pattern (icon-N.png)
+        if (!preg_match('/^icon-\d+\.png$/', $icon_filename)) {
+            wp_send_json_error(array('message' => 'Invalid icon format.'));
+        }
+
+        // 5. Verify file exists
+        $icons_dir = get_template_directory() . '/assets/images/default-icons';
+        $icon_path = $icons_dir . '/' . $icon_filename;
+
+        if (!file_exists($icon_path)) {
+            wp_send_json_error(array('message' => 'Icon file not found.'));
+        }
+
+        // 6. Generate URL for the icon
+        $icon_url = get_template_directory_uri() . '/assets/images/default-icons/' . $icon_filename;
+
+        // 7. Save to User Meta
+        update_user_meta($user_id, 'kmnft_user_avatar_url', $icon_url);
+
+        wp_send_json_success(array(
+            'message' => 'Icon selected successfully',
+            'url' => $icon_url
+        ));
     }
 }

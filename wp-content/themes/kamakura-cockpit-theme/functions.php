@@ -159,6 +159,32 @@ function kmnft_get_remote_thumbnail($remote_url, $token_id)
 }
 
 /**
+ * Get Default Icons
+ * Scans the default-icons directory and returns an array of available icons.
+ *
+ * @return array Array of icon filenames (e.g., ['icon-1.png', 'icon-2.png'])
+ */
+function kmnft_get_default_icons()
+{
+	$icons_dir = get_template_directory() . '/assets/images/default-icons';
+	$icons = array();
+
+	if (is_dir($icons_dir)) {
+		$files = scandir($icons_dir);
+		foreach ($files as $file) {
+			// Match pattern: icon-*.png
+			if (preg_match('/^icon-\d+\.png$/', $file)) {
+				$icons[] = $file;
+			}
+		}
+		// Sort naturally (icon-1, icon-2, ..., icon-10, etc.)
+		natsort($icons);
+	}
+
+	return array_values($icons);
+}
+
+/**
  * Restrict admin dashboard access for non-admin users.
  * Redirects subscribers to the dashboard page and hides the admin bar.
  */
