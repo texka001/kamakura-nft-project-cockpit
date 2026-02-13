@@ -1684,8 +1684,12 @@ class KMNFT_User_Manager
                                     style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
                                     <?php
                                     if ($edit_match && !empty($edit_match->goal_images)) {
-                                        $images = explode(',', $edit_match->goal_images);
-                                        foreach ($images as $img_url) {
+                                        // Handle both multiline and comma separated for preview
+                                        $all_images = preg_split('/[\n,]+/', $edit_match->goal_images);
+                                        foreach ($all_images as $img_url) {
+                                            $img_url = trim($img_url);
+                                            if (empty($img_url))
+                                                continue;
                                             echo '<div style="position:relative; width:80px; height:80px;">';
                                             echo '<img src="' . esc_url($img_url) . '" style="width:100%; height:100%; object-fit:cover; border:1px solid #ccc;">';
                                             echo '</div>';
@@ -1693,15 +1697,17 @@ class KMNFT_User_Manager
                                     }
                                     ?>
                                 </div>
-                                <input type="hidden" name="goal_images" id="goal_images_hidden"
-                                    value="<?php echo $edit_match ? esc_attr($edit_match->goal_images) : ''; ?>">
+                                <textarea name="goal_images" id="goal_images_textarea" rows="5" class="large-text"
+                                    placeholder="各ゴールの画像を1行ずつ入力してください。&#10;1つのゴールに複数ある場合はカンマ区切りで入力してください。"><?php echo $edit_match ? esc_textarea($edit_match->goal_images) : ''; ?></textarea>
 
-                                <!-- Media Uploader Trigger -->
-                                <button type="button" class="button"
-                                    id="upload_goal_image_btn"><?php echo $edit_match ? '画像を編集/追加' : '画像を追加'; ?></button>
-                                <button type="button" class="button" id="clear_goal_images_btn">画像をクリア</button>
-                                <p class="description">ゴールに対応する画像をアップロードしてください。画像の並び順はToken IDと一致させてください。<br>
-                                    <span style="color:red;">※複数画像を選ぶ場合は、Control（macはCommand）をおして、選択してください。</span>
+                                <div style="margin-top:10px;">
+                                    <button type="button" class="button"
+                                        id="upload_goal_image_btn"><?php echo $edit_match ? '画像を追加' : '画像を追加'; ?></button>
+                                    <button type="button" class="button" id="clear_goal_images_btn">入力をクリア</button>
+                                </div>
+                                <p class="description">
+                                    <strong>1行につき1ゴール</strong>の画像を登録してください。複数画像はカンマ区切りで並べてください。<br>
+                                    順序は Token IDs と一致させる必要があります。
                                 </p>
                             </td>
                         </tr>
@@ -1767,7 +1773,8 @@ class KMNFT_User_Manager
                                     <td>
                                         <?php if (!empty($match->goal_images)): ?>
                                             <?php
-                                            $imgs = explode(',', $match->goal_images);
+                                            // Split by both newline and comma for the preview icons
+                                            $imgs = preg_split('/[\n,]+/', $match->goal_images);
                                             foreach ($imgs as $img):
                                                 $img = trim($img);
                                                 if (empty($img))
@@ -1800,38 +1807,76 @@ class KMNFT_User_Manager
                 </table>
             </div>
         </div>
-        <script>     jQuery(documen                                       t).re                                 ady(funct              ion($) { var mediaUploader; function updateHiddenInput() { var urls = []; $('#goal-images-container img').each(function () { urls.push($(this).attr('src')); }); $('#goal_images_hidden').val(urls.join(',')); }
+        <script>
+            jQuery(document).ready(function ($) {
+                var mediaUploader;
 
-                                                                                                                                                                                                                                                                                                                                                                                $('#upload_goal_image_btn').click(functi                                                 on(e) {
-                e.preventDefaul                         t();
-                                                                                                                                    if(mediaUploader) {
-                    mediaUploader.open();
-                    return;
+                function updatePreview() {
+                    var content = $('#goal_images_textarea').val();
+                    var $container = $('#goal-images-container');
+                    $container.empty();
+
+                    if (!content) return;
+
+                    var urls = content.split(/[\n,]+/);
+                    $.each(urls, function (i, url) {
+                        url = url.trim();
+                        if (url) {
+                            $container.append('<div style="position:relative; width:80px; height:80px;"><img src="' + url + '" style="width:100%; height:100%; object-fit:cover; border:1px solid #ccc;"></div>');
+                        }
+                    }
+
+                    );
                 }
-                                                                                                                                                                                                                                                                                                        mediaUploader = wp.media.frames.file_frame = wp.media({
-                    title: 'Choose Goal Image',
-                    button: {
-                        text: 'Choose Image'
-                    },
-                    multiple: true
+
+                // Initial preview update
+                updatePreview();
+
+                // Update preview on manual textarea change
+                $('#goal_images_textarea').on('input propertychange', function () {
+                    updatePreview();
                 });
 
-                mediaUploader.on('select', function () {
-                    var selection = mediaUploader.state().get('selection');
-                    selection.each(function (attachment) {
-                        attachment = attachment.toJSON();
-                        $('#goal-images-container').append('<div style="position:relative; width:80px; height:80px;"><img src="' + attachment.url + '" style="width:100%; height:100%; object-fit:cover; border:1px solid #ccc;"></div>');
+                $('#upload_goal_image_btn').click(function (e) {
+                    e.preventDefault();
+                    if (mediaUploader) {
+                        mediaUploader.open();
+                        return;
+                    }
+                    mediaUploader = wp.media.frames.file_frame = wp.media({
+                        title: 'Choose Goal Image',
+                        button: {
+                            text: 'Add to List'
+                        },
+                        multiple: true
                     });
-                    updateHiddenInput();
-                });
-                mediaUploader.open();
-            });
 
-            $('#clear_goal_images_btn').click(function () {
-                $('#goal-images-container').empty();
-                updateHiddenInput();
+                    mediaUploader.on('select', function () {
+                        var selection = mediaUploader.state().get('selection');
+                        var currentVal = $('#goal_images_textarea').val().trim();
+                        var newUrls = [];
+
+                        selection.each(function (attachment) {
+                            attachment = attachment.toJSON();
+                            newUrls.push(attachment.url);
+                        });
+
+                        if (newUrls.length > 0) {
+                            var separator = currentVal === "" ? "" : (currentVal.endsWith("\n") ? "" : ", ");
+                            $('#goal_images_textarea').val(currentVal + separator + newUrls.join(', '));
+                            updatePreview();
+                        }
+                    });
+                    mediaUploader.open();
+                });
+
+                $('#clear_goal_images_btn').click(function () {
+                    if (confirm('入力内容をクリアしますか？')) {
+                        $('#goal_images_textarea').val('');
+                        updatePreview();
+                    }
+                });
             });
-                                                                                                                                                                                                                                                                                                                                                                            });
         </script>
         <?php
     }
@@ -1872,9 +1917,18 @@ class KMNFT_User_Manager
         }
         $clean_token_ids = implode("\n", $normalized_lines);
 
-        // Clean up videos (one per line, but stored as comma separated or preserved as textarea)
-        // preservation as textarea is easier for editing but for consistency with others let's store as is but maybe normalized.
-        // The user asked for "vertical box", so keeping it as original textarea content might be best for editing.
+        // Clean up images (Preserve lines for goal sequence, normalize within lines)
+        $img_lines = preg_split('/\r\n|\r|\n/', $goal_images);
+        $normalized_img_lines = array();
+        foreach ($img_lines as $line) {
+            $imgs = explode(',', $line);
+            $imgs = array_map('trim', $imgs);
+            $imgs = array_filter($imgs);
+            if (!empty($imgs)) {
+                $normalized_img_lines[] = implode(',', $imgs);
+            }
+        }
+        $clean_goal_images = implode("\n", $normalized_img_lines);
 
         $data = array(
             'section_label' => $section_label,
@@ -1883,7 +1937,7 @@ class KMNFT_User_Manager
             'result_score' => $result_score,
             'is_win' => $is_win,
             'goal_token_ids' => $clean_token_ids,
-            'goal_images' => $goal_images,
+            'goal_images' => $clean_goal_images,
             'goal_videos' => $goal_videos,
             'shoot_prize_memo' => $shoot_prize_memo
         );
