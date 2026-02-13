@@ -141,7 +141,10 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
 
     <main class="flex-grow pt-24 px-6 pb-10 max-w-5xl mx-auto w-full">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-            <h1 class="text-2xl font-bold neon-text uppercase tracking-widest">KSP Ranking</h1>
+            <div>
+                <h1 class="text-2xl font-bold neon-text uppercase tracking-widest">KSP Ranking</h1>
+                <p class="text-xs text-gray-400 mt-2">ランキングは、全ユーザーおよび全NFTを対象とした集計結果に基づいています。</p>
+            </div>
 
             <!-- Season Selector -->
             <form method="GET" action="" class="flex items-center gap-2">

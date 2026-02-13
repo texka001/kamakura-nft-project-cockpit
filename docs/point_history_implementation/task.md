@@ -8,4 +8,5 @@
 - [x] Implement NFT detail modal (same as dashboard)
 - [x] Display season-based summary (Total KSP & Rank)
 - [x] Link Dashboard KSP to Point History page
+- [x] 各ページに説明文を追加（ポイント明細、ランキング）
 - [x] Verify implementation
