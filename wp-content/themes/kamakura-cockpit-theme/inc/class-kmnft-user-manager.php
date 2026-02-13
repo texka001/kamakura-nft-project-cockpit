@@ -1672,8 +1672,9 @@ class KMNFT_User_Manager
                             <th><label for="goal_token_ids">Goal Token IDs（11桁）</label></th>
                             <td>
                                 <textarea name="goal_token_ids" id="goal_token_ids" rows="5" class="large-text"
-                                    placeholder="eg. &#10;1点目：10089172280, 10091172239（1点目に複数トークンある場合はカンマ区切り）&#10;2点目：10091172240"><?php echo $edit_match ? esc_textarea($edit_match->goal_token_ids) : ''; ?></textarea>
-                                <p class="description">1行1点（1ゴール）として入力してください。1点に複数のトークンがある場合は、カンマ区切りで入力してください。</p>
+                                    placeholder="10089172280（1行 = 1ゴール目）&#10;10091172239, 10091172240（2行 = 2ゴール目、複数いる場合はカンマ区切り）"><?php echo $edit_match ? esc_textarea($edit_match->goal_token_ids) : ''; ?></textarea>
+                                <p class="description">
+                                    1行につき1ゴールとして入力してください。1つのゴールに複数のアセットを紐付ける場合は、同じ行内でカンマ区切りで入力してください（「1点目」などの文字は不要です）。</p>
                             </td>
                         </tr>
                         <tr>
@@ -1801,13 +1802,13 @@ class KMNFT_User_Manager
         </div>
         <script>     jQuery(documen                                       t).re                                 ady(funct              ion($) { var mediaUploader; function updateHiddenInput() { var urls = []; $('#goal-images-container img').each(function () { urls.push($(this).attr('src')); }); $('#goal_images_hidden').val(urls.join(',')); }
 
-                                                                                                                                                                                                                                                                                                                                                                        $('#upload_goal_image_btn').click(functi                                                 on(e) {
+                                                                                                                                                                                                                                                                                                                                                                                $('#upload_goal_image_btn').click(functi                                                 on(e) {
                 e.preventDefaul                         t();
-                                                                                                                            if(mediaUploader) {
+                                                                                                                                    if(mediaUploader) {
                     mediaUploader.open();
                     return;
                 }
-                                                                                                                                                                                                                                                                                                mediaUploader = wp.media.frames.file_frame = wp.media({
+                                                                                                                                                                                                                                                                                                        mediaUploader = wp.media.frames.file_frame = wp.media({
                     title: 'Choose Goal Image',
                     button: {
                         text: 'Choose Image'
@@ -1830,7 +1831,7 @@ class KMNFT_User_Manager
                 $('#goal-images-container').empty();
                 updateHiddenInput();
             });
-                                                                                                                                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                                                                                                                                            });
         </script>
         <?php
     }
@@ -1860,7 +1861,9 @@ class KMNFT_User_Manager
         $lines = preg_split('/\r\n|\r|\n/', $goal_token_ids);
         $normalized_lines = array();
         foreach ($lines as $line) {
-            $tokens = explode(',', $line);
+            // Extract only digits and commas to handle accidental labels like "1st Goal: 12345"
+            $cleaned_line = preg_replace('/[^0-9,]/', '', $line);
+            $tokens = explode(',', $cleaned_line);
             $tokens = array_map('trim', $tokens);
             $tokens = array_filter($tokens);
             if (!empty($tokens)) {
