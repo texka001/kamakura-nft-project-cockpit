@@ -6,7 +6,8 @@
 
 ### [Component] テーマ機能 (`functions.php`)
 
-一般ユーザーの管理画面利用を制限するためのフックを追加します。
+  - 一般ユーザー（購読者）の管理画面アクセス制限（リダイレクト・管理バー非表示）。
+  - **NEW: 固定ページ自動生成の拡充**: `kmnft_create_core_pages` 関数にランキングページ (`ranking`) を追加し、テーマ有効化時に自動作成されるようにする。
 
 #### [MODIFY] [functions.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/functions.php)
 

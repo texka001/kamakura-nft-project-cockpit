@@ -12,6 +12,7 @@
 
 - **管理画面リダイレクト**: `admin_init` アクション時に `current_user_can('manage_options')` をチェックし、管理者以外の場合は `home_url('/dashboard/')` へリダイレクトします。
 - **ツールバー非表示**: `show_admin_bar` フィルタを管理権限がない場合に `false` に設定し、フロントエンドでのWordPressバー表示を消去しました。
+- **固定ページ自動生成の拡充**: `kmnft_create_core_pages` リストに `ranking` ページ（テンプレート: `page-ranking.php`）を追加しました。
 
 ## 検証結果
 
