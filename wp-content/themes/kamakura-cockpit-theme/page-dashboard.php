@@ -279,10 +279,13 @@ if (!$is_logged_in) {
                 <?php endif; ?>
 
                 <div class="flex justify-between items-end <?php echo $latest_season ? 'mb-0' : ''; ?>">
-                    <div class="text-4xl font-bold text-white neon-text leading-none">
-                        <?php echo number_format($ksp_total_val); ?><span
-                            class="text-xs ml-1 text-gray-400 font-normal">pt</span>
-                    </div>
+                    <a href="<?php echo home_url('/points'); ?>" class="group/ksp block hover:opacity-80 transition">
+                        <div
+                            class="text-4xl font-bold text-white neon-text leading-none group-hover/ksp:text-kmnft-green transition-colors">
+                            <?php echo number_format($ksp_total_val); ?><span
+                                class="text-xs ml-1 text-gray-400 font-normal">pt</span>
+                        </div>
+                    </a>
                     <?php if ($latest_season): ?>
                         <div class="text-right">
                             <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">

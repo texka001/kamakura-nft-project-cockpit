@@ -18,6 +18,9 @@
   - **NEW: シーズン集計表示**: ページ上部に、選択したシーズンの「合計獲得KSP」と「ランキング」を表示するカードを追加しました。
   - 非ログインユーザーのアクセス制限とログインページへのリダイレクト。
 
+### [Component] ダッシュボードの更新
+- **KSP Status リンク**: ダッシュボードの「KSP STATUS」カード内の合計ポイント部分をクリックすると、ポイント明細ページへ遷移するように設定しました。
+
 ### [Component] サイト内ナビゲーション
 
 #### [MODIFY] [page-dashboard.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-dashboard.php)

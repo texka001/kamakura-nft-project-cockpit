@@ -7,4 +7,5 @@
 - [x] Add sorting functionality to the table
 - [x] Implement NFT detail modal (same as dashboard)
 - [x] Display season-based summary (Total KSP & Rank)
+- [x] Link Dashboard KSP to Point History page
 - [x] Verify implementation
