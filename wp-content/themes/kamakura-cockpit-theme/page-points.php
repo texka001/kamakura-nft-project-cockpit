@@ -64,6 +64,16 @@ if (!empty($user_tokens) && $selected_season) {
     foreach ($holdings_results as $h) {
         $holdings_data[$h->token_id] = $h;
     }
+
+    // 4. Fetch User Summary for the selected season (Total Points & Rank)
+    $user_summary = $kmnft_manager->get_user_ksp_summary($current_user->ID);
+    $selected_season_stats = null;
+    foreach ($user_summary as $stats) {
+        if ($stats->season === $selected_season) {
+            $selected_season_stats = $stats;
+            break;
+        }
+    }
 }
 
 $is_logged_in = is_user_logged_in();
@@ -159,6 +169,23 @@ $is_logged_in = is_user_logged_in();
             </form>
         </div>
 
+        <!-- Season Stats Summary -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <div class="glass-card p-6 rounded-lg border-l-4 border-kmnft-gold">
+                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season Total KSP</div>
+                <div class="text-3xl font-bold text-kmnft-gold font-mono">
+                    <?php echo $selected_season_stats ? number_format($selected_season_stats->total_points) : '0'; ?><span
+                        class="text-xs text-gray-500 ml-1">PT</span>
+                </div>
+            </div>
+            <div class="glass-card p-6 rounded-lg border-l-4 border-kmnft-green">
+                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Season Rank</div>
+                <div class="text-3xl font-bold text-kmnft-green neon-text">
+                    <?php echo ($selected_season_stats && $selected_season_stats->rank > 0) ? '#' . esc_html($selected_season_stats->rank) : '-'; ?>
+                </div>
+            </div>
+        </div>
+
         <!-- Point History Table -->
         <div class="glass-card rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
@@ -230,8 +257,7 @@ $is_logged_in = is_user_logged_in();
                                     </td>
                                     <td class="px-4 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div
-                                                class="w-10 h-10 rounded border border-gray-700 overflow-hidden bg-gray-900 flex-shrink-0 group-hover/row:border-kmnft-green transition duration-300 cursor-pointer"
+                                            <div class="w-10 h-10 rounded border border-gray-700 overflow-hidden bg-gray-900 flex-shrink-0 group-hover/row:border-kmnft-green transition duration-300 cursor-pointer"
                                                 onclick="openTokenModal('<?php echo esc_js($item->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($zx); ?>', '<?php echo esc_js($zy); ?>', '<?php echo esc_js($selected_season); ?>')">
                                                 <img src="<?php echo $image_url; ?>"
                                                     alt="<?php echo esc_attr($item->token_id); ?>"

@@ -6,4 +6,5 @@
 - [x] Update header links
 - [x] Add sorting functionality to the table
 - [x] Implement NFT detail modal (same as dashboard)
-- [/] Verify implementation
+- [x] Display season-based summary (Total KSP & Rank)
+- [x] Verify implementation
