@@ -144,6 +144,8 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             <div>
                 <h1 class="text-2xl font-bold neon-text uppercase tracking-widest">KSP Ranking</h1>
                 <p class="text-xs text-gray-400 mt-2">ランキングは、全ユーザーおよび全NFTを対象とした集計結果に基づいています。</p>
+                <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">Rankings are based on the aggregate
+                    results of all users and all NFTs.</p>
             </div>
 
             <!-- Season Selector -->

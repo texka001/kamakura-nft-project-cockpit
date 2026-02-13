@@ -16,7 +16,9 @@
   - **NEW: 並び替え機能**: カラムヘッダー（日付、トークンID、獲得ポイント）をクリックすることで、昇順・降順に並び替えが可能です。
   - **NEW: NFT詳細表示**: 明細内のNFT画像をクリックすると、ダッシュボードと同様に座標、ランク、シーズン別履歴を含む詳細情報をモーダルで確認できます。
   - **NEW: シーズン集計表示**: ページ上部に、選択したシーズンの「合計獲得KSP」と「ランキング」を表示するカードを追加しました。
-  - **NEW: ページ説明文の追加**: 「このページでは、あなたが現在保有しているNFTが獲得したポイントの明細を表示しています。」という説明文を追加。
+  - **NEW: ページ説明文の日英併記**: ページトップに日本語と英語（小フォント）で内容説明を追記しました。
+    - 日本語: 「このページでは、あなたが現在保有しているNFTが獲得したポイントの明細を表示しています。」
+    - 英語: "This page displays the points earned by the NFTs you currently own."
   - 非ログインユーザーのアクセス制限とログインページへのリダイレクト。
 
 ### [Component] ダッシュボードの更新
@@ -25,7 +27,9 @@
 ### [Component] サイト内ナビゲーション
 
 - **Ranking ページの更新**:
-  - **NEW: ページ説明文の追加**: 「ランキングは、全ユーザーおよび全NFTを対象とした集計結果に基づいています。」という説明文を追加。
+  - **NEW: ページ説明文の日英併記**: ページトップに日本語と英語（小フォント）で内容説明を追記しました。
+    - 日本語: 「ランキングは、全ユーザーおよび全NFTを対象とした集計結果に基づいています。」
+    - 英語: "Rankings are based on the aggregate results of all users and all NFTs."
 
 #### [MODIFY] [page-dashboard.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-dashboard.php)
 #### [MODIFY] [page-points.php](file:///Users/mukaikazuma/Desktop/AIエージェント開発/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-points.php)

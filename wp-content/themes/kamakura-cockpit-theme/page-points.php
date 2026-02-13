@@ -152,6 +152,7 @@ $is_logged_in = is_user_logged_in();
             <div>
                 <h1 class="text-2xl font-bold neon-text uppercase tracking-widest">Point History</h1>
                 <p class="text-xs text-gray-400 mt-2">このページでは、あなたが現在保有しているNFTが獲得したポイントの明細を表示しています。</p>
+                <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">This page displays the points earned by the NFTs you currently own.</p>
             </div>
 
             <!-- Season Selector -->
