@@ -771,8 +771,30 @@ if (!$is_logged_in) {
                                                         class="w-full h-full object-cover opacity-60 relative z-0 rounded-sm">
 
                                                     <!-- Goal Plots -->
-                                                    <?php foreach ($goal_tokens as $i => $token_id): ?>
-                                                        <?php
+                                                    <!-- Goal Plots -->
+                                                    <?php
+                                                    // Parse Token IDs (Multiline format: one line per goal, multiple tokens per line comma-separated)
+                                                    $goal_lines = array_filter(preg_split('/\r\n|\r|\n/', $match->goal_token_ids));
+                                                    $all_goal_tokens_structured = array();
+
+                                                    foreach ($goal_lines as $idx => $line) {
+                                                        $tokens = explode(',', $line);
+                                                        $tokens = array_map('trim', $tokens);
+                                                        $tokens = array_filter($tokens);
+                                                        if (!empty($tokens)) {
+                                                            foreach ($tokens as $t) {
+                                                                $all_goal_tokens_structured[] = array(
+                                                                    'token_id' => $t,
+                                                                    'goal_num' => $idx + 1
+                                                                );
+                                                            }
+                                                        }
+                                                    }
+
+                                                    foreach ($all_goal_tokens_structured as $goal_data):
+                                                        $token_id = $goal_data['token_id'];
+                                                        $seq = $goal_data['goal_num'];
+
                                                         // Lookup coordinates
                                                         $coord_query = $wpdb->prepare("SELECT zone_x, zone_y FROM {$wpdb->prefix}kmnft_holdings WHERE token_id = %s", $token_id);
                                                         $coord = $wpdb->get_row($coord_query);
@@ -783,23 +805,19 @@ if (!$is_logged_in) {
 
                                                             $left = ($x / 120) * 100;
                                                             $bottom = ($y / 64) * 100;
-
-                                                            $seq = $i + 1;
                                                             ?>
-                                                            <?php
-                                                            $video_url = isset($goal_videos[$i]) ? $goal_videos[$i] : '';
-                                                            $clickable_class = !empty($video_url) ? 'cursor-pointer' : '';
-                                                            $video_onclick = !empty($video_url) ? 'onclick="window.open(\'' . esc_js($video_url) . '\', \'_blank\'); return false;"' : '';
-                                                            ?>
+                                                                            <?php
+                                                                            $video_url = isset($goal_videos[$seq - 1]) ? $goal_videos[$seq - 1] : '';
+                                                                            $clickable_class = !empty($video_url) ? 'cursor-pointer' : '';
+                                                                            $video_onclick = !empty($video_url) ? 'onclick="window.open(\'' . esc_js($video_url) . '\', \'_blank\'); return false;"' : '';
+                                                                            ?>
                                                                             <div class="absolute w-4 h-4 bg-red-500 rounded-full border border-white flex items-center justify-center text-[8px] text-white font-bold z-10 -translate-x-1/2 translate-y-1/2 shadow-lg hover:scale-125 transition <?php echo $clickable_class; ?>"
                                                                                 style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
                                                                                 <?php echo $video_onclick; ?>
                                                                                 title="<?php echo !empty($video_url) ? 'Watch Video' : 'Goal ' . $seq; ?> (ID: <?php echo esc_attr($token_id); ?>)">
                                                                                 <?php echo $seq; ?>
                                                                             </div>
-                                                                            <?php
-                                                        }
-                                                        ?>
+                                                                    <?php } ?>
                                                             <?php endforeach; ?>
                                                         </div>
                                                     </div>
@@ -820,6 +838,9 @@ if (!$is_logged_in) {
                                                                     class="relative group aspect-video rounded overflow-hidden border border-white/10 <?php echo $is_hidden ? 'hidden extra-images-' . $match->id : ''; ?>">
                                                                     <!-- Sequence Number Badge -->
                                                                     <?php
+                                                                    // We associate images with goals based on index
+                                                                    // If we follow the rule: 1st image = 1st goal, 2nd image = 2nd goal
+                                                                    $goal_num_for_img = $idx + 1;
                                                                     $video_url = isset($goal_videos[$idx]) ? $goal_videos[$idx] : '';
                                                                     $clickable_class = !empty($video_url) ? 'cursor-pointer' : 'pointer-events-none';
                                                                     $video_onclick = !empty($video_url) ? 'onclick="window.open(\'' . esc_js($video_url) . '\', \'_blank\');"' : '';
@@ -827,7 +848,7 @@ if (!$is_logged_in) {
                                                                     <div class="absolute top-1 left-1 w-4 h-4 bg-red-500 rounded-full border border-white flex items-center justify-center text-[9px] text-white font-bold z-10 shadow-md <?php echo $clickable_class; ?>"
                                                                         <?php echo $video_onclick; ?>
                                                                         title="<?php echo !empty($video_url) ? 'Watch Video' : ''; ?>">
-                                                                        <?php echo $idx + 1; ?>
+                                                                        <?php echo $goal_num_for_img; ?>
                                                                     </div>
                                                                     <img src="<?php echo esc_url(trim($url)); ?>"
                                                                         class="w-full h-full object-cover cursor-pointer hover:scale-110 transition duration-500"
