@@ -143,9 +143,10 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
                 <h1 class="text-2xl font-bold neon-text uppercase tracking-widest">KSP Ranking</h1>
-                <p class="text-xs text-gray-400 mt-2">ランキングは、全ユーザーおよび全NFTを対象とした集計結果に基づいています。</p>
+                <p class="text-xs text-gray-400 mt-2">ランキングは、全ユーザーおよび全NFTを対象とした集計結果に基づいています。トークン・ユーザーともに上位30位まで表示されます。
+                </p>
                 <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">Rankings are based on the aggregate
-                    results of all users and all NFTs.</p>
+                    results of all users and all NFTs. Top 30 tokens and users are displayed.</p>
             </div>
 
             <!-- Season Selector -->
@@ -227,8 +228,8 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                     </tbody>
                 </table>
             </div>
-            <p class="text-[10px] text-gray-500 px-2 italic">* Displays top 30 tokens for the selected season. (Click
-                row for details)</p>
+            <p class="text-[10px] text-gray-500 px-2 italic">* 選択されたシーズンの上位30トークンを表示しています。(行をクリックで詳細表示) / Displays top
+                30 tokens for the selected season. (Click row for details)</p>
         </div>
 
         <!-- User Ranking Table -->
@@ -292,7 +293,8 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                     </tbody>
                 </table>
             </div>
-            <p class="text-[10px] text-gray-500 px-2 italic">* Displays top 30 users for the selected season.</p>
+            <p class="text-[10px] text-gray-500 px-2 italic">* 選択されたシーズンの上位30ユーザーを表示しています。 / Displays top 30 users for
+                the selected season.</p>
         </div>
     </main>
 
