@@ -1552,14 +1552,10 @@ if (!$is_logged_in) {
     <script>
         // Toggle function defined early and in separate block to avoid ReferenceError
         window.toggleSection = function (contentId, iconId) {
-            console.log('toggleSection called', contentId, iconId);
             const content = document.getElementById(contentId);
             const icon = document.getElementById(iconId);
             if (content) {
                 content.classList.toggle('hidden');
-                console.log('Toggled content hidden class. New classes:', content.className);
-            } else {
-                console.error('Content element not found:', contentId);
             }
             if (icon) icon.classList.toggle('rotate-180');
         };
