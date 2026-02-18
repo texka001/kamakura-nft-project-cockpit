@@ -948,7 +948,7 @@ if (!$is_logged_in) {
                 <div class="glass-card p-6 rounded-lg mb-6">
                     <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
                         <h3 class="text-sm font-bold text-gray-300">LEAGUE STANDINGS</h3>
-                        <button onclick="toggleSection('standings-content', 'standings-toggle-icon')"
+                        <button type="button" onclick="toggleSection('standings-content', 'standings-toggle-icon')"
                             class="text-gray-400 hover:text-white transition">
                             <svg id="standings-toggle-icon" xmlns="http://www.w3.org/2000/svg"
                                 class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
@@ -1106,7 +1106,7 @@ if (!$is_logged_in) {
                 <div class="glass-card p-6 rounded-lg mb-6">
                     <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
                         <h3 class="text-sm font-bold text-gray-300">LEAGUE SCHEDULE / RESULTS</h3>
-                        <button onclick="toggleSection('schedule-content', 'schedule-toggle-icon')"
+                        <button type="button" onclick="toggleSection('schedule-content', 'schedule-toggle-icon')"
                             class="text-gray-400 hover:text-white transition">
                             <svg id="schedule-toggle-icon" xmlns="http://www.w3.org/2000/svg"
                                 class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
@@ -1553,12 +1553,18 @@ if (!$is_logged_in) {
         const latestSeasonLabel = '<?php echo esc_js($latest_season_label); ?>';
         const tokensHistory = <?php echo json_encode(!empty($tokens_ksp_history) ? $tokens_ksp_history : new stdClass()); ?>;
 
-        function toggleSection(contentId, iconId) {
+        window.toggleSection = function (contentId, iconId) {
+            console.log('toggleSection called', contentId, iconId);
             const content = document.getElementById(contentId);
             const icon = document.getElementById(iconId);
-            if (content) content.classList.toggle('hidden');
+            if (content) {
+                content.classList.toggle('hidden');
+                console.log('Toggled content hidden class. New classes:', content.className);
+            } else {
+                console.error('Content element not found:', contentId);
+            }
             if (icon) icon.classList.toggle('rotate-180');
-        }
+        };
 
         let currentTokenId = null;
 
