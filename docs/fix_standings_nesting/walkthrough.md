@@ -1,34 +1,31 @@
-# 修正内容の確認: セクション分離の修正
+# 修正内容の確認: トグルボタンの修正
 
 ## 変更内容
-`page-dashboard.php` において、「LEAGUE STANDINGS」セクション内の `foreach` ループが終了する前に `</div>` タグが欠落していた問題を修正しました。
-これにより、後続の「LEAGUE SCHEDULE / RESULTS」および「PREDICTION GAME」セクションが「LEAGUE STANDINGS」のカード内に入れ子になってしまう問題が解消されました。
+`page-dashboard.php` において、`toggleSection` 関数の定義をスクリプトブロックの先頭に移動しました。
+これにより、他のスクリプト（特に厳格モードでの変数の再代入など）でエラーが発生した場合でも、`toggleSection` 関数が確実に定義されるようになります。
 
-### 修正前
-```php
-                                        </div>
-                                    </div>
-                                    <!-- 欠落: </div> -->
-                                <?php endforeach; ?>
-                            </div>
+### 変更前
+```javascript
+// スクリプトブロックの最後の方で定義されていた
+function toggleSection(contentId, iconId) { ... }
 ```
 
-### 修正後
-```php
-                                        </div>
-                                    </div>
-                                </div> <!-- 追加 -->
-                                <?php endforeach; ?>
-                            </div>
+### 変更後
+```javascript
+// スクリプトブロックの直後（変数定義の後）に定義
+const tokensHistory = ...;
+
+function toggleSection(contentId, iconId) {
+    const content = document.getElementById(contentId);
+    const icon = document.getElementById(iconId);
+    if (content) content.classList.toggle('hidden');
+    if (icon) icon.classList.toggle('rotate-180');
+}
 ```
 
-## 検証結果
+## 検証計画
+### 自動テスト
+- なし
+
 ### 手動検証
-コードの構造を確認し、`LEAGUE STANDINGS` の各アイテムが適切に閉じられ、その外側のコンテナも適切に閉じられていることを確認しました。
-これにより、以下の構造が正しく維持されます。
-
-1. **LEAGUE STANDINGS** カード
-2. **LEAGUE SCHEDULE / RESULTS** カード
-3. **PREDICTION GAME** カード
-
-各セクションは独立したカードとして表示されるようになります。
+- ダッシュボードページで「LEAGUE STANDINGS」および「LEAGUE SCHEDULE / RESULTS」のセクション右上の矢印アイコンをクリックし、セクションの開閉が行われることを確認してください。

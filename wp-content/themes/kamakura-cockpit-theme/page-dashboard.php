@@ -1553,6 +1553,13 @@ if (!$is_logged_in) {
         const latestSeasonLabel = '<?php echo esc_js($latest_season_label); ?>';
         const tokensHistory = <?php echo json_encode(!empty($tokens_ksp_history) ? $tokens_ksp_history : new stdClass()); ?>;
 
+        function toggleSection(contentId, iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
+            if (content) content.classList.toggle('hidden');
+            if (icon) icon.classList.toggle('rotate-180');
+        }
+
         let currentTokenId = null;
 
         function openTokenModal(tokenId, rank, points, x, y, season) {
@@ -1711,12 +1718,7 @@ if (!$is_logged_in) {
             }
         });
 
-        function toggleSection(contentId, iconId) {
-            const content = document.getElementById(contentId);
-            const icon = document.getElementById(iconId);
-            if (content) content.classList.toggle('hidden');
-            if (icon) icon.classList.toggle('rotate-180');
-        }
+
 
         function showAllAssets() {
             const hiddenAssets = document.querySelectorAll('.asset-item.hidden-asset');
