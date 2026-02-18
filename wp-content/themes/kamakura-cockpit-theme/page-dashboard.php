@@ -1101,247 +1101,247 @@ if (!$is_logged_in) {
                 $schedule_history = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_league_schedule ORDER BY season_year DESC");
                 if ($schedule_history):
                     ?>
-                    <div class="glass-card p-6 rounded-lg mb-6">
-                        <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
-                            <h3 class="text-sm font-bold text-gray-300">LEAGUE SCHEDULE / RESULTS</h3>
-                            <button onclick="toggleSection('schedule-content', 'schedule-toggle-icon')"
-                                class="text-gray-400 hover:text-white transition">
-                                <svg id="schedule-toggle-icon" xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4 transform transition-transform duration-300" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div id="schedule-content">
-                            <div class="space-y-10">
-                                <?php
-                                $has_past_seasons = false;
-                                foreach ($schedule_history as $index => $schedule):
-                                    $is_latest = ($index === 0);
-                                    if (!$is_latest)
-                                        $has_past_seasons = true;
+                        <div class="glass-card p-6 rounded-lg mb-6">
+                            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                                <h3 class="text-sm font-bold text-gray-300">LEAGUE SCHEDULE / RESULTS</h3>
+                                <button onclick="toggleSection('schedule-content', 'schedule-toggle-icon')"
+                                    class="text-gray-400 hover:text-white transition">
+                                    <svg id="schedule-toggle-icon" xmlns="http://www.w3.org/2000/svg"
+                                        class="h-4 w-4 transform transition-transform duration-300" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="schedule-content">
+                                <div class="space-y-10">
+                                    <?php
+                                    $has_past_seasons = false;
+                                    foreach ($schedule_history as $index => $schedule):
+                                        $is_latest = ($index === 0);
+                                        if (!$is_latest)
+                                            $has_past_seasons = true;
 
-                                    $schedule_data = !empty($schedule->data) ? json_decode($schedule->data, true) : null;
-                                    $stats = !empty($schedule->summary_stats) ? json_decode($schedule->summary_stats, true) : null;
-                                    $summary_text = ($stats && isset($stats['win'])) ? "{$stats['win']}W {$stats['lose']}L {$stats['draw']}D" : '';
+                                        $schedule_data = !empty($schedule->data) ? json_decode($schedule->data, true) : null;
+                                        $stats = !empty($schedule->summary_stats) ? json_decode($schedule->summary_stats, true) : null;
+                                        $summary_text = ($stats && isset($stats['win'])) ? "{$stats['win']}W {$stats['lose']}L {$stats['draw']}D" : '';
 
-                                    // Process sorting and identify next match
-                                    $has_next_match = false;
-                                    if ($schedule_data) {
-                                        $current_ts = current_time('timestamp');
+                                        // Process sorting and identify next match
+                                        $has_next_match = false;
+                                        if ($schedule_data) {
+                                            $current_ts = current_time('timestamp');
 
-                                        // Add timestamp to each row
-                                        foreach ($schedule_data as &$row) {
-                                            $date_str = $row['date'];
-                                            $time_str = $row['time'];
-                                            $dt_parts = explode('/', $date_str);
-                                            if (count($dt_parts) === 2) {
-                                                $month = str_pad($dt_parts[0], 2, '0', STR_PAD_LEFT);
-                                                $day = str_pad($dt_parts[1], 2, '0', STR_PAD_LEFT);
-                                                // Assume season_year is correct year
-                                                $year = $schedule->season_year;
-                                                $full_date_str = "{$year}-{$month}-{$day} {$time_str}";
-                                                $row['_ts'] = strtotime($full_date_str);
-                                            } else {
-                                                $row['_ts'] = 0;
-                                            }
-                                        }
-                                        unset($row);
-
-                                        // Identify Next Match
-                                        $closest_diff = null;
-                                        $next_match_idx = -1;
-
-                                        foreach ($schedule_data as $idx => $row) {
-                                            if ($row['_ts'] >= $current_ts) {
-                                                $diff = $row['_ts'] - $current_ts;
-                                                if ($closest_diff === null || $diff < $closest_diff) {
-                                                    $closest_diff = $diff;
-                                                    $next_match_idx = $idx;
+                                            // Add timestamp to each row
+                                            foreach ($schedule_data as &$row) {
+                                                $date_str = $row['date'];
+                                                $time_str = $row['time'];
+                                                $dt_parts = explode('/', $date_str);
+                                                if (count($dt_parts) === 2) {
+                                                    $month = str_pad($dt_parts[0], 2, '0', STR_PAD_LEFT);
+                                                    $day = str_pad($dt_parts[1], 2, '0', STR_PAD_LEFT);
+                                                    // Assume season_year is correct year
+                                                    $year = $schedule->season_year;
+                                                    $full_date_str = "{$year}-{$month}-{$day} {$time_str}";
+                                                    $row['_ts'] = strtotime($full_date_str);
+                                                } else {
+                                                    $row['_ts'] = 0;
                                                 }
                                             }
+                                            unset($row);
+
+                                            // Identify Next Match
+                                            $closest_diff = null;
+                                            $next_match_idx = -1;
+
+                                            foreach ($schedule_data as $idx => $row) {
+                                                if ($row['_ts'] >= $current_ts) {
+                                                    $diff = $row['_ts'] - $current_ts;
+                                                    if ($closest_diff === null || $diff < $closest_diff) {
+                                                        $closest_diff = $diff;
+                                                        $next_match_idx = $idx;
+                                                    }
+                                                }
+                                            }
+
+                                            // Mark the next match row
+                                            if ($next_match_idx !== -1) {
+                                                $schedule_data[$next_match_idx]['_is_next'] = true;
+                                                if ($is_latest)
+                                                    $has_next_match = true;
+                                            }
+
+                                            // Sort Descending by Date (Timestamp)
+                                            usort($schedule_data, function ($a, $b) {
+                                                return $b['_ts'] - $a['_ts'];
+                                            });
                                         }
 
-                                        // Mark the next match row
-                                        if ($next_match_idx !== -1) {
-                                            $schedule_data[$next_match_idx]['_is_next'] = true;
-                                            if ($is_latest)
-                                                $has_next_match = true;
+                                        // Container classes
+                                        $container_class = '';
+                                        if (!$is_latest) {
+                                            $container_class = 'past-season hidden';
                                         }
 
-                                        // Sort Descending by Date (Timestamp)
-                                        usort($schedule_data, function ($a, $b) {
-                                            return $b['_ts'] - $a['_ts'];
-                                        });
-                                    }
+                                        // Accordion logic for past seasons
+                                        $header_class = 'flex items-center justify-between mb-3 px-1';
+                                        $content_class = '';
+                                        $content_style = '';
+                                        if (!$is_latest) {
+                                            $header_class .= ' cursor-pointer hover:bg-white/5 p-2 rounded transition-colors';
+                                            $content_class = 'hidden';
+                                        }
+                                        ?>
+                                            <div class="<?php echo $container_class; ?>">
+                                                <div class="<?php echo $header_class; ?>" <?php if (!$is_latest): ?>onclick="toggleSeason(this)" <?php endif; ?>>
+                                                    <div class="flex items-center">
+                                                        <h4
+                                                            class="text-kmnft-green font-bold text-sm tracking-widest border-l-4 border-kmnft-green pl-2">
+                                                            SEASON <?php echo esc_html($schedule->season_year); ?>
+                                                        </h4>
+                                                        <?php if (!$is_latest): ?>
+                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                    class="h-4 w-4 ml-2 text-gray-400 transform transition-transform duration-200"
+                                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                        d="M19 9l-7 7-7-7" />
+                                                                </svg>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <div class="text-xs font-mono text-gray-400">
+                                                        <?php echo esc_html($summary_text); ?>
+                                                    </div>
+                                                </div>
 
-                                    // Container classes
-                                    $container_class = '';
-                                    if (!$is_latest) {
-                                        $container_class = 'past-season hidden';
-                                    }
+                                                <?php if ($schedule_data): ?>
+                                                        <div
+                                                            class="<?php echo $content_class; ?> overflow-x-auto scrollbar-thin scrollbar-thumb-kmnft-green/20 scrollbar-track-transparent rounded bg-black/20 border border-white/5">
+                                                            <table class="w-full text-xs text-center border-collapse">
+                                                                <thead class="bg-black/40 text-gray-500 uppercase tracking-wider">
+                                                                    <tr>
+                                                                        <th class="py-2 px-3 text-left">Section</th>
+                                                                        <th class="py-2 px-2">Date</th>
+                                                                        <th class="py-2 px-2">Time</th>
+                                                                        <th class="py-2 px-3">Score</th>
+                                                                        <th class="py-2 px-4 text-left">Opponent</th>
+                                                                        <th class="py-2 px-4 text-left">STADIUM</th>
+                                                                        <th class="py-2 px-2">Result</th>
+                                                                        <th class="py-2 px-2">Action</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="text-gray-300 divide-y divide-gray-800/50">
+                                                                    <?php foreach ($schedule_data as $row):
+                                                                        $is_win = isset($row['is_win']) ? intval($row['is_win']) : -1;
+                                                                        $is_next = !empty($row['_is_next']);
 
-                                    // Accordion logic for past seasons
-                                    $header_class = 'flex items-center justify-between mb-3 px-1';
-                                    $content_class = '';
-                                    $content_style = '';
-                                    if (!$is_latest) {
-                                        $header_class .= ' cursor-pointer hover:bg-white/5 p-2 rounded transition-colors';
-                                        $content_class = 'hidden';
-                                    }
-                                    ?>
-                                    <div class="<?php echo $container_class; ?>">
-                                        <div class="<?php echo $header_class; ?>" <?php if (!$is_latest): ?>onclick="toggleSeason(this)" <?php endif; ?>>
-                                            <div class="flex items-center">
-                                                <h4
-                                                    class="text-kmnft-green font-bold text-sm tracking-widest border-l-4 border-kmnft-green pl-2">
-                                                    SEASON <?php echo esc_html($schedule->season_year); ?>
-                                                </h4>
-                                                <?php if (!$is_latest): ?>
-                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-4 w-4 ml-2 text-gray-400 transform transition-transform duration-200"
-                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M19 9l-7 7-7-7" />
-                                                    </svg>
+                                                                        $res_class = '';
+                                                                        $res_label = '-';
+                                                                        if ($is_win === 1) {
+                                                                            $res_class = 'text-kmnft-green font-bold';
+                                                                            $res_label = 'WIN';
+                                                                        } elseif ($is_win === 0) {
+                                                                            $res_class = 'text-red-500 font-bold';
+                                                                            $res_label = 'LOSE';
+                                                                        } elseif ($is_win === 2) {
+                                                                            $res_class = 'text-gray-400 font-bold';
+                                                                            $res_label = 'DRAW';
+                                                                        }
+
+                                                                        // Row Visibility for Latest Season
+                                                                        // Use hidden class instead of inline style
+                                                        
+                                                                        // Highlight style for next match
+                                                                        $row_classes = 'hover:bg-white/5 transition-colors';
+                                                                        if ($is_next) {
+                                                                            $row_classes = 'bg-kmnft-green/10 border-l-4 border-kmnft-green transition-colors';
+                                                                        }
+
+                                                                        // Apply hidden class for non-next matches in latest season
+                                                                        $tr_class = $row_classes;
+                                                                        if ($is_latest && $has_next_match && !$is_next) {
+                                                                            $tr_class .= ' latest-season-hidden hidden';
+                                                                        }
+                                                                        ?>
+                                                                            <tr class="<?php echo $tr_class; ?>">
+                                                                                <td
+                                                                                    class="py-3 px-3 text-left <?php echo $is_next ? '' : 'border-r border-white/5'; ?> text-kmnft-gold/80 font-mono">
+                                                                                    <?php echo esc_html($row['section']); ?>
+                                                                                    <?php if ($is_next): ?>
+                                                                                            <span
+                                                                                                class="text-kmnft-green text-[10px] font-bold ml-2 animate-pulse">NEXT</span>
+                                                                                    <?php endif; ?>
+                                                                                </td>
+                                                                                <td class="py-3 px-2"><?php echo esc_html($row['date']); ?></td>
+                                                                                <td class="py-3 px-2 text-gray-500">
+                                                                                    <?php echo esc_html($row['time']); ?>
+                                                                                </td>
+                                                                                <td class="py-3 px-3 font-mono font-bold tracking-wider">
+                                                                                    <?php echo esc_html($row['score']); ?>
+                                                                                </td>
+                                                                                <td class="py-3 px-4 text-left font-medium">
+                                                                                    <?php echo esc_html($row['opponent']); ?>
+                                                                                </td>
+                                                                                <td class="py-3 px-4 text-left text-gray-400">
+                                                                                    <?php echo esc_html($row['location'] ?? '-'); ?>
+                                                                                </td>
+                                                                                <td class="py-3 px-2 <?php echo $res_class; ?>">
+                                                                                    <?php echo $res_label; ?>
+                                                                                </td>
+                                                                                <td class="py-3 px-2">
+                                                                                    <?php if (!$is_latest): ?>
+                                                                                            <a href="<?php echo admin_url('admin-post.php?action=kmnft_download_league_schedule_csv&item_id=' . $schedule->id); ?>"
+                                                                                                class="text-xs text-kmnft-green hover:underline">CSV</a>
+                                                                                    <?php endif; ?>
+                                                                                </td>
+                                                                            </tr>
+                                                                    <?php endforeach; ?>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <?php if ($is_latest && $has_next_match): ?>
+                                                                <div class="text-center mt-2">
+                                                                    <button onclick="toggleLatestSeason()" id="btn-show-latest"
+                                                                        class="text-xs text-kmnft-green hover:text-white transition-colors border border-kmnft-green/50 px-3 py-1 rounded bg-black/20 hover:bg-black/40">
+                                                                        Show Full Schedule
+                                                                    </button>
+                                                                </div>
+                                                        <?php endif; ?>
+                                                <?php else: ?>
+                                                        <div class="text-center py-4 text-gray-500 italic text-xs">No schedule data available.
+                                                        </div>
                                                 <?php endif; ?>
                                             </div>
-                                            <div class="text-xs font-mono text-gray-400">
-                                                <?php echo esc_html($summary_text); ?>
-                                            </div>
-                                        </div>
-
-                                        <?php if ($schedule_data): ?>
-                                            <div
-                                                class="<?php echo $content_class; ?> overflow-x-auto scrollbar-thin scrollbar-thumb-kmnft-green/20 scrollbar-track-transparent rounded bg-black/20 border border-white/5">
-                                                <table class="w-full text-xs text-center border-collapse">
-                                                    <thead class="bg-black/40 text-gray-500 uppercase tracking-wider">
-                                                        <tr>
-                                                            <th class="py-2 px-3 text-left">Section</th>
-                                                            <th class="py-2 px-2">Date</th>
-                                                            <th class="py-2 px-2">Time</th>
-                                                            <th class="py-2 px-3">Score</th>
-                                                            <th class="py-2 px-4 text-left">Opponent</th>
-                                                            <th class="py-2 px-4 text-left">STADIUM</th>
-                                                            <th class="py-2 px-2">Result</th>
-                                                            <th class="py-2 px-2">Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody class="text-gray-300 divide-y divide-gray-800/50">
-                                                        <?php foreach ($schedule_data as $row):
-                                                            $is_win = isset($row['is_win']) ? intval($row['is_win']) : -1;
-                                                            $is_next = !empty($row['_is_next']);
-
-                                                            $res_class = '';
-                                                            $res_label = '-';
-                                                            if ($is_win === 1) {
-                                                                $res_class = 'text-kmnft-green font-bold';
-                                                                $res_label = 'WIN';
-                                                            } elseif ($is_win === 0) {
-                                                                $res_class = 'text-red-500 font-bold';
-                                                                $res_label = 'LOSE';
-                                                            } elseif ($is_win === 2) {
-                                                                $res_class = 'text-gray-400 font-bold';
-                                                                $res_label = 'DRAW';
-                                                            }
-
-                                                            // Row Visibility for Latest Season
-                                                            // Use hidden class instead of inline style
-                                            
-                                                            // Highlight style for next match
-                                                            $row_classes = 'hover:bg-white/5 transition-colors';
-                                                            if ($is_next) {
-                                                                $row_classes = 'bg-kmnft-green/10 border-l-4 border-kmnft-green transition-colors';
-                                                            }
-
-                                                            // Apply hidden class for non-next matches in latest season
-                                                            $tr_class = $row_classes;
-                                                            if ($is_latest && $has_next_match && !$is_next) {
-                                                                $tr_class .= ' latest-season-hidden hidden';
-                                                            }
-                                                            ?>
-                                                            <tr class="<?php echo $tr_class; ?>">
-                                                                <td
-                                                                    class="py-3 px-3 text-left <?php echo $is_next ? '' : 'border-r border-white/5'; ?> text-kmnft-gold/80 font-mono">
-                                                                    <?php echo esc_html($row['section']); ?>
-                                                                    <?php if ($is_next): ?>
-                                                                        <span
-                                                                            class="text-kmnft-green text-[10px] font-bold ml-2 animate-pulse">NEXT</span>
-                                                                    <?php endif; ?>
-                                                                </td>
-                                                                <td class="py-3 px-2"><?php echo esc_html($row['date']); ?></td>
-                                                                <td class="py-3 px-2 text-gray-500">
-                                                                    <?php echo esc_html($row['time']); ?>
-                                                                </td>
-                                                                <td class="py-3 px-3 font-mono font-bold tracking-wider">
-                                                                    <?php echo esc_html($row['score']); ?>
-                                                                </td>
-                                                                <td class="py-3 px-4 text-left font-medium">
-                                                                    <?php echo esc_html($row['opponent']); ?>
-                                                                </td>
-                                                                <td class="py-3 px-4 text-left text-gray-400">
-                                                                    <?php echo esc_html($row['location'] ?? '-'); ?>
-                                                                </td>
-                                                                <td class="py-3 px-2 <?php echo $res_class; ?>">
-                                                                    <?php echo $res_label; ?>
-                                                                </td>
-                                                                <td class="py-3 px-2">
-                                                                    <?php if (!$is_latest): ?>
-                                                                        <a href="<?php echo admin_url('admin-post.php?action=kmnft_download_league_schedule_csv&item_id=' . $schedule->id); ?>"
-                                                                            class="text-xs text-kmnft-green hover:underline">CSV</a>
-                                                                    <?php endif; ?>
-                                                                </td>
-                                                            </tr>
-                                                        <?php endforeach; ?>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <?php if ($is_latest && $has_next_match): ?>
-                                                <div class="text-center mt-2">
-                                                    <button onclick="toggleLatestSeason()" id="btn-show-latest"
-                                                        class="text-xs text-kmnft-green hover:text-white transition-colors border border-kmnft-green/50 px-3 py-1 rounded bg-black/20 hover:bg-black/40">
-                                                        Show Full Schedule
-                                                    </button>
-                                                </div>
-                                            <?php endif; ?>
-                                        <?php else: ?>
-                                            <div class="text-center py-4 text-gray-500 italic text-xs">No schedule data available.
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <?php if ($has_past_seasons): ?>
-                                <div class="text-center mt-8 pt-4 border-t border-white/10">
-                                    <button onclick="toggleHistory()" id="btn-show-history"
-                                        class="text-xs text-gray-400 hover:text-white transition-colors flex items-center justify-center mx-auto space-x-1">
-                                        <span>Previous Seasons</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </button>
+                                    <?php endforeach; ?>
                                 </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
 
-                    <script>                function toggleSeason(header) { const content = header.nextElementSibling; const icon = header.querySelector('svg'); if (content && content.classList.contains('hidden')) { content.classList.remove('hidden'); if (icon) icon.style.transform = 'rotate(180deg)'; } else if (content) { content.classList.add('hidden'); if (icon) icon.style.transform = 'rotate(0deg)'; } }
-                        function toggleLatestSeason() {
-                            const hiddenRows = document.querySelectorAll('.latest-season-hidden'); const btn = document.getElementById('btn-show-latest');
-                            hiddenRows.forEach(row => { row.classList.toggle('hidden'); });
-                            if (btn) { if (btn.innerText.includes('Show Full Schedule')) { btn.innerText = 'Show Next Match Only'; } else { btn.innerText = 'Show Full Schedule'; } }
-                        }
-                        function toggleHistory() {
-                            const pastSeasons = document.querySelectorAll('.past-season'); const btn = document.getElementById('btn-show-history');
-                            pastSeasons.forEach(season => { season.classList.toggle('hidden'); });
-                            if (btn) { const span = btn.querySelector('span'); const svg = btn.querySelector('svg'); if (span.innerText === 'Previous Seasons') { span.innerText = 'Hide Previous Seasons'; svg.style.transform = 'rotate(180deg)'; } else { span.innerText = 'Previous Seasons'; svg.style.transform = 'rotate(0deg)'; } }
-                        }
-                    </script>
+                                <?php if ($has_past_seasons): ?>
+                                        <div class="text-center mt-8 pt-4 border-t border-white/10">
+                                            <button onclick="toggleHistory()" id="btn-show-history"
+                                                class="text-xs text-gray-400 hover:text-white transition-colors flex items-center justify-center mx-auto space-x-1">
+                                                <span>Previous Seasons</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <script>                function toggleSeason(header) { const content = header.nextElementSibling; const icon = header.querySelector('svg'); if (content && content.classList.contains('hidden')) { content.classList.remove('hidden'); if (icon) icon.style.transform = 'rotate(180deg)'; } else if (content) { content.classList.add('hidden'); if (icon) icon.style.transform = 'rotate(0deg)'; } }
+                            function toggleLatestSeason() {
+                                const hiddenRows = document.querySelectorAll('.latest-season-hidden'); const btn = document.getElementById('btn-show-latest');
+                                hiddenRows.forEach(row => { row.classList.toggle('hidden'); });
+                                if (btn) { if (btn.innerText.includes('Show Full Schedule')) { btn.innerText = 'Show Next Match Only'; } else { btn.innerText = 'Show Full Schedule'; } }
+                            }
+                            function toggleHistory() {
+                                const pastSeasons = document.querySelectorAll('.past-season'); const btn = document.getElementById('btn-show-history');
+                                pastSeasons.forEach(season => { season.classList.toggle('hidden'); });
+                                if (btn) { const span = btn.querySelector('span'); const svg = btn.querySelector('svg'); if (span.innerText === 'Previous Seasons') { span.innerText = 'Hide Previous Seasons'; svg.style.transform = 'rotate(180deg)'; } else { span.innerText = 'Previous Seasons'; svg.style.transform = 'rotate(0deg)'; } }
+                            }
+                        </script>
                 <?php endif; ?>
 
                 <!-- Quick Actions / News Placeholder -->
@@ -1467,61 +1467,61 @@ if (!$is_logged_in) {
 
                     <!-- Plots (Large) -->
                     <?php foreach ($holdings as $holding): ?>
-                        <?php if (is_numeric($holding->zone_x) && is_numeric($holding->zone_y)): ?>
-                            <?php
-                            $x = max(0, min(120, floatval($holding->zone_x)));
-                            $y = max(0, min(64, floatval($holding->zone_y)));
+                            <?php if (is_numeric($holding->zone_x) && is_numeric($holding->zone_y)): ?>
+                                    <?php
+                                    $x = max(0, min(120, floatval($holding->zone_x)));
+                                    $y = max(0, min(64, floatval($holding->zone_y)));
 
-                            // Map directly
-                            $left = ($x / 120) * 100;
-                            $bottom = ($y / 64) * 100;
+                                    // Map directly
+                                    $left = ($x / 120) * 100;
+                                    $bottom = ($y / 64) * 100;
 
-                            $last4 = substr($holding->token_id, -4);
-                            $image_url_large = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
+                                    $last4 = substr($holding->token_id, -4);
+                                    $image_url_large = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
 
-                            $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
-                            $pts = $token_ksp_data ? number_format($token_ksp_data->total_points) : '0';
-                            $rnk = ($token_ksp_data && $token_ksp_data->rank > 0) ? $token_ksp_data->rank : '';
+                                    $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
+                                    $pts = $token_ksp_data ? number_format($token_ksp_data->total_points) : '0';
+                                    $rnk = ($token_ksp_data && $token_ksp_data->rank > 0) ? $token_ksp_data->rank : '';
 
-                            // Tooltip Y Position
-                            $tooltip_y_class = ($y > 32) ? 'top-full mt-2' : 'bottom-full mb-2';
+                                    // Tooltip Y Position
+                                    $tooltip_y_class = ($y > 32) ? 'top-full mt-2' : 'bottom-full mb-2';
 
-                            // Tooltip X Position
-                            if ($x > 100) {
-                                // Right edge -> Align Right
-                                $tooltip_x_class = 'right-0 translate-x-0';
-                            } elseif ($x < 20) {
-                                // Left edge -> Align Left
-                                $tooltip_x_class = 'left-0 translate-x-0';
-                            } else {
-                                // Center
-                                $tooltip_x_class = 'left-1/2 -translate-x-1/2';
-                            }
-                            ?>
-                            <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
-                                style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
-                                onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>', '<?php echo esc_js($latest_season_label); ?>')">
+                                    // Tooltip X Position
+                                    if ($x > 100) {
+                                        // Right edge -> Align Right
+                                        $tooltip_x_class = 'right-0 translate-x-0';
+                                    } elseif ($x < 20) {
+                                        // Left edge -> Align Left
+                                        $tooltip_x_class = 'left-0 translate-x-0';
+                                    } else {
+                                        // Center
+                                        $tooltip_x_class = 'left-1/2 -translate-x-1/2';
+                                    }
+                                    ?>
+                                    <div class="absolute w-3 h-3 md:w-4 md:h-4 bg-kmnft-gold rounded-full shadow-[0_0_10px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2 group"
+                                        style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
+                                        onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>', '<?php echo esc_js($latest_season_label); ?>')">
 
-                                <!-- Label (Last 4 Digits) -->
-                                <span
-                                    class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] md:text-[10px] text-white font-mono bg-black/50 px-1 rounded whitespace-nowrap pointer-events-none">
-                                    <?php echo esc_html($last4); ?>
-                                </span>
+                                        <!-- Label (Last 4 Digits) -->
+                                        <span
+                                            class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] md:text-[10px] text-white font-mono bg-black/50 px-1 rounded whitespace-nowrap pointer-events-none">
+                                            <?php echo esc_html($last4); ?>
+                                        </span>
 
-                                <!-- Tooltip -->
-                                <div
-                                    class="absolute <?php echo $tooltip_y_class . ' ' . $tooltip_x_class; ?> bg-black/90 border border-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 flex flex-col items-center shadow-xl">
-                                    <img src="<?php echo $image_url_large; ?>" alt="Asset"
-                                        class="w-16 h-16 object-cover rounded mb-1 bg-gray-800">
-                                    <div class="font-mono text-[10px] text-gray-300">ID:
-                                        <?php echo esc_html($holding->token_id); ?>
+                                        <!-- Tooltip -->
+                                        <div
+                                            class="absolute <?php echo $tooltip_y_class . ' ' . $tooltip_x_class; ?> bg-black/90 border border-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 flex flex-col items-center shadow-xl">
+                                            <img src="<?php echo $image_url_large; ?>" alt="Asset"
+                                                class="w-16 h-16 object-cover rounded mb-1 bg-gray-800">
+                                            <div class="font-mono text-[10px] text-gray-300">ID:
+                                                <?php echo esc_html($holding->token_id); ?>
+                                            </div>
+                                            <div class="font-mono text-[10px] text-kmnft-green whitespace-nowrap">(X:<?php echo $x; ?>,
+                                                Y:<?php echo $y; ?>)
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="font-mono text-[10px] text-kmnft-green whitespace-nowrap">(X:<?php echo $x; ?>,
-                                        Y:<?php echo $y; ?>)
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
+                            <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -1907,11 +1907,11 @@ if (!$is_logged_in) {
                     foreach ($default_icons as $icon_file):
                         $icon_url = get_template_directory_uri() . '/assets/images/default-icons/' . $icon_file;
                         ?>
-                        <div class="aspect-square rounded-lg overflow-hidden border-2 border-gray-700 hover:border-kmnft-green transition cursor-pointer group"
-                            onclick="selectDefaultIcon('<?php echo esc_js($icon_file); ?>')">
-                            <img src="<?php echo esc_url($icon_url); ?>" alt="Default Icon"
-                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition">
-                        </div>
+                            <div class="aspect-square rounded-lg overflow-hidden border-2 border-gray-700 hover:border-kmnft-green transition cursor-pointer group"
+                                onclick="selectDefaultIcon('<?php echo esc_js($icon_file); ?>')">
+                                <img src="<?php echo esc_url($icon_url); ?>" alt="Default Icon"
+                                    class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition">
+                            </div>
                     <?php endforeach; ?>
                 </div>
             </div>

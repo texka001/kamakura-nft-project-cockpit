@@ -50,11 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_forgot_password'
         $reset_link = home_url('/login/?view=reset&email=' . urlencode($email) . '&token=' . $token);
 
         // Send Email
-        $subject = '[KAMAKURA STADIUM NFT PORTAL(β)] Password Reset Request';
-        $message = "You requested a password reset.\n\n";
+        $subject = '[KAMAKURA STADIUM NFT PORTAL(β)] Password Reset Request / パスワードリセットのリクエスト';
+        $message = "You requested a password reset.\n";
+        $message .= "パスワードリセットのリクエストを受け付けました。\n\n";
         $message .= "Click the link below to reset your password (valid for 1 hour):\n";
+        $message .= "以下のリンクをクリックしてパスワードを再設定してください（1時間有効）:\n";
         $message .= $reset_link . "\n\n";
-        $message .= "If you did not request this, please ignore this email.";
+        $message .= "If you did not request this, please ignore this email.\n";
+        $message .= "お心当たりがない場合は、このメールを無視してください。";
 
         // Use wp_mail (Requires server setup)
         if (wp_mail($email, $subject, $message)) {
