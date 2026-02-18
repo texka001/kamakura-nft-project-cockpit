@@ -1548,11 +1548,7 @@ if (!$is_logged_in) {
     </div>
 
     <script>
-        const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
-        const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
-        const latestSeasonLabel = '<?php echo esc_js($latest_season_label); ?>';
-        const tokensHistory = <?php echo json_encode(!empty($tokens_ksp_history) ? $tokens_ksp_history : new stdClass()); ?>;
-
+        // Toggle function defined early to avoid ReferenceError
         window.toggleSection = function (contentId, iconId) {
             console.log('toggleSection called', contentId, iconId);
             const content = document.getElementById(contentId);
@@ -1565,6 +1561,12 @@ if (!$is_logged_in) {
             }
             if (icon) icon.classList.toggle('rotate-180');
         };
+
+        const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
+        const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
+        const latestSeasonLabel = '<?php echo esc_js($latest_season_label); ?>';
+        // Use safer JSON encoding options
+        const tokensHistory = <?php echo json_encode(!empty($tokens_ksp_history) ? $tokens_ksp_history : new stdClass(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
 
         let currentTokenId = null;
 
