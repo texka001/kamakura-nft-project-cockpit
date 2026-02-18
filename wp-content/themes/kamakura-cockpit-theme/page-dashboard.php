@@ -16,6 +16,8 @@ $ksp_by_season = array();
 $tokens_ksp_summary = array();
 $latest_rank = 0;
 $avatar_url = ''; // Will handle default below
+$tokens_ksp_history = array(); // Initialize to avoid undefined variable error
+$latest_season_label = ''; // Initialize to avoid undefined variable error
 
 if ($is_logged_in) {
     // Fetch Extended Data
@@ -1548,7 +1550,7 @@ if (!$is_logged_in) {
     </div>
 
     <script>
-        // Toggle function defined early to avoid ReferenceError
+        // Toggle function defined early and in separate block to avoid ReferenceError
         window.toggleSection = function (contentId, iconId) {
             console.log('toggleSection called', contentId, iconId);
             const content = document.getElementById(contentId);
@@ -1561,12 +1563,17 @@ if (!$is_logged_in) {
             }
             if (icon) icon.classList.toggle('rotate-180');
         };
+    </script>
 
+    <script>
         const imageBaseUrl = '<?php echo KMNFT_IMAGE_BASE_URL; ?>';
         const fallbackImage = '<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';
         const latestSeasonLabel = '<?php echo esc_js($latest_season_label); ?>';
-        // Use safer JSON encoding options
-        const tokensHistory = <?php echo json_encode(!empty($tokens_ksp_history) ? $tokens_ksp_history : new stdClass(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+        // Use safer JSON encoding options and ensure fallback
+        const tokensHistory = <?php
+        $json = json_encode(!empty($tokens_ksp_history) ? $tokens_ksp_history : new stdClass(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+        echo $json ?: '{}';
+        ?>;
 
         let currentTokenId = null;
 
