@@ -876,67 +876,68 @@ if (!$is_logged_in) {
                                                             <?php echo $goal_num_for_img; ?>
                                                         </div>
                                                         <?php
-                                                        $image_onclick = ($is_logged_in && !empty($video_url)) ? "window.open('" . esc_js($video_url) . "', '_blank');" : "openImageModal(this.src)";
+                                                        $video_url_param = ($is_logged_in && !empty($video_url)) ? esc_js($video_url) : '';
+                                                        $image_onclick = "openGoalScene(this.src, '$video_url_param')";
                                                         ?>
-                                                        <img src="<?php echo esc_url(trim($url)); ?>"
-                                                            class="w-full h-full object-cover cursor-pointer hover:scale-110 transition duration-500"
-                                                            onclick="<?php echo $image_onclick; ?>" alt="Goal Scene">
+                                                                    <img src="<?php echo esc_url(trim($url)); ?>"
+                                                                        class="w-full h-full object-cover cursor-pointer hover:scale-110 transition duration-500"
+                                                                        onclick="<?php echo $image_onclick; ?>" alt="Goal Scene">
+                                                                </div>
+                                                        <?php endforeach; ?>
                                                     </div>
-                                                <?php endforeach; ?>
+                                                    <?php if ($total_imgs > $display_limit): ?>
+                                                            <button
+                                                                onclick="document.querySelectorAll('.extra-images-<?php echo $match->id; ?>').forEach(el => el.classList.remove('hidden')); this.style.display='none';"
+                                                                class="text-[10px] text-kmnft-green hover:underline mt-2">
+                                                                + Show <?php echo $total_imgs - $display_limit; ?> More
+                                                            </button>
+                                                    <?php endif; ?>
+                                                    <?php if ($total_imgs === 0): ?>
+                                                            <p class="text-[10px] text-gray-500 italic">None</p>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
-                                            <?php if ($total_imgs > $display_limit): ?>
-                                                <button
-                                                    onclick="document.querySelectorAll('.extra-images-<?php echo $match->id; ?>').forEach(el => el.classList.remove('hidden')); this.style.display='none';"
-                                                    class="text-[10px] text-kmnft-green hover:underline mt-2">
-                                                    + Show <?php echo $total_imgs - $display_limit; ?> More
-                                                </button>
+
+                                            <!-- Shoot Zone Prize Toggle & Content -->
+                                            <?php if (!empty($match->shoot_prize_memo)): ?>
+                                                    <div class="flex justify-end mt-2 relative z-20">
+                                                        <button onclick="togglePrize('<?php echo $match->id; ?>')"
+                                                            class="text-[10px] text-kmnft-green hover:text-white border border-kmnft-green/50 hover:bg-kmnft-green/10 px-3 py-1 rounded transition flex items-center gap-1">
+                                                            <span>SHOOT ZONE PRIZE</span>
+                                                            <svg id="prize-icon-<?php echo $match->id; ?>" xmlns="http://www.w3.org/2000/svg"
+                                                                class="h-3 w-3 transform transition-transform duration-300" fill="none"
+                                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                    d="M19 9l-7 7-7-7" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+
+                                                    <div id="prize-memo-<?php echo $match->id; ?>"
+                                                        class="hidden mt-2 pt-2 border-t border-gray-700/50">
+                                                        <div class="text-xs text-gray-300 font-mono leading-relaxed bg-black/20 p-3 rounded">
+                                                            <?php echo nl2br(esc_html($match->shoot_prize_memo)); ?>
+                                                        </div>
+                                                    </div>
                                             <?php endif; ?>
-                                            <?php if ($total_imgs === 0): ?>
-                                                <p class="text-[10px] text-gray-500 italic">None</p>
-                                            <?php endif; ?>
                                         </div>
-                                    </div>
-
-                                    <!-- Shoot Zone Prize Toggle & Content -->
-                                    <?php if (!empty($match->shoot_prize_memo)): ?>
-                                        <div class="flex justify-end mt-2 relative z-20">
-                                            <button onclick="togglePrize('<?php echo $match->id; ?>')"
-                                                class="text-[10px] text-kmnft-green hover:text-white border border-kmnft-green/50 hover:bg-kmnft-green/10 px-3 py-1 rounded transition flex items-center gap-1">
-                                                <span>SHOOT ZONE PRIZE</span>
-                                                <svg id="prize-icon-<?php echo $match->id; ?>" xmlns="http://www.w3.org/2000/svg"
-                                                    class="h-3 w-3 transform transition-transform duration-300" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <div id="prize-memo-<?php echo $match->id; ?>"
-                                            class="hidden mt-2 pt-2 border-t border-gray-700/50">
-                                            <div class="text-xs text-gray-300 font-mono leading-relaxed bg-black/20 p-3 rounded">
-                                                <?php echo nl2br(esc_html($match->shoot_prize_memo)); ?>
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-
-                        <?php if (count($match_results) > 3): ?>
-                            <div class="text-center mt-4">
-                                <button id="show-more-matches" onclick="showAllMatches()"
-                                    class="text-xs text-kmnft-green hover:text-white underline transition">
-                                    Show All Matches
-                                </button>
-                                <button id="show-less-matches" onclick="showLessMatches()" style="display:none;"
-                                    class="text-xs text-red-400 hover:text-white underline transition">
-                                    Show Less Matches
-                                </button>
+                                <?php endforeach; ?>
                             </div>
-                        <?php endif; ?>
+
+                            <?php if (count($match_results) > 3): ?>
+                                    <div class="text-center mt-4">
+                                        <button id="show-more-matches" onclick="showAllMatches()"
+                                            class="text-xs text-kmnft-green hover:text-white underline transition">
+                                            Show All Matches
+                                        </button>
+                                        <button id="show-less-matches" onclick="showLessMatches()" style="display:none;"
+                                            class="text-xs text-red-400 hover:text-white underline transition">
+                                            Show Less Matches
+                                        </button>
+                                    </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                </div>
             <?php endif; ?>
 
             <!-- League Standings Section -->
@@ -944,156 +945,156 @@ if (!$is_logged_in) {
             $standings_history = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}kmnft_standings ORDER BY announcement_date DESC");
             if ($standings_history):
                 ?>
-                <div class="glass-card p-6 rounded-lg mb-6">
-                    <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
-                        <h3 class="text-sm font-bold text-gray-300">LEAGUE STANDINGS</h3>
-                        <button onclick="toggleSection('standings-content', 'standings-toggle-icon')"
-                            class="text-gray-400 hover:text-white transition">
-                            <svg id="standings-toggle-icon" xmlns="http://www.w3.org/2000/svg"
-                                class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div id="standings-content">
-                        <div class="space-y-12">
-                            <?php foreach ($standings_history as $index => $standing):
-                                $is_hidden_history = $index >= 1 ? 'hidden extra-standings' : '';
-                                ?>
-                                <div class="<?php echo $is_hidden_history; ?>">
-                                    <?php
-                                    $standings_data = !empty($standing->data) ? json_decode($standing->data, true) : null;
-                                    ?>
-                                    <div class="space-y-6">
-                                        <!-- Table or Image Section -->
-                                        <div class="space-y-4">
-                                            <div
-                                                class="text-sm font-bold text-kmnft-green tracking-wider flex items-center gap-2 mb-1">
-                                                <?php if (!empty($standing->display_title)): ?>
-                                                    <span class="w-1 h-3 bg-kmnft-green rounded-full"></span>
-                                                    <?php echo esc_html($standing->display_title); ?>
-                                                <?php endif; ?>
-                                                <span
-                                                    class="text-[10px] text-gray-500 font-normal <?php echo !empty($standing->display_title) ? 'ml-1' : ''; ?>">
-                                                    Updated: <?php echo esc_html($standing->announcement_date); ?>
-                                                </span>
-                                            </div>
-
-                                            <div
-                                                class="glass-card p-3 rounded bg-kmnft-navy/50 border border-kmnft-green/30 shadow-[0_0_15px_rgba(57,255,20,0.05)] flex items-center justify-between gap-4">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-2 h-2 rounded-full bg-kmnft-green"></div>
-                                                    <div class="text-[10px] text-gray-400 uppercase tracking-widest">My Club
-                                                        Status</div>
-                                                    <div class="text-[10px] text-gray-500 font-mono">Kamakura Intl. FC</div>
-                                                </div>
-                                                <div class="flex items-center gap-6">
-                                                    <div class="flex items-baseline gap-1">
-                                                        <span class="text-[10px] text-gray-500">RANK</span>
-                                                        <span
-                                                            class="text-xl font-bold text-white neon-text"><?php echo esc_html($standing->our_rank); ?></span>
-                                                        <span class="text-[10px] text-gray-400 font-normal">th</span>
-                                                    </div>
-                                                    <div class="w-[1px] h-4 bg-gray-700"></div>
-                                                    <div class="flex items-baseline gap-1">
-                                                        <span class="text-[10px] text-gray-500">POINTS</span>
-                                                        <span
-                                                            class="text-xl font-bold text-kmnft-gold"><?php echo esc_html($standing->our_points); ?></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div
-                                                class="relative group rounded overflow-hidden border border-white/10 bg-black/20">
-                                                <?php if ($standings_data): ?>
-                                                    <div
-                                                        class="overflow-x-auto max-h-[400px] scrollbar-thin scrollbar-thumb-kmnft-green/20 scrollbar-track-transparent">
-                                                        <table class="w-full text-xs text-center border-collapse">
-                                                            <thead
-                                                                class="bg-black/60 text-gray-400 font-bold uppercase sticky top-0 backdrop-blur-md z-10 shadow-lg">
-                                                                <tr>
-                                                                    <th class="py-3 px-2">Rank</th>
-                                                                    <th class="py-3 px-4 text-left">Club</th>
-                                                                    <th class="py-3 px-2">PL</th>
-                                                                    <th class="py-3 px-2">W</th>
-                                                                    <th class="py-3 px-2">D</th>
-                                                                    <th class="py-3 px-2">L</th>
-                                                                    <th class="py-3 px-2">GD</th>
-                                                                    <th class="py-3 px-2">Pts</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody class="text-gray-300">
-                                                                <?php foreach ($standings_data as $row):
-                                                                    // Logic for highlighting
-                                                                    $is_kamakura = (strpos($row['clubname'], '鎌倉') !== false || stripos($row['clubname'], 'Kamakura') !== false);
-                                                                    $row_bg = $is_kamakura ? 'bg-kmnft-green/10 border-l-2 border-kmnft-green' : 'border-b border-gray-800 hover:bg-white/5';
-                                                                    $text_cls = $is_kamakura ? 'text-white font-bold' : '';
-                                                                    ?>
-                                                                    <tr
-                                                                        class="<?php echo $row_bg . ' ' . $text_cls; ?> transition-colors duration-200">
-                                                                        <td class="py-3 px-2"><?php echo esc_html($row['rank']); ?></td>
-                                                                        <td
-                                                                            class="py-3 px-4 text-left whitespace-nowrap flex items-center gap-2">
-                                                                            <?php if ($is_kamakura): ?>
-                                                                                <span
-                                                                                    class="w-1.5 h-1.5 rounded-full bg-kmnft-green animate-pulse shadow-[0_0_8px_#39ff14]"></span>
-                                                                            <?php endif; ?>
-                                                                            <?php echo esc_html($row['clubname']); ?>
-                                                                        </td>
-                                                                        <td class="py-3 px-2 text-gray-500">
-                                                                            <?php echo esc_html($row['pl']); ?>
-                                                                        </td>
-                                                                        <td class="py-3 px-2"><?php echo esc_html($row['w']); ?></td>
-                                                                        <td class="py-3 px-2"><?php echo esc_html($row['d']); ?></td>
-                                                                        <td class="py-3 px-2"><?php echo esc_html($row['l']); ?></td>
-                                                                        <td class="py-3 px-2 font-mono">
-                                                                            <?php echo esc_html($row['gd']); ?>
-                                                                        </td>
-                                                                        <td
-                                                                            class="py-3 px-2 font-bold text-kmnft-gold text-sm shadow-black drop-shadow-md">
-                                                                            <?php echo esc_html($row['pt']); ?>
-                                                                        </td>
-                                                                    </tr>
-                                                                <?php endforeach; ?>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                <?php elseif (!empty($standing->image_url)): ?>
-                                                    <img src="<?php echo esc_url($standing->image_url); ?>" alt="League Standings"
-                                                        class="w-full h-auto object-contain cursor-pointer hover:scale-105 transition duration-500"
-                                                        onclick="openImageModal(this.src)">
-                                                <?php else: ?>
-                                                    <div class="p-8 text-center text-gray-500 italic">No standings data available.
-                                                    </div>
-                                                <?php endif; ?>
-                                            </div>
-
-                                            <?php if (!empty($standing->memo)): ?>
-                                                <div class="bg-black/20 p-4 rounded border border-gray-700/50">
-                                                    <h4 class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Memo /
-                                                        Analysis</h4>
-                                                    <div class="text-xs text-gray-300 font-sans leading-relaxed">
-                                                        <?php echo nl2br(esc_html($standing->memo)); ?>
-                                                    </div>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <?php if (count($standings_history) > 1): ?>
-                                <div class="text-center mt-4">
-                                    <button id="show-more-standing-history"
-                                        onclick="document.querySelectorAll('.extra-standings').forEach(el => el.classList.remove('hidden')); this.style.display='none';"
-                                        class="text-xs text-kmnft-green hover:text-white underline transition">
-                                        Show All History
-                                    </button>
-                                </div>
-                            <?php endif; ?>
+                    <div class="glass-card p-6 rounded-lg mb-6">
+                        <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                            <h3 class="text-sm font-bold text-gray-300">LEAGUE STANDINGS</h3>
+                            <button onclick="toggleSection('standings-content', 'standings-toggle-icon')"
+                                class="text-gray-400 hover:text-white transition">
+                                <svg id="standings-toggle-icon" xmlns="http://www.w3.org/2000/svg"
+                                    class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
                         </div>
-                    </div>
+                        <div id="standings-content">
+                            <div class="space-y-12">
+                                <?php foreach ($standings_history as $index => $standing):
+                                    $is_hidden_history = $index >= 1 ? 'hidden extra-standings' : '';
+                                    ?>
+                                        <div class="<?php echo $is_hidden_history; ?>">
+                                            <?php
+                                            $standings_data = !empty($standing->data) ? json_decode($standing->data, true) : null;
+                                            ?>
+                                            <div class="space-y-6">
+                                                <!-- Table or Image Section -->
+                                                <div class="space-y-4">
+                                                    <div
+                                                        class="text-sm font-bold text-kmnft-green tracking-wider flex items-center gap-2 mb-1">
+                                                        <?php if (!empty($standing->display_title)): ?>
+                                                                <span class="w-1 h-3 bg-kmnft-green rounded-full"></span>
+                                                                <?php echo esc_html($standing->display_title); ?>
+                                                        <?php endif; ?>
+                                                        <span
+                                                            class="text-[10px] text-gray-500 font-normal <?php echo !empty($standing->display_title) ? 'ml-1' : ''; ?>">
+                                                            Updated: <?php echo esc_html($standing->announcement_date); ?>
+                                                        </span>
+                                                    </div>
+
+                                                    <div
+                                                        class="glass-card p-3 rounded bg-kmnft-navy/50 border border-kmnft-green/30 shadow-[0_0_15px_rgba(57,255,20,0.05)] flex items-center justify-between gap-4">
+                                                        <div class="flex items-center gap-3">
+                                                            <div class="w-2 h-2 rounded-full bg-kmnft-green"></div>
+                                                            <div class="text-[10px] text-gray-400 uppercase tracking-widest">My Club
+                                                                Status</div>
+                                                            <div class="text-[10px] text-gray-500 font-mono">Kamakura Intl. FC</div>
+                                                        </div>
+                                                        <div class="flex items-center gap-6">
+                                                            <div class="flex items-baseline gap-1">
+                                                                <span class="text-[10px] text-gray-500">RANK</span>
+                                                                <span
+                                                                    class="text-xl font-bold text-white neon-text"><?php echo esc_html($standing->our_rank); ?></span>
+                                                                <span class="text-[10px] text-gray-400 font-normal">th</span>
+                                                            </div>
+                                                            <div class="w-[1px] h-4 bg-gray-700"></div>
+                                                            <div class="flex items-baseline gap-1">
+                                                                <span class="text-[10px] text-gray-500">POINTS</span>
+                                                                <span
+                                                                    class="text-xl font-bold text-kmnft-gold"><?php echo esc_html($standing->our_points); ?></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        class="relative group rounded overflow-hidden border border-white/10 bg-black/20">
+                                                        <?php if ($standings_data): ?>
+                                                                <div
+                                                                    class="overflow-x-auto max-h-[400px] scrollbar-thin scrollbar-thumb-kmnft-green/20 scrollbar-track-transparent">
+                                                                    <table class="w-full text-xs text-center border-collapse">
+                                                                        <thead
+                                                                            class="bg-black/60 text-gray-400 font-bold uppercase sticky top-0 backdrop-blur-md z-10 shadow-lg">
+                                                                            <tr>
+                                                                                <th class="py-3 px-2">Rank</th>
+                                                                                <th class="py-3 px-4 text-left">Club</th>
+                                                                                <th class="py-3 px-2">PL</th>
+                                                                                <th class="py-3 px-2">W</th>
+                                                                                <th class="py-3 px-2">D</th>
+                                                                                <th class="py-3 px-2">L</th>
+                                                                                <th class="py-3 px-2">GD</th>
+                                                                                <th class="py-3 px-2">Pts</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="text-gray-300">
+                                                                            <?php foreach ($standings_data as $row):
+                                                                                // Logic for highlighting
+                                                                                $is_kamakura = (strpos($row['clubname'], '鎌倉') !== false || stripos($row['clubname'], 'Kamakura') !== false);
+                                                                                $row_bg = $is_kamakura ? 'bg-kmnft-green/10 border-l-2 border-kmnft-green' : 'border-b border-gray-800 hover:bg-white/5';
+                                                                                $text_cls = $is_kamakura ? 'text-white font-bold' : '';
+                                                                                ?>
+                                                                                    <tr
+                                                                                        class="<?php echo $row_bg . ' ' . $text_cls; ?> transition-colors duration-200">
+                                                                                        <td class="py-3 px-2"><?php echo esc_html($row['rank']); ?></td>
+                                                                                        <td
+                                                                                            class="py-3 px-4 text-left whitespace-nowrap flex items-center gap-2">
+                                                                                            <?php if ($is_kamakura): ?>
+                                                                                                    <span
+                                                                                                        class="w-1.5 h-1.5 rounded-full bg-kmnft-green animate-pulse shadow-[0_0_8px_#39ff14]"></span>
+                                                                                            <?php endif; ?>
+                                                                                            <?php echo esc_html($row['clubname']); ?>
+                                                                                        </td>
+                                                                                        <td class="py-3 px-2 text-gray-500">
+                                                                                            <?php echo esc_html($row['pl']); ?>
+                                                                                        </td>
+                                                                                        <td class="py-3 px-2"><?php echo esc_html($row['w']); ?></td>
+                                                                                        <td class="py-3 px-2"><?php echo esc_html($row['d']); ?></td>
+                                                                                        <td class="py-3 px-2"><?php echo esc_html($row['l']); ?></td>
+                                                                                        <td class="py-3 px-2 font-mono">
+                                                                                            <?php echo esc_html($row['gd']); ?>
+                                                                                        </td>
+                                                                                        <td
+                                                                                            class="py-3 px-2 font-bold text-kmnft-gold text-sm shadow-black drop-shadow-md">
+                                                                                            <?php echo esc_html($row['pt']); ?>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                            <?php endforeach; ?>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                        <?php elseif (!empty($standing->image_url)): ?>
+                                                                <img src="<?php echo esc_url($standing->image_url); ?>" alt="League Standings"
+                                                                    class="w-full h-auto object-contain cursor-pointer hover:scale-105 transition duration-500"
+                                                                    onclick="openImageModal(this.src)">
+                                                        <?php else: ?>
+                                                                <div class="p-8 text-center text-gray-500 italic">No standings data available.
+                                                                </div>
+                                                        <?php endif; ?>
+                                                    </div>
+
+                                                    <?php if (!empty($standing->memo)): ?>
+                                                            <div class="bg-black/20 p-4 rounded border border-gray-700/50">
+                                                                <h4 class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Memo /
+                                                                    Analysis</h4>
+                                                                <div class="text-xs text-gray-300 font-sans leading-relaxed">
+                                                                    <?php echo nl2br(esc_html($standing->memo)); ?>
+                                                                </div>
+                                                            </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                    <?php endforeach; ?>
+                                </div>
+
+                                <?php if (count($standings_history) > 1): ?>
+                                        <div class="text-center mt-4">
+                                            <button id="show-more-standing-history"
+                                                onclick="document.querySelectorAll('.extra-standings').forEach(el => el.classList.remove('hidden')); this.style.display='none';"
+                                                class="text-xs text-kmnft-green hover:text-white underline transition">
+                                                Show All History
+                                            </button>
+                                        </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
                 <?php endif; ?>
 
                 <!-- League Schedule Section -->
@@ -1387,9 +1388,23 @@ if (!$is_logged_in) {
             </button>
             <div class="flex flex-col md:flex-row h-full">
                 <!-- Image Section -->
-                <div class="w-full md:w-3/5 aspect-square">
+                <!-- Image Section -->
+                <div class="w-full md:w-3/5 aspect-square relative group">
                     <img id="modal-token-image" src="" alt="Token NFT"
                         class="w-full h-full object-contain brightness-[1.1]">
+
+                    <!-- Watch Video Button -->
+                    <a id="modal-watch-video-btn" href="#" target="_blank"
+                        class="hidden absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-white hover:text-red-500 transition duration-300 flex items-center gap-2 z-20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>WATCH VIDEO</span>
+                    </a>
                 </div>
                 <!-- Info Section -->
                 <div
@@ -1649,12 +1664,31 @@ if (!$is_logged_in) {
             originalCloseTokenModal();
             const infoSection = document.querySelector('#token-modal .md\\:w-2\\/5');
             const imgSection = document.querySelector('#token-modal .md\\:w-3\\/5');
+            const videoBtn = document.getElementById('modal-watch-video-btn');
+
             if (infoSection && imgSection) {
                 infoSection.classList.remove('hidden');
                 imgSection.classList.add('md:w-3/5');
                 imgSection.classList.remove('w-full');
             }
+            if (videoBtn) {
+                videoBtn.classList.add('hidden');
+                videoBtn.href = '#';
+            }
         };
+
+        function openGoalScene(imageUrl, videoUrl) {
+            openImageModal(imageUrl);
+            const btn = document.getElementById('modal-watch-video-btn');
+            if (btn) {
+                if (videoUrl) {
+                    btn.href = videoUrl;
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            }
+        }
 
         function openMapModal() {
             const modal = document.getElementById('map-modal');
