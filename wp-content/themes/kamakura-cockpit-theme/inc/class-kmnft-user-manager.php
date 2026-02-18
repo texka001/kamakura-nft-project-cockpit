@@ -1684,7 +1684,7 @@ class KMNFT_User_Manager
                             <th><label for="goal_token_ids">Goal Token IDs（11桁）</label></th>
                             <td>
                                 <textarea name="goal_token_ids" id="goal_token_ids" rows="5" class="large-text"
-                                    placeholder="10089172280（1行 = 1ゴール目）&#10;10091172239, 10091172240（2行 = 2ゴール目、複数いる場合はカンマ区切り）"><?php echo $edit_match ? esc_textarea($edit_match->goal_token_ids) : ''; ?></textarea>
+                                    placeholder="10089172280（1行 = 1ゴール目）&#10;10091172239, 10091172240（2行 = 2ゴール目、複数いる場合はカンマ区切り）"><?php echo "\n" . ($edit_match ? esc_textarea($edit_match->goal_token_ids) : ''); ?></textarea>
                                 <p class="description">
                                     1行につき1ゴールとして入力してください。1つのゴールに複数のアセットを紐付ける場合は、同じ行内でカンマ区切りで入力してください（「1点目」などの文字は不要です）。</p>
                             </td>
@@ -1841,8 +1841,8 @@ class KMNFT_User_Manager
                 );
             }
 
-                                                                        // Initial preview update
-                                                                        updatePreview();
+                                                                                                // Initial preview update
+                                                                                                updatePreview();
 
             // Update preview on manual textarea change
             $('#goal_images_textarea').on('input propertychange', function () {
@@ -1891,7 +1891,7 @@ class KMNFT_User_Manager
                     updatePreview();
                 }
             });
-                                                                    });
+                                                                                            });
         </script>
         <?php
     }
@@ -1912,15 +1912,15 @@ class KMNFT_User_Manager
         $opponent = sanitize_text_field($_POST['opponent']);
         $result_score = sanitize_text_field($_POST['result_score']);
         $is_win = intval($_POST['is_win']);
-        $goal_token_ids = sanitize_textarea_field($_POST['goal_token_ids']);
+        // goal_token_ids: Preserve empty lines
+        $raw_token_ids = isset($_POST['goal_token_ids']) ? $_POST['goal_token_ids'] : '';
         $shoot_prize_memo = sanitize_textarea_field($_POST['shoot_prize_memo']);
-
-        // Clean up token IDs (Preserve lines for goal sequence, normalize within lines)
-        $id_lines = preg_split('/\r\n|\r|\n/', $goal_token_ids);
+        $id_lines = preg_split('/\r\n|\r|\n/', $raw_token_ids);
         $normalized_id_lines = array();
         foreach ($id_lines as $line) {
             $ids = explode(',', $line);
             $ids = array_map('trim', $ids);
+            $ids = array_map('sanitize_text_field', $ids);
             $ids = array_filter($ids);
             $normalized_id_lines[] = implode(',', $ids);
         }

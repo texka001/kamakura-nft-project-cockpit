@@ -13,9 +13,17 @@ Implemented a fix to correct the saving and display logic for empty lines in "Go
 #### `render_match_results_page`
 -   **Display**: Prepended a newline character `\n` to the echoed content within `<textarea>` for both "Goal Images" and "Goal Videos". This forces the browser to recognize leading newlines in the content, ensuring empty lines at the start are visible and editable.
 
-## Verification Results
+### 3. Regression Fixes (Restored Missing Logic)
+- **`process_match_save`**: Restored the missing assignment for `$shoot_prize_memo` which was causing the "SHOOT ZONE Prize" to not save.
+- **`process_match_save`**: Restored the logic for processing `$goal_token_ids` into `$clean_token_ids`, which was accidentally removed.
 
-### Manual Verification
+## Verification
+
+### 1. Match Results Saving
+- **Empty Lines**:
+    - Enter multiple video URLs with empty lines in between.
+    - Save and reload.
+    - Verify that empty lines are preserved in the textarea and the order matches the goals.
 -   **Goal Videos**:
     -   [ ] Enter a video URL on the 2nd line only (leave 1st line empty).
     -   [ ] Save.
@@ -26,3 +34,7 @@ Implemented a fix to correct the saving and display logic for empty lines in "Go
     -   [ ] Save.
     -   [ ] Verify preview/table.
     -   [ ] Open Edit screen again -> Verify 1st line is empty and URL is on 2nd line.
+-   **Goal Token IDs**:
+    -   [ ] Enter a token ID on the 2nd line only (leave 1st line empty).
+    -   [ ] Verify.
+    -   [ ] Open Edit screen again -> Verify 1st line is empty.
