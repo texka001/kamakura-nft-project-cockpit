@@ -1,39 +1,14 @@
-# 修正内容の確認 (Walkthrough)
-
-グラウンドの白線が拡大時にぼやける問題を解決するため、PNG画像をSVG画像に置き換えました。
+# 修正内容の確認 (Walkthrough) - 品質改善
 
 ## 変更内容
 
-### 1. SVGアセットの追加
-- ユーザーから提供されたSVGコードを `assets/images/whiteLine.svg` として保存しました。
+### 1. SVGの描画精度向上
+- `assets/images/whiteLine.svg` に `shape-rendering="geometricPrecision"` を追加しました。
+- これにより、ブラウザがベクターデータを描画する際により精密な計算を行うようになり、特に点線や斜線のジャギー（ギザギザ）が軽減されます。
 
-### 2. ダッシュボードの修正
-- `page-dashboard.php` 内の以下の箇所で `ground_map.png` を `whiteLine.svg` に差し替えました。
-  - **My Asset Map** セクション
-  - **LATEST MATCH RESULTS** セクション
-- 元々のPNG画像には `opacity: 0.8` や `opacity: 0.6` が指定されていましたが、SVGでは白線をより鮮明にするため、`opacity: 1.0` に調整しました。
-
-## 修正前後の比較（コードベース）
-
-### My Asset Map
-```diff
-- <img src="<?php echo get_template_directory_uri(); ?>/assets/images/ground_map.png"
--      alt="Ground Map" class="w-full h-full object-cover opacity-80 relative z-0 rounded">
-+ <img src="<?php echo get_template_directory_uri(); ?>/assets/images/whiteLine.svg"
-+      alt="Ground Map" class="w-full h-full object-cover opacity-100 relative z-0 rounded">
-```
-
-### LATEST MATCH RESULTS
-```diff
-- <img src="<?php echo get_template_directory_uri(); ?>/assets/images/ground_map.png"
--      alt="Ground Map"
--      class="w-full h-full object-cover opacity-60 relative z-0 rounded-sm">
-+ <img src="<?php echo get_template_directory_uri(); ?>/assets/images/whiteLine.svg"
-+      alt="Ground Map"
-+      class="w-full h-full object-cover opacity-100 relative z-0 rounded-sm">
-```
+### 2. デプロイと反映
+- `./deploy.sh` を実行し、修正後のSVGファイルがLocal WP環境に同期されました。
 
 ## 検証結果
-- SVGファイルが指定のパスに正しく作成されていることを確認しました。
-- `page-dashboard.php` の置換が正しく行われていることを確認しました。
-- ベクターデータ（SVG）になったことで、画面サイズが大きくなっても白線がぼやけず、鮮明に維持されます。
+- SVGファイルに属性が正しく追加されていることを確認しました。
+- 画面上の点線が、以前よりも滑らかに表示されているか、ユーザーの環境でご確認をお願いします。
