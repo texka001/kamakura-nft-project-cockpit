@@ -1348,29 +1348,7 @@ if (!$is_logged_in) {
             <?php endif; ?>
 
             <!-- Quick Actions / News Placeholder -->
-            <div class="grid grid-cols-1 gap-6">
-                <!--
-                <div class="glass-card p-6 rounded-lg">
-                    <h3 class="text-sm font-bold text-gray-300 mb-3">LATEST NEWS</h3>
-                    <div
-                        class="w-full h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
-                        <a class="twitter-timeline inline-block bg-[#1d9bf0] text-white px-5 py-2.5 rounded-full font-bold no-underline hover:bg-[#1a8cd8] transition duration-200 shadow-md"
-                            data-lang="ja" data-theme="dark" data-height="400"
-                            data-chrome="noheader nofooter noborders transparent" href="https://twitter.com/stadiumNFT">
-                            Tweets by stadiumNFT
-                        </a>
-                    </div>
-                </div>
-                -->
-                <div
-                    class="glass-card p-6 rounded-lg border-kmnft-green border bg-kmnft-green/5 text-center flex flex-col justify-center items-center">
-                    <h3 class="text-kmnft-green font-bold mb-2">PREDICTION GAME</h3>
-                    <p class="text-xs text-gray-300 mb-4">Submit your score for the next match.</p>
-                    <button
-                        class="px-4 py-2 bg-black border border-kmnft-green text-kmnft-green text-xs uppercase hover:bg-kmnft-green hover:text-black transition">Play
-                        Now</button>
-                </div>
-            </div>
+
 
         </div>
 
