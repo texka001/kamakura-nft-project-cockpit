@@ -458,20 +458,20 @@ if (!$is_logged_in) {
                                 $x = max(0, min(102, floatval($holding->zone_x)));
                                 $y = max(0, min(64, floatval($holding->zone_y)));
 
-                                // Map directly to percentage
-                                $left = ($x / 102) * 100;
-                                $bottom = ($y / 64) * 100;
+                                // Map directly to percentage (with -0.5m offset to center in 1m cell)
+                                $left = (($x - 0.5) / 102) * 100;
+                                $bottom = (($y - 0.5) / 64) * 100;
 
                                 $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
                                 $pts = $token_ksp_data ? number_format($token_ksp_data->total_points) : '0';
                                 $rnk = ($token_ksp_data && $token_ksp_data->rank > 0) ? $token_ksp_data->rank : '';
                                 ?>
-                                        <div class="absolute w-1.5 h-1.5 bg-kmnft-gold rounded-full shadow-[0_0_4px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2"
-                                            style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
-                                            onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>', '<?php echo esc_js($latest_season_label); ?>')"
-                                            title="ID: <?php echo esc_attr($holding->token_id); ?> (X:<?php echo $x; ?>, Y:<?php echo $y; ?>)">
-                                        </div>
-                                <?php endif; ?>
+                                <div class="absolute w-1.5 h-1.5 bg-kmnft-gold rounded-full shadow-[0_0_4px_#ffd700] hover:scale-150 transition cursor-help z-10 -translate-x-1/2 translate-y-1/2"
+                                    style="left: <?php echo $left; ?>%; bottom: <?php echo $bottom; ?>%;"
+                                    onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($x); ?>', '<?php echo esc_js($y); ?>', '<?php echo esc_js($latest_season_label); ?>')"
+                                    title="ID: <?php echo esc_attr($holding->token_id); ?> (X:<?php echo $x; ?>, Y:<?php echo $y; ?>)">
+                                </div>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -487,236 +487,236 @@ if (!$is_logged_in) {
 
             <!-- NFT Gallery Section -->
             <?php if (!$is_logged_in): ?>
-                    <div class="glass-card p-4 rounded-lg mb-6 relative overflow-hidden group">
-                        <div class="flex items-center justify-between mb-4 px-2">
-                            <h3 class="text-sm font-bold text-gray-300 flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-kmnft-green" fill="none"
+                <div class="glass-card p-4 rounded-lg mb-6 relative overflow-hidden group">
+                    <div class="flex items-center justify-between mb-4 px-2">
+                        <h3 class="text-sm font-bold text-gray-300 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-kmnft-green" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            NFT GALLERY
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <a href="<?php echo home_url('/nft-gallery'); ?>"
+                                class="text-[10px] text-gray-400 hover:text-white transition flex items-center gap-1 group/link">
+                                VIEW ALL
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-3 w-3 transform group-hover/link:translate-x-0.5 transition" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                 </svg>
-                                NFT GALLERY
-                            </h3>
+                            </a>
+                            <span
+                                class="text-[10px] text-gray-500 bg-gray-900 px-2 py-0.5 rounded border border-gray-700">LIVE</span>
+                        </div>
+                    </div>
+
+                    <div class="marquee-mask w-full overflow-hidden relative">
+                        <div class="marquee-track py-2">
+                            <?php foreach ($gallery_loop as $g_token):
+                                $g_original_url = KMNFT_IMAGE_BASE_URL . esc_attr($g_token) . '.png';
+                                // Use cached thumbnail for display
+                                $g_thumb_url = function_exists('kmnft_get_remote_thumbnail') ? kmnft_get_remote_thumbnail($g_original_url, $g_token) : $g_original_url;
+                                ?>
+                                <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer relative group/item"
+                                    onclick="openImageModal('<?php echo $g_original_url; ?>')">
+                                    <img src="<?php echo $g_thumb_url; ?>" alt="Token <?php echo esc_attr($g_token); ?>"
+                                        class="w-full h-full object-cover opacity-80 group-hover/item:opacity-100 transition duration-300"
+                                        loading="lazy"
+                                        onerror="this.src='<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';this.style.opacity='0.5';">
+                                    <div
+                                        class="absolute bottom-0 inset-x-0 bg-black/60 p-1 text-center translate-y-full group-hover/item:translate-y-0 transition duration-300">
+                                        <span class="text-[8px] font-mono text-white">#<?php echo esc_html($g_token); ?></span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- My Seat / Holdings -->
+            <?php if ($is_logged_in): ?>
+                <div class="glass-card p-6 rounded-lg">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-4">
+                            <h2
+                                class="text-lg font-bold text-white tracking-wide border-b border-kmnft-green pb-1 inline-block">
+                                OWNED ASSETS</h2>
                             <div class="flex items-center gap-2">
-                                <a href="<?php echo home_url('/nft-gallery'); ?>"
-                                    class="text-[10px] text-gray-400 hover:text-white transition flex items-center gap-1 group/link">
-                                    VIEW ALL
+                                <a href="https://kamakura-stadium-nft.com/" target="_blank"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1 border border-kmnft-green/50 text-kmnft-green text-[10px] font-bold rounded hover:bg-kmnft-green hover:text-black transition duration-200 group uppercase tracking-wider">
+                                    <span>アセットを追加購入</span>
                                     <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-3 w-3 transform group-hover/link:translate-x-0.5 transition" fill="none"
+                                        class="h-2.5 w-2.5 transform group-hover:translate-x-0.5 transition" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
                                 </a>
-                                <span
-                                    class="text-[10px] text-gray-500 bg-gray-900 px-2 py-0.5 rounded border border-gray-700">LIVE</span>
+                                <?php if (count($holdings) > 5): ?>
+                                    <button id="show-more-assets" onclick="showAllAssets()"
+                                        class="px-3 py-1 border border-gray-600 text-gray-400 text-[10px] font-bold rounded hover:border-kmnft-green hover:text-kmnft-green transition uppercase tracking-wider">
+                                        Show More
+                                    </button>
+                                    <button id="show-less-assets" onclick="showLessAssets()" style="display:none;"
+                                        class="px-3 py-1 border border-red-900/50 text-red-500 text-[10px] font-bold rounded hover:bg-red-500 hover:text-white transition uppercase tracking-wider">
+                                        Show Less
+                                    </button>
+                                <?php endif; ?>
                             </div>
                         </div>
-
-                        <div class="marquee-mask w-full overflow-hidden relative">
-                            <div class="marquee-track py-2">
-                                <?php foreach ($gallery_loop as $g_token):
-                                    $g_original_url = KMNFT_IMAGE_BASE_URL . esc_attr($g_token) . '.png';
-                                    // Use cached thumbnail for display
-                                    $g_thumb_url = function_exists('kmnft_get_remote_thumbnail') ? kmnft_get_remote_thumbnail($g_original_url, $g_token) : $g_original_url;
-                                    ?>
-                                        <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer relative group/item"
-                                            onclick="openImageModal('<?php echo $g_original_url; ?>')">
-                                            <img src="<?php echo $g_thumb_url; ?>" alt="Token <?php echo esc_attr($g_token); ?>"
-                                                class="w-full h-full object-cover opacity-80 group-hover/item:opacity-100 transition duration-300"
-                                                loading="lazy"
-                                                onerror="this.src='<?php echo get_template_directory_uri(); ?>/assets/images/creative_logo.jpg';this.style.opacity='0.5';">
-                                            <div
-                                                class="absolute bottom-0 inset-x-0 bg-black/60 p-1 text-center translate-y-full group-hover/item:translate-y-0 transition duration-300">
-                                                <span class="text-[8px] font-mono text-white">#<?php echo esc_html($g_token); ?></span>
-                                            </div>
-                                        </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
+                        <span class="text-xs text-gray-500">
+                            <?php echo count($holdings); ?> ASSETS
+                        </span>
                     </div>
-            <?php endif; ?>
 
-            <!-- My Seat / Holdings -->
-            <?php if ($is_logged_in): ?>
-                    <div class="glass-card p-6 rounded-lg">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center gap-4">
-                                <h2
-                                    class="text-lg font-bold text-white tracking-wide border-b border-kmnft-green pb-1 inline-block">
-                                    OWNED ASSETS</h2>
-                                <div class="flex items-center gap-2">
-                                    <a href="https://kamakura-stadium-nft.com/" target="_blank"
-                                        class="inline-flex items-center gap-1.5 px-3 py-1 border border-kmnft-green/50 text-kmnft-green text-[10px] font-bold rounded hover:bg-kmnft-green hover:text-black transition duration-200 group uppercase tracking-wider">
-                                        <span>アセットを追加購入</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="h-2.5 w-2.5 transform group-hover:translate-x-0.5 transition" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                        </svg>
-                                    </a>
-                                    <?php if (count($holdings) > 5): ?>
-                                            <button id="show-more-assets" onclick="showAllAssets()"
-                                                class="px-3 py-1 border border-gray-600 text-gray-400 text-[10px] font-bold rounded hover:border-kmnft-green hover:text-kmnft-green transition uppercase tracking-wider">
-                                                Show More
-                                            </button>
-                                            <button id="show-less-assets" onclick="showLessAssets()" style="display:none;"
-                                                class="px-3 py-1 border border-red-900/50 text-red-500 text-[10px] font-bold rounded hover:bg-red-500 hover:text-white transition uppercase tracking-wider">
-                                                Show Less
-                                            </button>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <span class="text-xs text-gray-500">
-                                <?php echo count($holdings); ?> ASSETS
-                            </span>
-                        </div>
+                    <?php if ($holdings): ?>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="asset-grid">
+                            <?php foreach ($holdings as $index => $holding): ?>
+                                <?php
+                                $is_hidden = $index >= 5 ? 'hidden hidden-asset' : '';
+                                $image_url = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
+                                $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
+                                $pts = $token_ksp_data ? number_format($token_ksp_data->total_points) : '0';
+                                $rnk = ($token_ksp_data && $token_ksp_data->rank > 0) ? $token_ksp_data->rank : '';
+                                $zx = isset($holding->zone_x) ? $holding->zone_x : '';
+                                $zy = isset($holding->zone_y) ? $holding->zone_y : '';
+                                ?>
+                                <div class="asset-item group relative glass-card rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer <?php echo $is_hidden; ?>"
+                                    onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($zx); ?>', '<?php echo esc_js($zy); ?>', '<?php echo esc_js($latest_season_label); ?>')">
+                                    <!-- Image -->
+                                    <div class="aspect-square w-full bg-gray-900 relative">
+                                        <img src="<?php echo $image_url; ?>" alt="Asset <?php echo esc_attr($holding->token_id); ?>"
+                                            class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500"
+                                            loading="lazy">
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-100">
+                                        </div>
+                                    </div>
 
-                        <?php if ($holdings): ?>
-                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="asset-grid">
-                                    <?php foreach ($holdings as $index => $holding): ?>
-                                            <?php
-                                            $is_hidden = $index >= 5 ? 'hidden hidden-asset' : '';
-                                            $image_url = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
-                                            $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
-                                            $pts = $token_ksp_data ? number_format($token_ksp_data->total_points) : '0';
-                                            $rnk = ($token_ksp_data && $token_ksp_data->rank > 0) ? $token_ksp_data->rank : '';
-                                            $zx = isset($holding->zone_x) ? $holding->zone_x : '';
-                                            $zy = isset($holding->zone_y) ? $holding->zone_y : '';
+                                    <!-- Overlay Info -->
+                                    <div class="absolute bottom-0 left-0 w-full p-3">
+
+
+                                        <?php
+                                        $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
+                                        if ($token_ksp_data):
                                             ?>
-                                            <div class="asset-item group relative glass-card rounded-lg overflow-hidden border border-gray-800 hover:border-kmnft-green transition cursor-pointer <?php echo $is_hidden; ?>"
-                                                onclick="openTokenModal('<?php echo esc_js($holding->token_id); ?>', '<?php echo esc_js($rnk); ?>', '<?php echo esc_js($pts); ?>', '<?php echo esc_js($zx); ?>', '<?php echo esc_js($zy); ?>', '<?php echo esc_js($latest_season_label); ?>')">
-                                                <!-- Image -->
-                                                <div class="aspect-square w-full bg-gray-900 relative">
-                                                    <img src="<?php echo $image_url; ?>" alt="Asset <?php echo esc_attr($holding->token_id); ?>"
-                                                        class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500"
-                                                        loading="lazy">
-                                                    <div
-                                                        class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-100">
+                                            <div class="flex flex-col gap-1.5 mt-1 border-t border-white/10 pt-2">
+                                                <div class="flex items-baseline justify-between">
+                                                    <span class="text-[8px] text-gray-500 font-bold uppercase tracking-wider">KSP</span>
+                                                    <div class="text-base font-mono font-bold text-white leading-none">
+                                                        <?php echo number_format($token_ksp_data->total_points); ?><span
+                                                            class="text-[9px] ml-0.5 text-gray-400 font-normal">pt</span>
                                                     </div>
                                                 </div>
-
-                                                <!-- Overlay Info -->
-                                                <div class="absolute bottom-0 left-0 w-full p-3">
-
-
-                                                    <?php
-                                                    $token_ksp_data = isset($tokens_ksp_summary[$holding->token_id]) ? $tokens_ksp_summary[$holding->token_id] : null;
-                                                    if ($token_ksp_data):
-                                                        ?>
-                                                            <div class="flex flex-col gap-1.5 mt-1 border-t border-white/10 pt-2">
-                                                                <div class="flex items-baseline justify-between">
-                                                                    <span class="text-[8px] text-gray-500 font-bold uppercase tracking-wider">KSP</span>
-                                                                    <div class="text-base font-mono font-bold text-white leading-none">
-                                                                        <?php echo number_format($token_ksp_data->total_points); ?><span
-                                                                            class="text-[9px] ml-0.5 text-gray-400 font-normal">pt</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="flex items-baseline justify-between">
-                                                                    <span
-                                                                        class="text-[8px] text-gray-500 font-bold uppercase tracking-wider">RANK</span>
-                                                                    <div class="text-base font-mono font-bold text-kmnft-gold leading-none">
-                                                                        <?php echo $token_ksp_data->rank > 0 ? '#' . esc_html($token_ksp_data->rank) : '-'; ?>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                    <?php endif; ?>
-
+                                                <div class="flex items-baseline justify-between">
+                                                    <span
+                                                        class="text-[8px] text-gray-500 font-bold uppercase tracking-wider">RANK</span>
+                                                    <div class="text-base font-mono font-bold text-kmnft-gold leading-none">
+                                                        <?php echo $token_ksp_data->rank > 0 ? '#' . esc_html($token_ksp_data->rank) : '-'; ?>
+                                                    </div>
                                                 </div>
                                             </div>
-                                    <?php endforeach; ?>
+                                        <?php endif; ?>
+
+                                    </div>
                                 </div>
+                            <?php endforeach; ?>
+                        </div>
 
 
 
-                        <?php else: ?>
-                                <div class="text-center py-10 text-gray-500 text-sm">
-                                    No Assets Found. Please contact admin.
-                                </div>
-                        <?php endif; ?>
+                    <?php else: ?>
+                        <div class="text-center py-10 text-gray-500 text-sm">
+                            No Assets Found. Please contact admin.
+                        </div>
+                    <?php endif; ?>
 
-                    </div>
+                </div>
             <?php endif; ?>
 
 
 
             <!-- Match Highlights -->
             <?php if ($match_results): ?>
-                    <div class="glass-card p-6 rounded-lg mb-6">
-                        <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
-                            <h3 class="text-sm font-bold text-gray-300">LATEST MATCH RESULTS</h3>
-                            <button onclick="toggleSection('latest-matches-content', 'matches-toggle-icon')"
-                                class="text-gray-400 hover:text-white transition">
-                                <svg id="matches-toggle-icon" xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div id="latest-matches-content">
-                            <div class="space-y-6">
-                                <?php foreach ($match_results as $index => $match): ?>
-                                        <?php
-                                        $is_hidden_match = $index >= 3 ? 'hidden hidden-match' : '';
+                <div class="glass-card p-6 rounded-lg mb-6">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                        <h3 class="text-sm font-bold text-gray-300">LATEST MATCH RESULTS</h3>
+                        <button onclick="toggleSection('latest-matches-content', 'matches-toggle-icon')"
+                            class="text-gray-400 hover:text-white transition">
+                            <svg id="matches-toggle-icon" xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="latest-matches-content">
+                        <div class="space-y-6">
+                            <?php foreach ($match_results as $index => $match): ?>
+                                <?php
+                                $is_hidden_match = $index >= 3 ? 'hidden hidden-match' : '';
 
-                                        $win_status = intval($match->is_win);
-                                        if ($win_status === 1) {
-                                            // WIN
-                                            $bgColor = 'bg-green-900/20';
-                                            $borderColor = 'border-kmnft-green/30';
-                                            $resultText = 'WIN';
-                                            $resultTextColor = 'text-kmnft-green';
-                                        } elseif ($win_status === 2) {
-                                            // DRAW
-                                            $bgColor = 'bg-gray-800/40';
-                                            $borderColor = 'border-gray-600';
-                                            $resultText = 'DRAW';
-                                            $resultTextColor = 'text-gray-300';
-                                        } else {
-                                            // LOSE
-                                            $bgColor = 'bg-gray-800/40';
-                                            $borderColor = 'border-gray-700';
-                                            $resultText = 'LOSE';
-                                            $resultTextColor = 'text-red-500';
-                                        }
+                                $win_status = intval($match->is_win);
+                                if ($win_status === 1) {
+                                    // WIN
+                                    $bgColor = 'bg-green-900/20';
+                                    $borderColor = 'border-kmnft-green/30';
+                                    $resultText = 'WIN';
+                                    $resultTextColor = 'text-kmnft-green';
+                                } elseif ($win_status === 2) {
+                                    // DRAW
+                                    $bgColor = 'bg-gray-800/40';
+                                    $borderColor = 'border-gray-600';
+                                    $resultText = 'DRAW';
+                                    $resultTextColor = 'text-gray-300';
+                                } else {
+                                    // LOSE
+                                    $bgColor = 'bg-gray-800/40';
+                                    $borderColor = 'border-gray-700';
+                                    $resultText = 'LOSE';
+                                    $resultTextColor = 'text-red-500';
+                                }
 
-                                        // Parse Token IDs
-                                        $goal_tokens = explode(',', $match->goal_token_ids);
-                                        $goal_tokens = array_map('trim', $goal_tokens);
-                                        $goal_tokens = array_filter($goal_tokens);
+                                // Parse Token IDs
+                                $goal_tokens = explode(',', $match->goal_token_ids);
+                                $goal_tokens = array_map('trim', $goal_tokens);
+                                $goal_tokens = array_filter($goal_tokens);
 
-                                        // Parse Video URLs
-                                        $goal_videos = !empty($match->goal_videos) ? explode("\n", $match->goal_videos) : array();
-                                        $goal_videos = array_map('trim', $goal_videos);
-                                        ?>
-                                        <div
-                                            class="match-item <?php echo $is_hidden_match; ?> <?php echo $bgColor; ?> border <?php echo $borderColor; ?> rounded p-4">
-                                            <div class="flex justify-between items-center mb-3">
-                                                <div class="text-xs text-gray-400 font-mono">
-                                                    <?php if (!empty($match->section_label)): ?>
-                                                            <span
-                                                                class="mr-2 text-kmnft-gold"><?php echo esc_html($match->section_label); ?></span>
-                                                    <?php endif; ?>
-                                                    <?php echo esc_html($match->match_date); ?>
-                                                </div>
-                                                <div class="text-sm font-bold <?php echo $resultTextColor; ?>">
-                                                    <?php echo $resultText; ?>
-                                                    <?php echo esc_html($match->result_score); ?>
-                                                </div>
+                                // Parse Video URLs
+                                $goal_videos = !empty($match->goal_videos) ? explode("\n", $match->goal_videos) : array();
+                                $goal_videos = array_map('trim', $goal_videos);
+                                ?>
+                                <div
+                                    class="match-item <?php echo $is_hidden_match; ?> <?php echo $bgColor; ?> border <?php echo $borderColor; ?> rounded p-4">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div class="text-xs text-gray-400 font-mono">
+                                            <?php if (!empty($match->section_label)): ?>
+                                                <span
+                                                    class="mr-2 text-kmnft-gold"><?php echo esc_html($match->section_label); ?></span>
+                                            <?php endif; ?>
+                                            <?php echo esc_html($match->match_date); ?>
+                                        </div>
+                                        <div class="text-sm font-bold <?php echo $resultTextColor; ?>">
+                                            <?php echo $resultText; ?>
+                                            <?php echo esc_html($match->result_score); ?>
+                                        </div>
+                                    </div>
+                                    <!-- Header Row for Alignment -->
+                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-2">
+                                        <div class="md:col-span-4">
+                                            <div class="text-sm text-white font-bold">VS
+                                                <?php echo esc_html($match->opponent); ?>
                                             </div>
-                                            <!-- Header Row for Alignment -->
-                                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-2">
-                                                <div class="md:col-span-4">
-                                                    <div class="text-sm text-white font-bold">VS
-                                                        <?php echo esc_html($match->opponent); ?>
-                                                    </div>
-                                                </div>
-                                                <div class="md:col-span-8 hidden md:block">
-                                                    <h4 class="text-xs font-bold text-gray-400">GOAL SCENES</h4>
-                                                </div>
-                                                <!-- Mobile only: Goal scenes title usually appears above images, but here we want to enforce structure using grid. 
+                                        </div>
+                                        <div class="md:col-span-8 hidden md:block">
+                                            <h4 class="text-xs font-bold text-gray-400">GOAL SCENES</h4>
+                                        </div>
+                                        <!-- Mobile only: Goal scenes title usually appears above images, but here we want to enforce structure using grid. 
                                              If on mobile we want standard flow: VS -> Map -> Goal Scenes Title -> Images.
                                              The grid above puts VS and Goal Scenes Title in one row on desktop.
                                              On mobile (grid-cols-1), it would be VS -> Goal Scenes Title -> Map -> Images.
@@ -760,59 +760,60 @@ if (!$is_logged_in) {
                                              Where does the "GOAL SCENES" title go on mobile?
                                              I should add it back in the Images column but `md:hidden`.
                                         -->
-                                            </div>
+                                    </div>
 
-                                            <!-- Layout: Map + Images -->
-                                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                                                <!-- Mini Map Column (approx 33%) -->
-                                                <div class="md:col-span-4">
-                                                    <div class="w-full bg-[#1a4023] rounded p-1.5 border border-white/10">
-                                                        <div class="relative w-full h-full" style="aspect-ratio: 102/64;">
-                                                            <!-- Field Boundary -->
-                                                            <div
-                                                                class="absolute inset-0 border border-white/30 pointer-events-none z-0 rounded-sm">
-                                                            </div>
+                                    <!-- Layout: Map + Images -->
+                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                        <!-- Mini Map Column (approx 33%) -->
+                                        <div class="md:col-span-4">
+                                            <div class="w-full bg-[#1a4023] rounded p-1.5 border border-white/10">
+                                                <div class="relative w-full h-full" style="aspect-ratio: 102/64;">
+                                                    <!-- Field Boundary -->
+                                                    <div
+                                                        class="absolute inset-0 border border-white/30 pointer-events-none z-0 rounded-sm">
+                                                    </div>
 
-                                                            <img src="<?php echo get_template_directory_uri(); ?>/assets/images/whiteLine.svg"
-                                                                alt="Ground Map"
-                                                                class="w-full h-full object-cover opacity-100 relative z-0 rounded-sm">
+                                                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/whiteLine.svg"
+                                                        alt="Ground Map"
+                                                        class="w-full h-full object-cover opacity-100 relative z-0 rounded-sm">
 
-                                                            <!-- Goal Plots -->
-                                                            <!-- Goal Plots -->
-                                                            <?php
-                                                            // Parse Token IDs (Multiline format: one line per goal, multiple tokens per line comma-separated)
-                                                            $goal_lines = array_filter(preg_split('/\r\n|\r|\n/', $match->goal_token_ids));
-                                                            $all_goal_tokens_structured = array();
+                                                    <!-- Goal Plots -->
+                                                    <!-- Goal Plots -->
+                                                    <?php
+                                                    // Parse Token IDs (Multiline format: one line per goal, multiple tokens per line comma-separated)
+                                                    $goal_lines = array_filter(preg_split('/\r\n|\r|\n/', $match->goal_token_ids));
+                                                    $all_goal_tokens_structured = array();
 
-                                                            foreach ($goal_lines as $idx => $line) {
-                                                                $tokens = explode(',', $line);
-                                                                $tokens = array_map('trim', $tokens);
-                                                                $tokens = array_filter($tokens);
-                                                                if (!empty($tokens)) {
-                                                                    foreach ($tokens as $t) {
-                                                                        $all_goal_tokens_structured[] = array(
-                                                                            'token_id' => $t,
-                                                                            'goal_num' => $idx + 1
-                                                                        );
-                                                                    }
-                                                                }
+                                                    foreach ($goal_lines as $idx => $line) {
+                                                        $tokens = explode(',', $line);
+                                                        $tokens = array_map('trim', $tokens);
+                                                        $tokens = array_filter($tokens);
+                                                        if (!empty($tokens)) {
+                                                            foreach ($tokens as $t) {
+                                                                $all_goal_tokens_structured[] = array(
+                                                                    'token_id' => $t,
+                                                                    'goal_num' => $idx + 1
+                                                                );
                                                             }
+                                                        }
+                                                    }
 
-                                                            foreach ($all_goal_tokens_structured as $goal_data):
-                                                                $token_id = $goal_data['token_id'];
-                                                                $seq = $goal_data['goal_num'];
+                                                    foreach ($all_goal_tokens_structured as $goal_data):
+                                                        $token_id = $goal_data['token_id'];
+                                                        $seq = $goal_data['goal_num'];
 
-                                                                // Lookup coordinates
-                                                                $coord_query = $wpdb->prepare("SELECT zone_x, zone_y FROM {$wpdb->prefix}kmnft_holdings WHERE token_id = %s", $token_id);
-                                                                $coord = $wpdb->get_row($coord_query);
+                                                        // Lookup coordinates
+                                                        $coord_query = $wpdb->prepare("SELECT zone_x, zone_y FROM {$wpdb->prefix}kmnft_holdings WHERE token_id = %s", $token_id);
+                                                        $coord = $wpdb->get_row($coord_query);
 
-                                                                if ($coord && is_numeric($coord->zone_x) && is_numeric($coord->zone_y)) {
-                                                                    $x = max(0, min(102, floatval($coord->zone_x)));
-                                                                    $y = max(0, min(64, floatval($coord->zone_y)));
+                                                        if ($coord && is_numeric($coord->zone_x) && is_numeric($coord->zone_y)) {
+                                                            $x = max(0, min(102, floatval($coord->zone_x)));
+                                                            $y = max(0, min(64, floatval($coord->zone_y)));
 
-                                                                    $left = ($x / 102) * 100;
-                                                                    $bottom = ($y / 64) * 100;
-                                                                    ?>
+                                                            // Map directly (with -0.5m offset to center in 1m cell)
+                                                            $left = (($x - 0.5) / 102) * 100;
+                                                            $bottom = (($y - 0.5) / 64) * 100;
+                                                            ?>
                                                                             <?php
                                                                             $video_url = isset($goal_videos[$seq - 1]) ? $goal_videos[$seq - 1] : '';
                                                                             $clickable_class = ($is_logged_in && !empty($video_url)) ? 'cursor-pointer' : '';
@@ -1467,9 +1468,9 @@ if (!$is_logged_in) {
                                     $x = max(0, min(102, floatval($holding->zone_x)));
                                     $y = max(0, min(64, floatval($holding->zone_y)));
 
-                                    // Map directly
-                                    $left = ($x / 102) * 100;
-                                    $bottom = ($y / 64) * 100;
+                                    // Map directly (with -0.5m offset to center in 1m cell)
+                                    $left = (($x - 0.5) / 102) * 100;
+                                    $bottom = (($y - 0.5) / 64) * 100;
 
                                     $last4 = substr($holding->token_id, -4);
                                     $image_url_large = KMNFT_IMAGE_BASE_URL . esc_attr($holding->token_id) . '.png';
