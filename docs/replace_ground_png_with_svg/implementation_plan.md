@@ -1,22 +1,18 @@
-# グラウンド画像のSVG化実装計画
+# グラウンド画像の品質改善計画
 
-グラウンドの白線が拡大時にぼやける問題を解決するため、現在のPNG画像 (`ground_map.png`) をSVG画像 (`whiteLine.svg`) に置き換えます。
-
-## ユーザーへの確認事項
-- 添付された `whiteLine.svg` のコード内容をこちらで読み取ることができませんでした（画像として表示されています）。恐れ入りますが、SVGのコード（`<svg ...>` で始まるテキスト）をチャットに貼り付けていただけますでしょうか？
+グラウンドの白線（特に点線部分）が荒く見える問題を解決するため、SVGのレンダリング設定の調整とアスペクト比の最適化を行います。
 
 ## 変更内容
 
-### テーマアセット
-#### [NEW] [whiteLine.svg](file:///Users/mukaikazuma/Desktop/AI%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E9%96%8B%E7%99%BA/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/assets/images/whiteLine.svg)
-- 提供されたSVGデータを保存します。
+### 1. SVGファイルの最適化
+- `whiteLine.svg` に `shape-rendering="geometricPrecision"` を追加し、ブラウザによるレンダリングの精度を高めます。
 
-### ダッシュボードページ
-#### [MODIFY] [page-dashboard.php](file:///Users/mukaikazuma/Desktop/AI%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E9%96%8B%E7%99%BA/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-dashboard.php)
-- `assets/images/ground_map.png` を `assets/images/whiteLine.svg` に差し替えます。
-- 画像の `opacity` や CSS クラスを調整し、背景色との兼ね合いを確認します。
+### 2. ダッシュボードの調整
+- `page-dashboard.php` の `LATEST MATCH RESULTS` セクションにおいて、SVGを配置しているコンテナの CSS を調整します。
+- `object-fit: contain` や、レンダリングを滑らかにする CSS プロパティ（`-webkit-font-smoothing` は対象外ですが、`image-rendering` など）の適用を検討します。
+- 必要に応じて、コンテナのアスペクト比をSVGの本来の比率（約1.59）に近づけるか、歪みが出ないような配置方法を検討します。
 
 ## 検証計画
 ### 手動確認
-- ブラウザでダッシュボードを表示し、`My Asset Map` と `LATEST MATCH RESULTS` のグラウンド画像が鮮明に表示されていることを確認します。
-- 画面幅を変更しても線が細くなったり消えたりしないか確認します。
+- 修正後、特に「点線部分」が滑らかに表示されているか、ユーザーの環境で再度確認を依頼します。
+- 画面を縮小した際にも、線が消えたりジャギーが目立ったりしないか確認します。
