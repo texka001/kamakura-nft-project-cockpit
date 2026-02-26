@@ -447,8 +447,8 @@ if (!$is_logged_in) {
                         <div class="absolute inset-0 border border-white/30 pointer-events-none z-0 rounded"></div>
 
                         <!-- Ground Image -->
-                        <img src="<?php echo get_template_directory_uri(); ?>/assets/images/ground_map.png"
-                            alt="Ground Map" class="w-full h-full object-cover opacity-80 relative z-0 rounded">
+                        <img src="<?php echo get_template_directory_uri(); ?>/assets/images/whiteLine.svg"
+                            alt="Ground Map" class="w-full h-full object-cover opacity-100 relative z-0 rounded">
 
                         <!-- Plots -->
                         <?php foreach ($holdings as $holding): ?>
@@ -773,9 +773,9 @@ if (!$is_logged_in) {
                                                         class="absolute inset-0 border border-white/30 pointer-events-none z-0 rounded-sm">
                                                     </div>
 
-                                                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/ground_map.png"
+                                                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/whiteLine.svg"
                                                         alt="Ground Map"
-                                                        class="w-full h-full object-cover opacity-60 relative z-0 rounded-sm">
+                                                        class="w-full h-full object-cover opacity-100 relative z-0 rounded-sm">
 
                                                     <!-- Goal Plots -->
                                                     <!-- Goal Plots -->
