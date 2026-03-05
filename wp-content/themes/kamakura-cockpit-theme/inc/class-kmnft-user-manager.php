@@ -387,7 +387,11 @@ class KMNFT_User_Manager
                             <p><strong>Success!</strong> <?php echo esc_html($_GET['msg']); ?></p>
                         <?php else: ?>
                             <p><strong>Success!</strong> <?php echo isset($_GET['count']) ? intval($_GET['count']) : 0; ?> records processed
-                                successfully.</p>
+                                successfully.
+                                <?php if (isset($_GET['skipped']) && intval($_GET['skipped']) > 0): ?>
+                                    (Skipped <?php echo intval($_GET['skipped']); ?> records with no points)
+                                <?php endif; ?>
+                            </p>
                         <?php endif; ?>
                     </div>
                 <?php elseif ($_GET['status'] === 'deleted'): ?>
@@ -1093,6 +1097,7 @@ class KMNFT_User_Manager
                 fgetcsv($handle); // Skip Header
 
                 $row_count = 0;
+                $skip_count = 0;
                 global $wpdb;
                 $table_name = $wpdb->prefix . 'kmnft_token_ksp';
 
@@ -1119,12 +1124,18 @@ class KMNFT_User_Manager
                     $time = strtotime(str_replace('/', '-', $raw_date));
                     $acquisition_date = ($time !== false) ? date('Y-m-d', $time) : '';
 
-                    $acquisition_point = intval($data[2]);
+                    $acquisition_point = isset($data[2]) ? trim($data[2]) : '';
                     $season = isset($data[3]) ? sanitize_text_field($data[3]) : '';
                     $reason_1 = isset($data[4]) ? sanitize_textarea_field($data[4]) : '';
                     $reason_2 = isset($data[5]) ? sanitize_textarea_field($data[5]) : '';
 
                     if (empty($token_id) || empty($acquisition_date)) {
+                        continue;
+                    }
+
+                    // Skip if points are 0, NULL, or empty
+                    if ($acquisition_point === '' || intval($acquisition_point) === 0) {
+                        $skip_count++;
                         continue;
                     }
 
@@ -1134,7 +1145,7 @@ class KMNFT_User_Manager
                         array(
                             'token_id' => $token_id,
                             'acquisition_date' => $acquisition_date,
-                            'acquisition_point' => $acquisition_point,
+                            'acquisition_point' => intval($acquisition_point),
                             'season' => $season,
                             'reason_1' => $reason_1,
                             'reason_2' => $reason_2
@@ -1144,7 +1155,7 @@ class KMNFT_User_Manager
                     $row_count++;
                 }
                 fclose($handle);
-                wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=success&count=' . $row_count));
+                wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=success&count=' . $row_count . '&skipped=' . $skip_count));
                 exit;
             }
         }
@@ -1923,7 +1934,7 @@ class KMNFT_User_Manager
                 </table>
             </div>
         </div>
-        <script>             jQuery(document).ready(functi                         on($) {
+        <script>             jQuery(document).ready(functi                         o               n($) {
                 var mediaUploader;
 
                 function updatePreview() {
@@ -1944,8 +1955,8 @@ class KMNFT_User_Manager
                 );
             }
 
-                                                                                                                // Initial preview update
-                                                                                                                updatePreview();
+                                                                                                                                // Initial preview update
+                                                                                                                                updatePreview();
 
             // Update preview on manual textarea change
             $('#goal_images_textarea').on('input propertychange', function () {
@@ -1994,7 +2005,7 @@ class KMNFT_User_Manager
                     updatePreview();
                 }
             });
-                                                                                                            });
+                                                                                                                            });
         </script>
         <?php
     }
