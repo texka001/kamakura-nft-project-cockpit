@@ -26,6 +26,7 @@ class KMNFT_User_Manager
         add_action('admin_post_kmnft_export_token_ksp', array($this, 'process_token_ksp_export'));
         add_action('admin_post_kmnft_delete_token_ksp', array($this, 'process_token_ksp_delete'));
         add_action('admin_post_kmnft_delete_token_ksp_by_date', array($this, 'process_token_ksp_delete_by_date'));
+        add_action('admin_post_kmnft_delete_token_ksp_by_only_date', array($this, 'process_token_ksp_delete_by_only_date'));
         add_action('admin_post_kmnft_aggregate_token_ksp', array($this, 'process_token_ksp_aggregation'));
         add_action('admin_post_kmnft_export_token_summary', array($this, 'process_token_summary_export'));
         add_action('admin_post_kmnft_export_user_summary', array($this, 'process_user_summary_export'));
@@ -449,17 +450,39 @@ class KMNFT_User_Manager
 
             <div style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px;">
                 <h2>Export Token KSP</h2>
-                <p>Download the current list of Token KSP records.</p>
+                <p>Download the current list of Token KSP records. <br>
+                    <span style="color: #d63638;"><strong>Note:</strong> At least one filter (Season, Token ID, or Acquisition
+                        Date) must be specified.</span>
+                </p>
                 <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
                     <input type="hidden" name="action" value="kmnft_export_token_ksp">
                     <?php wp_nonce_field('kmnft_token_ksp_export_nonce', 'kmnft_nonce'); ?>
-                    <?php submit_button('Download CSV', 'secondary'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="export_season">Season</label></th>
+                            <td><input type="text" name="season" id="export_season" class="regular-text"
+                                    placeholder="e.g. 2026"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="export_token_id">Token ID</label></th>
+                            <td><input type="text" name="token_id" id="export_token_id" class="regular-text"
+                                    placeholder="e.g. 12345678901"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="export_acquisition_date">Acquisition Date</label></th>
+                            <td>
+                                <input type="date" name="acquisition_date" id="export_acquisition_date" class="regular-text">
+                                <p class="description">Only records from this specific date will be exported.</p>
+                            </td>
+                        </tr>
+                    </table>
+                    <?php submit_button('Download Filtered CSV', 'secondary'); ?>
                 </form>
             </div>
 
             <div
                 style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px; border-left: 4px solid #d63638;">
-                <h2 style="color: #d63638;">Delete Token KSP</h2>
+                <h2 style="color: #d63638;">Delete Token KSP (Token ID)</h2>
                 <p>Delete records by specifying Token IDs. All records for the specified Token IDs will be deleted.</p>
                 <form action="<?php echo admin_url('admin-post.php'); ?>" method="post"
                     onsubmit="return confirm('Are you sure you want to delete KSP data for these tokens?');">
@@ -474,7 +497,27 @@ class KMNFT_User_Manager
                             </td>
                         </tr>
                     </table>
-                    <?php submit_button('Delete Token KSP', 'delete'); ?>
+                    <?php submit_button('Delete Token KSP (By Token ID)', 'delete'); ?>
+                </form>
+            </div>
+
+            <div
+                style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px; border-left: 4px solid #d63638;">
+                <h2 style="color: #d63638;">Delete Token KSP (Date)</h2>
+                <p>Delete all records for a specific acquisition date. This is useful for undoing a whole batch import.</p>
+                <form action="<?php echo admin_url('admin-post.php'); ?>" method="post"
+                    onsubmit="return confirm('Are you sure you want to delete ALL KSP records for this date?');">
+                    <input type="hidden" name="action" value="kmnft_delete_token_ksp_by_only_date">
+                    <?php wp_nonce_field('kmnft_token_ksp_delete_by_only_date_nonce', 'kmnft_nonce'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="delete_date">Acquisition Date</label></th>
+                            <td>
+                                <input type="date" name="acquisition_date" id="delete_date" class="regular-text" required>
+                            </td>
+                        </tr>
+                    </table>
+                    <?php submit_button('Delete Records for this Date', 'delete'); ?>
                 </form>
             </div>
 
@@ -1115,10 +1158,37 @@ class KMNFT_User_Manager
         }
         check_admin_referer('kmnft_token_ksp_export_nonce', 'kmnft_nonce');
 
+        if (empty($_POST['season']) && empty($_POST['token_id']) && empty($_POST['acquisition_date'])) {
+            wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=error&msg=At least one filter (Season, Token ID, or Date) is required for Export.'));
+            exit;
+        }
+
         global $wpdb;
         $table_name = $wpdb->prefix . 'kmnft_token_ksp';
 
-        $results = $wpdb->get_results("SELECT token_id, acquisition_date, acquisition_point, season, reason_1, reason_2 FROM $table_name ORDER BY acquisition_date DESC");
+        $where = array();
+        $params = array();
+
+        if (!empty($_POST['season'])) {
+            $where[] = "season = %s";
+            $params[] = sanitize_text_field($_POST['season']);
+        }
+        if (!empty($_POST['token_id'])) {
+            $where[] = "token_id = %s";
+            $params[] = sanitize_text_field($_POST['token_id']);
+        }
+        if (!empty($_POST['acquisition_date'])) {
+            $where[] = "acquisition_date = %s";
+            $params[] = sanitize_text_field($_POST['acquisition_date']);
+        }
+
+        $sql = "SELECT token_id, acquisition_date, acquisition_point, season, reason_1, reason_2 FROM $table_name WHERE " . implode(' AND ', $where) . " ORDER BY acquisition_date DESC";
+
+        if (!empty($params)) {
+            $results = $wpdb->get_results($wpdb->prepare($sql, $params));
+        } else {
+            $results = $wpdb->get_results($sql);
+        }
 
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="kmnft_token_ksp_export_' . date('Y-m-d') . '.csv"');
@@ -1195,11 +1265,11 @@ class KMNFT_User_Manager
         $deleted_count = 0;
 
         foreach ($lines as $line) {
-            // Expected format: TokenID, Date
-            $parts = explode(',', $line);
+            $parts = array_map('trim', explode(',', $line));
             if (count($parts) < 2) {
                 continue;
             }
+            $token_id = $parts[0];
             if (empty($token_id) || empty($parts[1])) {
                 continue;
             }
@@ -1225,7 +1295,40 @@ class KMNFT_User_Manager
                 $deleted_count += $result;
             }
         }
+        wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=deleted&count=' . intval($deleted_count)));
+        exit;
+    }
 
+    public function process_token_ksp_delete_by_only_date()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        check_admin_referer('kmnft_token_ksp_delete_by_only_date_nonce', 'kmnft_nonce');
+
+        $date = isset($_POST['acquisition_date']) ? sanitize_text_field($_POST['acquisition_date']) : '';
+        if (empty($date)) {
+            wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=error&msg=No date provided'));
+            exit;
+        }
+
+        $time = strtotime($date);
+        if ($time === false) {
+            wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=error&msg=Invalid date format'));
+            exit;
+        }
+        $acquisition_date = date('Y-m-d', $time);
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'kmnft_token_ksp';
+
+        $deleted = $wpdb->delete(
+            $table_name,
+            array('acquisition_date' => $acquisition_date),
+            array('%s')
+        );
+
+        wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=deleted&count=' . intval($deleted)));
         exit;
     }
 
@@ -1841,8 +1944,8 @@ class KMNFT_User_Manager
                 );
             }
 
-                                                                                                // Initial preview update
-                                                                                                updatePreview();
+                                                                                                                // Initial preview update
+                                                                                                                updatePreview();
 
             // Update preview on manual textarea change
             $('#goal_images_textarea').on('input propertychange', function () {
@@ -1891,7 +1994,7 @@ class KMNFT_User_Manager
                     updatePreview();
                 }
             });
-                                                                                            });
+                                                                                                            });
         </script>
         <?php
     }
