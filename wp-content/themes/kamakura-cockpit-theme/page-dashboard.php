@@ -1138,46 +1138,66 @@ if (!$is_logged_in) {
 
                                     // Add timestamp to each row
                                     foreach ($schedule_data as &$row) {
-                                        $date_str = $row['date'];
-                                        $time_str = $row['time'];
-                                        $dt_parts = explode('/', $date_str);
-                                        if (count($dt_parts) === 2) {
-                                            $month = str_pad($dt_parts[0], 2, '0', STR_PAD_LEFT);
-                                            $day = str_pad($dt_parts[1], 2, '0', STR_PAD_LEFT);
-                                            // Assume season_year is correct year
-                                            $year = $schedule->season_year;
-                                            $full_date_str = "{$year}-{$month}-{$day} {$time_str}";
-                                            $row['_ts'] = strtotime($full_date_str);
+                                        $date_str = trim($row['date']);
+                                        $time_str = trim($row['time']);
+
+                                        // Check if it has a 4-digit year or two separators (indicating full date)
+                                        $has_year = (substr_count($date_str, '/') === 2 || substr_count($date_str, '-') === 2 || preg_match('/^\d{4}/', $date_str));
+
+                                        if ($has_year) {
+                                            $full_date_ts = strtotime("{$date_str} {$time_str}");
+                                            $row['_ts'] = ($full_date_ts !== false) ? $full_date_ts : 0;
                                         } else {
-                                            $row['_ts'] = 0;
+                                            // Fallback to legacy format parsing (MM/DD or M/D)
+                                            $dt_parts = explode('/', $date_str);
+                                            if (count($dt_parts) === 2) {
+                                                $month = str_pad($dt_parts[0], 2, '0', STR_PAD_LEFT);
+                                                $day = str_pad($dt_parts[1], 2, '0', STR_PAD_LEFT);
+                                                $year = $schedule->season_year;
+                                                $full_date_str = "{$year}-{$month}-{$day} {$time_str}";
+                                                $row['_ts'] = strtotime($full_date_str);
+                                            } else {
+                                                $row['_ts'] = 0;
+                                            }
                                         }
                                     }
                                     unset($row);
 
-                                    // Identify Next Match
-                                    $closest_diff = null;
+                                    // Identify Next Match and Last Match
                                     $next_match_idx = -1;
+                                    $last_match_idx = -1;
+                                    $closest_next_diff = null;
+                                    $closest_last_diff = null;
 
                                     foreach ($schedule_data as $idx => $row) {
-                                        if ($row['_ts'] >= $current_ts) {
-                                            $diff = $row['_ts'] - $current_ts;
-                                            if ($closest_diff === null || $diff < $closest_diff) {
-                                                $closest_diff = $diff;
+                                        $diff = $row['_ts'] - $current_ts;
+                                        if ($diff >= 0) {
+                                            // Future match (including right now)
+                                            if ($closest_next_diff === null || $diff < $closest_next_diff) {
+                                                $closest_next_diff = $diff;
                                                 $next_match_idx = $idx;
+                                            }
+                                        } else {
+                                            // Past match
+                                            $abs_diff = abs($diff);
+                                            if ($closest_last_diff === null || $abs_diff < $closest_last_diff) {
+                                                $closest_last_diff = $abs_diff;
+                                                $last_match_idx = $idx;
                                             }
                                         }
                                     }
 
-                                    // Mark the next match row
+                                    // Mark matches
                                     if ($next_match_idx !== -1) {
                                         $schedule_data[$next_match_idx]['_is_next'] = true;
-                                        if ($is_latest)
-                                            $has_next_match = true;
+                                    }
+                                    if ($last_match_idx !== -1) {
+                                        $schedule_data[$last_match_idx]['_is_recent'] = true;
                                     }
 
-                                    // Sort Descending by Date (Timestamp)
+                                    // Sort Ascending by Date (Timestamp)
                                     usort($schedule_data, function ($a, $b) {
-                                        return $b['_ts'] - $a['_ts'];
+                                        return $a['_ts'] - $b['_ts'];
                                     });
                                 }
 
@@ -1230,7 +1250,6 @@ if (!$is_logged_in) {
                                                         <th class="py-2 px-4 text-left">Opponent</th>
                                                         <th class="py-2 px-4 text-left">STADIUM</th>
                                                         <th class="py-2 px-2">Result</th>
-                                                        <th class="py-2 px-2">Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="text-gray-300 divide-y divide-gray-800/50">
@@ -1256,23 +1275,29 @@ if (!$is_logged_in) {
                                         
                                                         // Highlight style for next match
                                                         $row_classes = 'hover:bg-white/5 transition-colors';
+                                                        $is_recent = !empty($row['_is_recent']);
+
                                                         if ($is_next) {
                                                             $row_classes = 'bg-kmnft-green/10 border-l-4 border-kmnft-green transition-colors';
+                                                        } elseif ($is_recent) {
+                                                            $row_classes = 'bg-white/5 border-l-4 border-gray-400 transition-colors';
                                                         }
 
-                                                        // Apply hidden class for non-next matches in latest season
+                                                        // Apply hidden class for non-next/recent matches in latest season
                                                         $tr_class = $row_classes;
-                                                        if ($is_latest && $has_next_match && !$is_next) {
+                                                        if ($is_latest && !$is_next && !$is_recent) {
                                                             $tr_class .= ' latest-season-hidden hidden';
                                                         }
                                                         ?>
                                                         <tr class="<?php echo $tr_class; ?>">
                                                             <td
-                                                                class="py-3 px-3 text-left <?php echo $is_next ? '' : 'border-r border-white/5'; ?> text-kmnft-gold/80 font-mono">
+                                                                class="py-3 px-3 text-left <?php echo ($is_next || $is_recent) ? '' : 'border-r border-white/5'; ?> text-kmnft-gold/80 font-mono">
                                                                 <?php echo esc_html($row['section']); ?>
                                                                 <?php if ($is_next): ?>
                                                                     <span
                                                                         class="text-kmnft-green text-[10px] font-bold ml-2 animate-pulse">NEXT</span>
+                                                                <?php elseif ($is_recent): ?>
+                                                                    <span class="text-gray-400 text-[10px] font-bold ml-2">LAST</span>
                                                                 <?php endif; ?>
                                                             </td>
                                                             <td class="py-3 px-2"><?php echo esc_html($row['date']); ?></td>
@@ -1291,18 +1316,12 @@ if (!$is_logged_in) {
                                                             <td class="py-3 px-2 <?php echo $res_class; ?>">
                                                                 <?php echo $res_label; ?>
                                                             </td>
-                                                            <td class="py-3 px-2">
-                                                                <?php if (!$is_latest): ?>
-                                                                    <a href="<?php echo admin_url('admin-post.php?action=kmnft_download_league_schedule_csv&item_id=' . $schedule->id); ?>"
-                                                                        class="text-xs text-kmnft-green hover:underline">CSV</a>
-                                                                <?php endif; ?>
-                                                            </td>
                                                         </tr>
                                                     <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <?php if ($is_latest && $has_next_match): ?>
+                                        <?php if ($is_latest): ?>
                                             <div class="text-center mt-2">
                                                 <button onclick="toggleLatestSeason()" id="btn-show-latest"
                                                     class="text-xs text-kmnft-green hover:text-white transition-colors border border-kmnft-green/50 px-3 py-1 rounded bg-black/20 hover:bg-black/40">
@@ -1338,7 +1357,7 @@ if (!$is_logged_in) {
                     function toggleLatestSeason() {
                         const hiddenRows = document.querySelectorAll('.latest-season-hidden'); const btn = document.getElementById('btn-show-latest');
                         hiddenRows.forEach(row => { row.classList.toggle('hidden'); });
-                        if (btn) { if (btn.innerText.includes('Show Full Schedule')) { btn.innerText = 'Show Next Match Only'; } else { btn.innerText = 'Show Full Schedule'; } }
+                        if (btn) { if (btn.innerText.includes('Show Full Schedule')) { btn.innerText = 'Show Recent/Next Only'; } else { btn.innerText = 'Show Full Schedule'; } }
                     }
                     function toggleHistory() {
                         const pastSeasons = document.querySelectorAll('.past-season'); const btn = document.getElementById('btn-show-history');
@@ -2154,8 +2173,11 @@ if (!$is_logged_in) {
                     class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
                     <div
                         class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
-                        <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.9175 16.263V12.5919C18.9175 11.9229 18.9515 11.6998 19.0524 11.3566C19.322 10.4131 20.2325 9.7099 21.3111 9.7099C22.3897 9.7099 23.2999 10.4303 23.5695 11.3566C23.6707 11.6998 23.7047 11.9229 23.7047 12.5919V18.2529C23.7047 18.5962 23.7047 18.9391 23.6371 19.248C23.4518 20.1056 22.6933 20.8779 21.8504 21.0665C21.5471 21.1349 21.2099 21.135 20.8727 21.135H15.3105C14.6532 21.135 14.434 21.1007 14.0968 20.9977C13.1866 20.7233 12.4788 19.7969 12.4788 18.6991C12.4788 17.601 13.1866 16.6747 14.0968 16.4003C14.434 16.2973 14.6532 16.263 15.3105 16.263H18.9175ZM38.7396 41.9273H8.90544V15.1824C8.90544 14.8391 9.02345 14.5476 9.25947 14.3074L16.996 6.43303C17.232 6.19312 17.5185 6.073 17.8557 6.073H38.7396V41.9273ZM42.1278 0.034229C41.9761 0.0171142 41.7737 0 41.3861 0H17.0633C16.7939 0 16.5243 0.0171142 16.3387 0.034229C15.2261 0.137224 14.2316 0.669007 13.4394 1.47524L4.38795 10.6876C3.5961 11.4941 3.07331 12.506 2.97241 13.6384C2.95529 13.8269 2.93848 14.1014 2.93848 14.3758V44.6204C2.93848 45.015 2.95529 45.221 2.97241 45.3753C3.10694 46.662 4.25312 47.8282 5.51732 47.9655C5.66927 47.9829 5.87136 48 6.25903 48H41.3861C41.7737 48 41.9761 47.9829 42.1278 47.9655C43.392 47.8282 44.5381 46.662 44.673 45.3753C44.6895 45.221 44.7066 45.015 44.7066 44.6204V3.37956C44.7066 2.985 44.6895 2.77902 44.673 2.62468C44.5381 1.33801 43.392 0.171453 42.1278 0.034229Z" fill="currentColor"/>
+                        <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            class="h-8 w-8">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M18.9175 16.263V12.5919C18.9175 11.9229 18.9515 11.6998 19.0524 11.3566C19.322 10.4131 20.2325 9.7099 21.3111 9.7099C22.3897 9.7099 23.2999 10.4303 23.5695 11.3566C23.6707 11.6998 23.7047 11.9229 23.7047 12.5919V18.2529C23.7047 18.5962 23.7047 18.9391 23.6371 19.248C23.4518 20.1056 22.6933 20.8779 21.8504 21.0665C21.5471 21.1349 21.2099 21.135 20.8727 21.135H15.3105C14.6532 21.135 14.434 21.1007 14.0968 20.9977C13.1866 20.7233 12.4788 19.7969 12.4788 18.6991C12.4788 17.601 13.1866 16.6747 14.0968 16.4003C14.434 16.2973 14.6532 16.263 15.3105 16.263H18.9175ZM38.7396 41.9273H8.90544V15.1824C8.90544 14.8391 9.02345 14.5476 9.25947 14.3074L16.996 6.43303C17.232 6.19312 17.5185 6.073 17.8557 6.073H38.7396V41.9273ZM42.1278 0.034229C41.9761 0.0171142 41.7737 0 41.3861 0H17.0633C16.7939 0 16.5243 0.0171142 16.3387 0.034229C15.2261 0.137224 14.2316 0.669007 13.4394 1.47524L4.38795 10.6876C3.5961 11.4941 3.07331 12.506 2.97241 13.6384C2.95529 13.8269 2.93848 14.1014 2.93848 14.3758V44.6204C2.93848 45.015 2.95529 45.221 2.97241 45.3753C3.10694 46.662 4.25312 47.8282 5.51732 47.9655C5.66927 47.9829 5.87136 48 6.25903 48H41.3861C41.7737 48 41.9761 47.9829 42.1278 47.9655C43.392 47.8282 44.5381 46.662 44.673 45.3753C44.6895 45.221 44.7066 45.015 44.7066 44.6204V3.37956C44.7066 2.985 44.6895 2.77902 44.673 2.62468C44.5381 1.33801 43.392 0.171453 42.1278 0.034229Z"
+                                fill="currentColor" />
                         </svg>
                     </div>
                     <span class="text-xs font-bold tracking-wider">NOTE</span>

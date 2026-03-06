@@ -1,0 +1,3 @@
+- [x] ACTION列削除の計画作成
+- [x] page-dashboard.php の修正（THEAD/TDの削除）
+- [x] 動作確認とデプロイ

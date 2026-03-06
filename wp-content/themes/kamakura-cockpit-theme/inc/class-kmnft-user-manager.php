@@ -1833,6 +1833,9 @@ class KMNFT_User_Manager
                                 </div>
                                 <p class="description">
                                     1行につき1ゴールの画像を登録してください。1つのゴールに複数画像がある場合は、同じ行内でカンマ区切りで入力してください（「1点目」などの文字は不要です）。<br>
+                                    複数ゴールある時は、行ごとに複数回画像追加ボタンを押して、選択してください。<br>
+                                    1行目＝1点目（ボタン押して追加、そして改行）<br>
+                                    2行目＝2点目（ボタン押して追加、そして改行）<br>
                                     行の順序は Goal Token IDs の指定順と一致させる必要があります。
                                 </p>
                             </td>
@@ -1934,78 +1937,77 @@ class KMNFT_User_Manager
                 </table>
             </div>
         </div>
-        <script>             jQuery(document).ready(functi                         o               n($) {
+        <script>
+            jQuery(document).ready(function ($) {
                 var mediaUploader;
 
                 function updatePreview() {
-                var content = $('#goal_images_textarea').val();
-                var $container = $('#goal-images-container');
-                $container.empty();
+                    var content = $('#goal_images_textarea').val();
+                    var $container = $('#goal-images-container');
+                    $container.empty();
 
-                if(!content) return;
+                    if (!content) return;
 
-                var urls = content.split(/[\n,]+/);
-                $.each(urls, function (i, url) {
-                    url = url.trim();
-                    if (url) {
-                        $container.append('<div style="position:relative; width:80px; height:80px;"><img src="' + url + '" style="width:100%; height:100%; object-fit:cover; border:1px solid #ccc;"></div>');
-                    }
+                    var urls = content.split(/[\n,]+/);
+                    $.each(urls, function (i, url) {
+                        url = url.trim();
+                        if (url) {
+                            $container.append('<div style="position:relative; width:80px; height:80px;"><img src="' + url + '" style="width:100%; height:100%; object-fit:cover; border:1px solid #ccc;"></div>');
+                        }
+                    });
                 }
 
-                );
-            }
-
-                                                                                                                                // Initial preview update
-                                                                                                                                updatePreview();
-
-            // Update preview on manual textarea change
-            $('#goal_images_textarea').on('input propertychange', function () {
+                // Initial preview update
                 updatePreview();
-            });
 
-            $('#upload_goal_image_btn').click(function (e) {
-                e.preventDefault();
-                if (mediaUploader) {
-                    mediaUploader.open();
-                    return;
-                }
-                mediaUploader = wp.media.frames.file_frame = wp.media({
-                    title: 'Choose Goal Image',
-                    button: {
-                        text: 'Add to List'
-                    },
-                    multiple: true
+                // Update preview on manual textarea change
+                $('#goal_images_textarea').on('input propertychange', function () {
+                    updatePreview();
                 });
 
-                mediaUploader.on('select', function () {
-                    var selection = mediaUploader.state().get('selection');
-                    var currentVal = $('#goal_images_textarea').val();
-                    var newUrls = [];
-
-                    selection.each(function (attachment) {
-                        attachment = attachment.toJSON();
-                        newUrls.push(attachment.url);
+                $('#upload_goal_image_btn').click(function (e) {
+                    e.preventDefault();
+                    if (mediaUploader) {
+                        mediaUploader.open();
+                        return;
+                    }
+                    mediaUploader = wp.media.frames.file_frame = wp.media({
+                        title: 'Choose Goal Image',
+                        button: {
+                            text: 'Add to List'
+                        },
+                        multiple: true
                     });
 
-                    if (newUrls.length > 0) {
-                        // If there's existing text and it doesn't end with a newline, add one
-                        if (currentVal.length > 0 && !currentVal.match(/\n$/)) {
-                            currentVal += "\n";
+                    mediaUploader.on('select', function () {
+                        var selection = mediaUploader.state().get('selection');
+                        var currentVal = $('#goal_images_textarea').val();
+                        var newUrls = [];
+
+                        selection.each(function (attachment) {
+                            attachment = attachment.toJSON();
+                            newUrls.push(attachment.url);
+                        });
+
+                        if (newUrls.length > 0) {
+                            // If there's existing text and it doesn't end with a newline, add one
+                            if (currentVal.length > 0 && !currentVal.match(/\n$/)) {
+                                currentVal += "\n";
+                            }
+                            $('#goal_images_textarea').val(currentVal + newUrls.join(', '));
+                            updatePreview();
                         }
-                        $('#goal_images_textarea').val(currentVal + newUrls.join(', '));
+                    });
+                    mediaUploader.open();
+                });
+
+                $('#clear_goal_images_btn').click(function () {
+                    if (confirm('入力内容をクリアしますか？')) {
+                        $('#goal_images_textarea').val('');
                         updatePreview();
                     }
                 });
-                mediaUploader.open();
             });
-
-            $('#clear_goal_images_btn').click(function () {
-                if (confirm('入力内容をクリアしますか？')) {
-                    $('#goal_images_textarea').val('');
-                    updatePreview();
-                }
-            });
-                                                                                                                            });
         </script>
         <?php
     }
@@ -2534,9 +2536,9 @@ class KMNFT_User_Manager
                             <td>
                                 <input type="file" name="csv_file" id="csv_file" accept=".csv" <?php echo $edit_item ? '' : 'required'; ?>>
                                 <p class="description">
-                                    Format: <code>Section</code>, <code>Date(m/d)</code>, <code>Time</code>,
+                                    Format: <code>Section</code>, <code>Date(YYYY/MM/DD)</code>, <code>Time</code>,
                                     <code>Score(H - A)</code>, <code>Opponent</code>, <code>Location</code><br>
-                                    Example: <code>1, 4/6, 13:00, 3 - 1, イトゥアーノFC横浜, 鎌倉スタジアム</code><br>
+                                    Example: <code>1, 2025/04/06, 13:00, 3 - 1, イトゥアーノFC横浜, 鎌倉スタジアム</code><br>
                                     <?php if ($edit_item): ?>
                                         <br><strong
                                             style="color: #dc3232;">注意：新しいCSVファイルをアップロードすると、このシーズンの既存データはすべて上書きされます。</strong>
@@ -2778,11 +2780,11 @@ class KMNFT_User_Manager
         fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
         // Header
-        fputcsv($output, array('Section', 'Date(m/d)', 'Time', 'Score(H - A)', 'Opponent', 'Location'));
+        fputcsv($output, array('Section', 'Date(YYYY/MM/DD)', 'Time', 'Score(H - A)', 'Opponent', 'Location'));
         // Sample Data
-        fputcsv($output, array('1', '4/6', '13:00', '3 - 1', 'Sample FC', 'Kamakura Stadium'));
-        fputcsv($output, array('2', '4/13', '11:00', '1 - 2', 'Test City', 'Away Ground'));
-        fputcsv($output, array('3', '4/20', '14:00', '2 - 2', 'Demo United', 'Kamakura Stadium'));
+        fputcsv($output, array('1', '2025/04/06', '13:00', '3 - 1', 'Sample FC', 'Kamakura Stadium'));
+        fputcsv($output, array('2', '2025/04/13', '11:00', '1 - 2', 'Test City', 'Away Ground'));
+        fputcsv($output, array('3', '2025/04/20', '14:00', '2 - 2', 'Demo United', 'Kamakura Stadium'));
 
         fclose($output);
         exit;
@@ -2817,7 +2819,7 @@ class KMNFT_User_Manager
         fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
         // Header
-        fputcsv($output, array('Section', 'Date(m/d)', 'Time', 'Score(H - A)', 'Opponent', 'Location'));
+        fputcsv($output, array('Section', 'Date(YYYY/MM/DD)', 'Time', 'Score(H - A)', 'Opponent', 'Location'));
 
         $data = json_decode($item->data, true);
         if (is_array($data)) {
