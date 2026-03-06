@@ -108,7 +108,7 @@ if (!$is_logged_in) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cockpit - Kamakura Stadium NFT PORTAL(β)</title>
+    <title>Dashboard - Kamakura Stadium NFT PORTAL(β)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
