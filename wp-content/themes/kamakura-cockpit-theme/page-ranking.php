@@ -129,6 +129,8 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                 class="px-4 py-1 border border-kmnft-green text-kmnft-green rounded text-xs transition">RANKING</a>
             <a href="<?php echo home_url('/contact'); ?>"
                 class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">CONTACT</a>
+            <span class="text-xs text-gray-400 hidden sm:inline">Welcome,
+                <?php echo $is_logged_in ? esc_html($current_user->user_login) : 'Guest'; ?></span>
             <?php if ($is_logged_in): ?>
                 <a href="<?php echo wp_logout_url(home_url('/dashboard')); ?>"
                     class="px-4 py-1 border border-white/50 text-white rounded text-xs hover:bg-white hover:text-black transition">LOGOUT</a>

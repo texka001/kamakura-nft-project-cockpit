@@ -137,6 +137,8 @@ $is_logged_in = is_user_logged_in();
                 class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">RANKING</a>
             <a href="<?php echo home_url('/contact'); ?>"
                 class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">CONTACT</a>
+            <span class="text-xs text-gray-400 hidden sm:inline">Welcome,
+                <?php echo $is_logged_in ? esc_html($current_user->user_login) : 'Guest'; ?></span>
             <?php if ($is_logged_in): ?>
                 <a href="<?php echo wp_logout_url(home_url('/dashboard')); ?>"
                     class="px-4 py-1 border border-white/50 text-white rounded text-xs hover:bg-white hover:text-black transition">LOGOUT</a>
@@ -152,7 +154,8 @@ $is_logged_in = is_user_logged_in();
             <div>
                 <h1 class="text-2xl font-bold neon-text uppercase tracking-widest">Point History</h1>
                 <p class="text-xs text-gray-400 mt-2">このページでは、あなたが現在保有しているNFTが獲得したポイントの明細を表示しています。</p>
-                <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">This page displays the points earned by the NFTs you currently own.</p>
+                <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">This page displays the points earned
+                    by the NFTs you currently own.</p>
             </div>
 
             <!-- Season Selector -->

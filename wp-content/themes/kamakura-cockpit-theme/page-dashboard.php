@@ -197,10 +197,13 @@ if (!$is_logged_in) {
     <!-- Navbar -->
     <header class="w-full h-16 glass-card flex items-center justify-between px-6 fixed top-0 z-50">
         <div class="flex items-center space-x-4">
-            <div class="text-kmnft-green font-bold tracking-widest text-lg">KAMAKURA STADIUM NFT PORTAL(β)</div>
-
+            <a href="<?php echo home_url('/dashboard'); ?>"
+                class="text-kmnft-green font-bold tracking-widest text-lg hover:opacity-80 transition">KAMAKURA STADIUM
+                NFT PORTAL(β)</a>
         </div>
         <div class="flex items-center space-x-4 ml-auto">
+            <a href="<?php echo home_url('/dashboard'); ?>"
+                class="px-4 py-1 border border-kmnft-green text-kmnft-green rounded text-xs transition">DASHBOARD</a>
             <?php if ($is_logged_in): ?>
                 <a href="<?php echo home_url('/points'); ?>"
                     class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">POINTS</a>

@@ -1,0 +1,24 @@
+# タスクリスト
+
+- [x] 既存のページのヘッダーを確認
+    - [x] `page-points.php` の確認
+    - [x] `page-ranking.php` の確認
+    - [x] `page-nft-gallery.php` の確認
+    - [x] `page-contact.php` の確認 (ヘッダーなし、対象外)
+- [x] 実装計画の作成
+- [x] 修正の実施
+    - [x] `page-points.php` に Welcome メッセージを追加
+    - [x] `page-ranking.php` に Welcome メッセージを追加
+    - [x] `page-nft-gallery.php` に Welcome メッセージを追加
+    - [x] `page-contact.php` にヘッダーメニューを追加
+- [x] 修正内容の確認 (Walkthrough) の作成
+- [x] Contact ページのヘッダーを Dashboard と一致させる [x]
+    - [x] 実装計画の作成
+    - [x] `page-contact.php` のヘッダー修正
+    - [x] 動作確認と Walkthrough 更新
+- [x] 全ページのヘッダーに 「DASHBOARD」 ボタンを追加する [x]
+    - [x] 実装計画の作成
+    - [x] `page-dashboard.php` のヘッダー修正（アクティブ表示）
+    - [x] `page-contact.php` に DASHBOARD ボタンを復元
+    - [x] 全ページのロゴリンクとスタイルの最終調整
+    - [x] 動作確認と Walkthrough 更新
