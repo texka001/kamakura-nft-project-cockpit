@@ -75,6 +75,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
             $mail_result = wp_mail($to, $email_subject, $email_body, $headers);
 
             if ($mail_result) {
+                // --- Start Auto-reply to Sender ---
+                $auto_reply_subject = '【KAMAKURA STADIUM NFT PORTAL】お問い合わせを受け付けました / Thank you for your inquiry';
+
+                $auto_reply_body = "<html><body>";
+                $auto_reply_body .= "<p>" . esc_html($name) . " 様</p>";
+                $auto_reply_body .= "<p>KAMAKURA STADIUM NFT PORTAL(β)へのお問い合わせありがとうございます。<br>";
+                $auto_reply_body .= "以下の内容でお問い合わせを受け付けました。返信まで今しばらくお待ちください。</p>";
+
+                $auto_reply_body .= "<p>---</p>";
+
+                $auto_reply_body .= "<p>Dear " . esc_html($name) . ",</p>";
+                $auto_reply_body .= "<p>Thank you for contacting KAMAKURA STADIUM NFT PORTAL(β).<br>";
+                $auto_reply_body .= "We have received your inquiry as follows. Please wait for our response.</p>";
+
+                $auto_reply_body .= "<hr>";
+                $auto_reply_body .= "<h3>[ お問い合わせ内容 / Inquiry Details ]</h3>";
+                $auto_reply_body .= "<p><strong>件名 / Subject:</strong> " . esc_html($subject) . "</p>";
+                $auto_reply_body .= "<p><strong>本文 / Message:</strong><br>" . nl2br(esc_html($message_content)) . "</p>";
+                $auto_reply_body .= "<hr>";
+
+                $auto_reply_body .= "<p>KAMAKURA STADIUM NFT PORTAL(β) 運営チーム</p>";
+                $auto_reply_body .= "</body></html>";
+
+                $auto_reply_headers = array('Content-Type: text/html; charset=UTF-8');
+                $auto_reply_headers[] = 'From: KAMAKURA STADIUM NFT PORTAL(β) <' . $admin_email . '>';
+
+                wp_mail($email, $auto_reply_subject, $auto_reply_body, $auto_reply_headers);
+                // --- End Auto-reply to Sender ---
+
                 $success_msg = 'Your message has been sent successfully.';
                 // Reset fields
                 $subject = '';
