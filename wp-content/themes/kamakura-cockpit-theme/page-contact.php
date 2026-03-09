@@ -56,6 +56,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
             }
 
             $headers = array('Content-Type: text/html; charset=UTF-8');
+
+            // Get CC Recipients from Settings
+            $cc_recipients_option = get_option('kmnft_contact_cc_recipients', '');
+            if (!empty($cc_recipients_option)) {
+                $cc = preg_split('/[\r\n,]+/', $cc_recipients_option);
+                $cc = array_map('trim', $cc);
+                $cc = array_filter($cc, 'is_email');
+                if (!empty($cc)) {
+                    $headers[] = 'Cc: ' . implode(',', $cc);
+                }
+            }
             // Use Admin Email as 'From' to avoid SPF/DKIM issues on production
             $headers[] = 'From: KAMAKURA STADIUM NFT PORTAL(β) <' . $admin_email . '>';
             $headers[] = 'Reply-To: ' . $email;
@@ -100,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
 
                 $auto_reply_headers = array('Content-Type: text/html; charset=UTF-8');
                 $auto_reply_headers[] = 'From: KAMAKURA STADIUM NFT PORTAL(β) <' . $admin_email . '>';
+                $auto_reply_headers[] = 'Reply-To: ' . $to;
 
                 wp_mail($email, $auto_reply_subject, $auto_reply_body, $auto_reply_headers);
                 // --- End Auto-reply to Sender ---

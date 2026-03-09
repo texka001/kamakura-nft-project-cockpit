@@ -1,37 +1,36 @@
-# 修正内容の確認 - お問い合わせ自動返信メール追加
+# お問い合わせ通知へのCC設定追加 - 修正内容の確認
 
-お問い合わせフォームからメッセージを送信した際、送信者（ユーザー）に対して自動的に確認メールが送られる機能を実装しました。
+お問い合わせ通知メールにCCを追加できる機能を実装し、Local WP環境にデプロイしました。
 
 ## 変更内容
 
-### [page-contact.php](file:///Users/mukaikazuma/Desktop/AI%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E9%96%8B%E7%99%BA/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-contact.php)
+### 1. 管理画面設定の修正
+- **ファイル:** [class-kmnft-user-manager.php](file:///Users/mukaikazuma/Desktop/AI%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E9%96%8B%E7%99%BA/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/inc/class-kmnft-user-manager.php)
+- 既存の「通知先メールアドレス (Recipient Emails)」を「**TO通知先メールアドレス (TO Recipient Emails)**」に名称変更しました。
+- 新規に「**CC通知先メールアドレス (CC Recipient Emails)**」の入力フィールドを追加しました。
+- 保存処理にて `kmnft_contact_cc_recipients` オプションの保存・更新を実装しました。
 
-- 管理者宛のメール送信が成功した直後に、入力されたメールアドレス宛に自動返信メールを送信する処理を追加しました。
-- メール本文は、ユーザーの要望通り日本語と英語の両方で記載しています。
-- 送信された「件名」と「メッセージ内容」を含めています。
-
+### 2. メール送信ロジックの修正
+- **ファイル:** [page-contact.php](file:///Users/mukaikazuma/Desktop/AI%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E9%96%8B%E7%99%BA/kamakura-nft-project202601/wp-content/themes/kamakura-cockpit-theme/page-contact.php)
+- 管理者向けの通知メール送信時に、設定されたCCアドレスを `Cc:` ヘッダーとして付与するようにしました。
+- コードの実装例（`page-contact.php` より抜粋）:
 ```php
-// 送信者への自動返信処理（抜粋）
-$auto_reply_subject = '【KAMAKURA STADIUM NFT PORTAL】お問い合わせを受け付けました / Thank you for your inquiry';
-
-$auto_reply_body = "<html><body>";
-$auto_reply_body .= "<p>" . esc_html($name) . " 様</p>";
-$auto_reply_body .= "<p>KAMAKURA STADIUM NFT PORTAL(β)へのお問い合わせありがとうございます。<br>";
-$auto_reply_body .= "以下の内容でお問い合わせを受け付けました。返信まで今しばらくお待ちください。</p>";
-// ... (英語メッセージ) ...
-$auto_reply_body .= "<h3>[ お問い合わせ内容 / Inquiry Details ]</h3>";
-$auto_reply_body .= "<p><strong>件名 / Subject:</strong> " . esc_html($subject) . "</p>";
-$auto_reply_body .= "<p><strong>本文 / Message:</strong><br>" . nl2br(esc_html($message_content)) . "</p>";
-// ...
-wp_mail($email, $auto_reply_subject, $auto_reply_body, $auto_reply_headers);
+// Get CC Recipients from Settings
+$cc_recipients_option = get_option('kmnft_contact_cc_recipients', '');
+if (!empty($cc_recipients_option)) {
+    $cc = preg_split('/[\r\n,]+/', $cc_recipients_option);
+    $cc = array_map('trim', $cc);
+    $cc = array_filter($cc, 'is_email');
+    if (!empty($cc)) {
+        $headers[] = 'Cc: ' . implode(',', $cc);
+    }
+}
 ```
 
-## 検証結果
+## 確認手順
 
-### コード確認
-- `wp_mail` の引数が正しいこと（宛先：ユーザーのメール、送信元：システム管理メール）。
-- 全ての変数が適切にエスケープ（`esc_html`, `nl2br`）されていること。
-- 文字コード、コンテンツタイプ（HTML）が正しく設定されていること。
-
-### 動作確認（推奨）
-- 実際にフォームから送信テストを行い、入力したメールアドレスに期待通りの内容のメールが届くことをご確認ください。
+1. 管理画面の **KMNFT Console > Settings** を表示します。
+2. 「TO通知先メールアドレス」と「CC通知先メールアドレス」がそれぞれ表示されていることを確認します。
+3. CC通知先（自分などのテストアドレス）を入力して「設定を保存」をクリックし、値が保持されるか確認します。
+4. 表側のコンタクトフォームからテスト送信を行います。
+5. TO宛とCC宛の双方にメールが届くことを確認してください。

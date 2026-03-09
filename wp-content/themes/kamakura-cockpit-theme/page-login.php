@@ -210,19 +210,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_reset_password']
                     <label class="flex items-center hover:text-white cursor-pointer transition">
                         <input type="checkbox" name="remember"
                             class="mr-2 bg-black border-gray-600 rounded focus:ring-kmnft-green">
-                        Remember Me
+                        Remember Me / ログイン状態を保持する
                     </label>
                 </div>
 
                 <button type="submit" name="kmnft_login"
                     class="w-full py-4 bg-kmnft-green text-black font-bold text-lg uppercase tracking-widest hover:bg-white hover:text-black transition duration-300 neon-glow rounded">
-                    Connect
+                    Connect / ログイン
                 </button>
             </form>
 
             <div class="mt-6 text-center">
                 <a href="<?php echo home_url('/login/?view=forgot'); ?>"
-                    class="text-xs text-gray-500 hover:text-kmnft-green transition">Forgot Access Code?</a>
+                    class="text-xs text-gray-300 hover:text-kmnft-green transition underline decoration-gray-600 underline-offset-4">Forgot
+                    Password? / パスワードをお忘れですか？</a>
             </div>
 
             <!-- VIEW: FORGOT PASSWORD -->
@@ -247,7 +248,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_reset_password']
 
             <div class="mt-6 text-center">
                 <a href="<?php echo home_url('/login'); ?>"
-                    class="text-xs text-gray-500 hover:text-kmnft-green transition">Back to Login</a>
+                    class="text-xs text-gray-400 hover:text-kmnft-green transition">Back
+                    to Login / ログイン画面に戻る</a>
             </div>
 
             <!-- VIEW: RESET PASSWORD -->
@@ -285,7 +287,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_reset_password']
 
             <div class="mt-6 text-center">
                 <a href="<?php echo home_url('/login'); ?>"
-                    class="text-xs text-gray-500 hover:text-kmnft-green transition">Back to Login</a>
+                    class="text-xs text-gray-400 hover:text-kmnft-green transition">Back
+                    to Login / ログイン画面に戻る</a>
             </div>
 
         <?php endif; ?>

@@ -640,6 +640,7 @@ class KMNFT_User_Manager
     {
         $prefix = get_option('kmnft_contact_subject_prefix', '[Contact Form]');
         $recipients = get_option('kmnft_contact_recipients', '');
+        $cc_recipients = get_option('kmnft_contact_cc_recipients', '');
         ?>
         <div class="wrap">
             <h1>お問い合わせフォーム設定 (Contact Form Settings)</h1>
@@ -669,12 +670,12 @@ class KMNFT_User_Manager
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row"><label for="recipients">通知先メールアドレス<br>(Recipient Emails)</label></th>
+                            <th scope="row"><label for="recipients">TO通知先メールアドレス<br>(TO Recipient Emails)</label></th>
                             <td>
                                 <textarea name="recipients" id="recipients" rows="5"
                                     class="large-text code"><?php echo esc_textarea($recipients); ?></textarea>
                                 <p class="description">
-                                    お問い合わせがあった際に通知を受け取るメールアドレスを入力してください。<br>
+                                    お問い合わせがあった際に通知を受け取るメインのメールアドレスを入力してください。<br>
                                     <strong>複数入力する場合は、改行して1行に1つのアドレスを入力してください。</strong><br>
                                     <br>
                                     入力例:<br>
@@ -683,6 +684,17 @@ class KMNFT_User_Manager
                                     <br>
                                     ※空欄の場合は、サイトの管理者メールアドレス (<code><?php echo get_option('admin_email'); ?></code>)
                                     に送信されます。
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="cc_recipients">CC通知先メールアドレス<br>(CC Recipient Emails)</label></th>
+                            <td>
+                                <textarea name="cc_recipients" id="cc_recipients" rows="5"
+                                    class="large-text code"><?php echo esc_textarea($cc_recipients); ?></textarea>
+                                <p class="description">
+                                    CCで通知を受け取るメールアドレスを入力してください。<br>
+                                    <strong>複数入力する場合は、改行して1行に1つのアドレスを入力してください。</strong>
                                 </p>
                             </td>
                         </tr>
@@ -703,9 +715,11 @@ class KMNFT_User_Manager
 
         $prefix = isset($_POST['subject_prefix']) ? sanitize_text_field($_POST['subject_prefix']) : '[Contact Form]';
         $recipients = isset($_POST['recipients']) ? trim($_POST['recipients']) : '';
+        $cc_recipients = isset($_POST['cc_recipients']) ? trim($_POST['cc_recipients']) : '';
 
         update_option('kmnft_contact_subject_prefix', $prefix);
         update_option('kmnft_contact_recipients', $recipients);
+        update_option('kmnft_contact_cc_recipients', $cc_recipients);
 
         wp_redirect(admin_url('admin.php?page=kmnft-settings&status=success'));
         exit;
