@@ -824,6 +824,9 @@ class KMNFT_User_Manager
                 $row_count = 0;
                 $skipped_users = array();
                 while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                    // Shift-JIS (Excel形式)等でアップロードされた場合の文字化け・消失対策
+                    mb_convert_variables('UTF-8', 'SJIS-win, UTF-8, auto', $data);
+
                     $login_id = sanitize_user($data[0]);
                     $email = sanitize_email($data[1]);
                     $password = $data[2];
@@ -849,9 +852,10 @@ class KMNFT_User_Manager
 
                     if (!is_wp_error($user_id)) {
                         wp_update_user(array('ID' => $user_id, 'display_name' => $display_name));
+                        // ニックネームはユーザIDでご希望のため、$login_id をセット
+                        update_user_meta($user_id, 'nickname', $login_id);
 
                         global $wpdb;
-
 
                         $row_count++;
                     }
