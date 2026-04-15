@@ -198,10 +198,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
     <header class="w-full h-16 glass-card flex items-center justify-between px-6 fixed top-0 z-50">
         <div class="flex items-center space-x-4">
             <a href="<?php echo home_url('/dashboard'); ?>"
-                class="text-kmnft-green font-bold tracking-widest text-lg hover:opacity-80 transition">KAMAKURA STADIUM
+                class="text-kmnft-green font-bold tracking-widest text-sm sm:text-lg hover:opacity-80 transition leading-tight">KAMAKURA STADIUM
                 NFT PORTAL(β)</a>
         </div>
-        <div class="flex items-center space-x-4 ml-auto">
+
+        <!-- PC ナビ -->
+        <div class="hidden md:flex items-center space-x-4 ml-auto">
             <a href="<?php echo home_url('/dashboard'); ?>"
                 class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">DASHBOARD</a>
             <a href="<?php echo home_url('/points'); ?>"
@@ -210,7 +212,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
                 class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">RANKING</a>
             <a href="<?php echo home_url('/contact'); ?>"
                 class="px-4 py-1 border border-kmnft-green text-kmnft-green rounded text-xs transition">CONTACT</a>
-            <span class="text-xs text-gray-400 hidden sm:inline">Welcome,
+            <span class="text-xs text-gray-400">Welcome,
                 <?php echo $is_logged_in ? esc_html($current_user->user_login) : 'Guest'; ?></span>
             <?php if ($is_logged_in): ?>
                 <a href="<?php echo wp_logout_url(home_url('/dashboard')); ?>"
@@ -220,7 +222,69 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['kmnft_contact_submit']
                     class="px-4 py-1 border border-kmnft-green text-kmnft-green rounded text-xs hover:bg-kmnft-green hover:text-black transition">LOGIN</a>
             <?php endif; ?>
         </div>
+
+        <!-- ハンバーガーボタン（スマホのみ） -->
+        <button id="kmnft-hamburger" class="md:hidden ml-auto flex flex-col justify-center items-center gap-[5px] w-10 h-10 border border-white/20 rounded-lg bg-transparent cursor-pointer transition" aria-label="メニュー" aria-expanded="false">
+            <span class="kmnft-bar block w-5 h-[2px] bg-white rounded transition-all duration-300 origin-center"></span>
+            <span class="kmnft-bar block w-5 h-[2px] bg-white rounded transition-all duration-300 origin-center"></span>
+            <span class="kmnft-bar block w-5 h-[2px] bg-white rounded transition-all duration-300 origin-center"></span>
+        </button>
     </header>
+
+    <!-- モバイルドロワー -->
+    <div id="kmnft-drawer" class="fixed top-16 right-0 h-[calc(100dvh-4rem)] w-72 bg-[#0d0d1a] border-l border-white/10 z-40 translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+        <nav class="flex flex-col p-6 gap-5">
+            <span class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">
+                Welcome, <?php echo $is_logged_in ? esc_html($current_user->user_login) : 'Guest'; ?>
+            </span>
+            <a href="<?php echo home_url('/dashboard'); ?>" class="kmnft-drawer-link border border-gray-600 text-gray-300 text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:border-kmnft-green hover:text-kmnft-green transition">DASHBOARD</a>
+            <a href="<?php echo home_url('/points'); ?>" class="kmnft-drawer-link border border-gray-600 text-gray-300 text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:border-kmnft-green hover:text-kmnft-green transition">POINTS</a>
+            <a href="<?php echo home_url('/ranking'); ?>" class="kmnft-drawer-link border border-gray-600 text-gray-300 text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:border-kmnft-green hover:text-kmnft-green transition">RANKING</a>
+            <a href="<?php echo home_url('/contact'); ?>" class="kmnft-drawer-link border border-kmnft-green text-kmnft-green text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:bg-kmnft-green hover:text-black transition">CONTACT</a>
+            <?php if ($is_logged_in): ?>
+                <a href="<?php echo wp_logout_url(home_url('/dashboard')); ?>" class="kmnft-drawer-link border border-white/40 text-white text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:bg-white hover:text-black transition mt-auto">LOGOUT</a>
+            <?php else: ?>
+                <a href="<?php echo home_url('/login'); ?>" class="kmnft-drawer-link bg-kmnft-green text-black text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:opacity-80 transition">LOGIN</a>
+            <?php endif; ?>
+        </nav>
+    </div>
+
+    <!-- オーバーレイ -->
+    <div id="kmnft-overlay" class="fixed inset-0 bg-black/60 z-30 hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
+
+    <script>
+    (function() {
+        const btn    = document.getElementById('kmnft-hamburger');
+        const drawer = document.getElementById('kmnft-drawer');
+        const overlay= document.getElementById('kmnft-overlay');
+        const bars   = btn.querySelectorAll('.kmnft-bar');
+        function openMenu() {
+            drawer.classList.remove('translate-x-full');
+            overlay.classList.remove('hidden');
+            requestAnimationFrame(() => overlay.classList.add('opacity-100'));
+            btn.setAttribute('aria-expanded', 'true');
+            bars[0].style.transform = 'translateY(7px) rotate(45deg)';
+            bars[1].style.opacity = '0';
+            bars[2].style.transform = 'translateY(-7px) rotate(-45deg)';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMenu() {
+            drawer.classList.add('translate-x-full');
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+            btn.setAttribute('aria-expanded', 'false');
+            bars[0].style.transform = '';
+            bars[1].style.opacity = '';
+            bars[2].style.transform = '';
+            document.body.style.overflow = '';
+        }
+        btn.addEventListener('click', () => btn.getAttribute('aria-expanded') === 'true' ? closeMenu() : openMenu());
+        overlay.addEventListener('click', closeMenu);
+        document.querySelectorAll('.kmnft-drawer-link').forEach(l => l.addEventListener('click', closeMenu));
+    })();
+    </script>
+
+
 
     <div class="flex-grow flex items-center justify-center relative py-10 px-4 pt-24">
 

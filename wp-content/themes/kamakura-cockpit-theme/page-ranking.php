@@ -117,10 +117,12 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
     <header class="w-full h-16 glass-card flex items-center justify-between px-6 fixed top-0 z-50">
         <div class="flex items-center space-x-4">
             <a href="<?php echo home_url('/dashboard'); ?>"
-                class="text-kmnft-green font-bold tracking-widest text-lg hover:opacity-80 transition">KAMAKURA STADIUM
+                class="text-kmnft-green font-bold tracking-widest text-sm sm:text-lg hover:opacity-80 transition leading-tight">KAMAKURA STADIUM
                 NFT PORTAL(β)</a>
         </div>
-        <div class="flex items-center space-x-4 ml-auto">
+
+        <!-- PC ナビ -->
+        <div class="hidden md:flex items-center space-x-4 ml-auto">
             <a href="<?php echo home_url('/dashboard'); ?>"
                 class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">DASHBOARD</a>
             <a href="<?php echo home_url('/points'); ?>"
@@ -129,7 +131,7 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                 class="px-4 py-1 border border-kmnft-green text-kmnft-green rounded text-xs transition">RANKING</a>
             <a href="<?php echo home_url('/contact'); ?>"
                 class="px-4 py-1 border border-gray-600 text-gray-300 rounded text-xs hover:border-kmnft-green hover:text-kmnft-green transition">CONTACT</a>
-            <span class="text-xs text-gray-400 hidden sm:inline">Welcome,
+            <span class="text-xs text-gray-400">Welcome,
                 <?php echo $is_logged_in ? esc_html($current_user->user_login) : 'Guest'; ?></span>
             <?php if ($is_logged_in): ?>
                 <a href="<?php echo wp_logout_url(home_url('/dashboard')); ?>"
@@ -139,7 +141,69 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                     class="px-4 py-1 border border-kmnft-green text-kmnft-green rounded text-xs hover:bg-kmnft-green hover:text-black transition">LOGIN</a>
             <?php endif; ?>
         </div>
+
+        <!-- ハンバーガーボタン（スマホのみ） -->
+        <button id="kmnft-hamburger" class="md:hidden ml-auto flex flex-col justify-center items-center gap-[5px] w-10 h-10 border border-white/20 rounded-lg bg-transparent cursor-pointer transition" aria-label="メニュー" aria-expanded="false">
+            <span class="kmnft-bar block w-5 h-[2px] bg-white rounded transition-all duration-300 origin-center"></span>
+            <span class="kmnft-bar block w-5 h-[2px] bg-white rounded transition-all duration-300 origin-center"></span>
+            <span class="kmnft-bar block w-5 h-[2px] bg-white rounded transition-all duration-300 origin-center"></span>
+        </button>
     </header>
+
+    <!-- モバイルドロワー -->
+    <div id="kmnft-drawer" class="fixed top-16 right-0 h-[calc(100dvh-4rem)] w-72 bg-[#0d0d1a] border-l border-white/10 z-40 translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+        <nav class="flex flex-col p-6 gap-5">
+            <span class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">
+                Welcome, <?php echo $is_logged_in ? esc_html($current_user->user_login) : 'Guest'; ?>
+            </span>
+            <a href="<?php echo home_url('/dashboard'); ?>" class="kmnft-drawer-link border border-gray-600 text-gray-300 text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:border-kmnft-green hover:text-kmnft-green transition">DASHBOARD</a>
+            <a href="<?php echo home_url('/points'); ?>" class="kmnft-drawer-link border border-gray-600 text-gray-300 text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:border-kmnft-green hover:text-kmnft-green transition">POINTS</a>
+            <a href="<?php echo home_url('/ranking'); ?>" class="kmnft-drawer-link border border-kmnft-green text-kmnft-green text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:bg-kmnft-green hover:text-black transition">RANKING</a>
+            <a href="<?php echo home_url('/contact'); ?>" class="kmnft-drawer-link border border-gray-600 text-gray-300 text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:border-kmnft-green hover:text-kmnft-green transition">CONTACT</a>
+            <?php if ($is_logged_in): ?>
+                <a href="<?php echo wp_logout_url(home_url('/dashboard')); ?>" class="kmnft-drawer-link border border-white/40 text-white text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:bg-white hover:text-black transition mt-auto">LOGOUT</a>
+            <?php else: ?>
+                <a href="<?php echo home_url('/login'); ?>" class="kmnft-drawer-link bg-kmnft-green text-black text-sm font-bold px-4 py-2 rounded text-center tracking-widest hover:opacity-80 transition">LOGIN</a>
+            <?php endif; ?>
+        </nav>
+    </div>
+
+    <!-- オーバーレイ -->
+    <div id="kmnft-overlay" class="fixed inset-0 bg-black/60 z-30 hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
+
+    <script>
+    (function() {
+        const btn    = document.getElementById('kmnft-hamburger');
+        const drawer = document.getElementById('kmnft-drawer');
+        const overlay= document.getElementById('kmnft-overlay');
+        const bars   = btn.querySelectorAll('.kmnft-bar');
+        function openMenu() {
+            drawer.classList.remove('translate-x-full');
+            overlay.classList.remove('hidden');
+            requestAnimationFrame(() => overlay.classList.add('opacity-100'));
+            btn.setAttribute('aria-expanded', 'true');
+            bars[0].style.transform = 'translateY(7px) rotate(45deg)';
+            bars[1].style.opacity = '0';
+            bars[2].style.transform = 'translateY(-7px) rotate(-45deg)';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMenu() {
+            drawer.classList.add('translate-x-full');
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+            btn.setAttribute('aria-expanded', 'false');
+            bars[0].style.transform = '';
+            bars[1].style.opacity = '';
+            bars[2].style.transform = '';
+            document.body.style.overflow = '';
+        }
+        btn.addEventListener('click', () => btn.getAttribute('aria-expanded') === 'true' ? closeMenu() : openMenu());
+        overlay.addEventListener('click', closeMenu);
+        document.querySelectorAll('.kmnft-drawer-link').forEach(l => l.addEventListener('click', closeMenu));
+    })();
+    </script>
+
+
 
     <main class="flex-grow pt-24 px-6 pb-10 max-w-5xl mx-auto w-full">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -182,7 +246,8 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
         <!-- Token Ranking Table -->
         <div id="tab-content-token" class="space-y-4">
             <div class="glass-card rounded-lg overflow-hidden">
-                <table class="w-full text-left text-sm">
+                <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm min-w-[480px]">
                     <thead class="bg-white/5 text-gray-400 uppercase text-[10px] tracking-widest">
                         <tr>
                             <th class="px-6 py-3 font-medium">Rank</th>
@@ -229,6 +294,7 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                         <?php endif; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
             <p class="text-[10px] text-gray-500 px-2 italic">* 選択されたシーズンの上位30トークンを表示しています。(行をクリックで詳細表示) / Displays top
                 30 tokens for the selected season. (Click row for details)</p>
@@ -237,7 +303,8 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
         <!-- User Ranking Table -->
         <div id="tab-content-user" class="space-y-4 hidden">
             <div class="glass-card rounded-lg overflow-hidden">
-                <table class="w-full text-left text-sm">
+                <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm min-w-[480px]">
                     <thead class="bg-white/5 text-gray-400 uppercase text-[10px] tracking-widest">
                         <tr>
                             <th class="px-6 py-3 font-medium">Rank</th>
@@ -294,6 +361,7 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
                         <?php endif; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
             <p class="text-[10px] text-gray-500 px-2 italic">* 選択されたシーズンの上位30ユーザーを表示しています。 / Displays top 30 users for
                 the selected season.</p>
@@ -375,8 +443,8 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             <a href="https://kamakura-inter.com/" target="_blank" rel="noopener noreferrer"
                 class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
                 <div
-                    class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                    class="p-2 sm:p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -389,9 +457,9 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             <a href="https://twitter.com/kamakura_inter" target="_blank" rel="noopener noreferrer"
                 class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
                 <div
-                    class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
+                    class="p-2 sm:p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
                     <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        class="h-8 w-8">
+                        class="h-5 w-5 sm:h-8 sm:w-8">
                         <path fill-rule="evenodd" clip-rule="evenodd"
                             d="M18.0558 26.103L0.912215 45.6713H8.50661L21.6288 30.6534L33.1916 45.6744L48 45.5936L29.2251 20.7665L45.2472 2.41364L37.7747 2.33008L25.6722 16.1228L15.3177 2.3526L0 2.33598L18.0558 26.103ZM39.0315 41.1669L35.1992 41.155L8.8696 6.68504H12.9919L39.0315 41.1669Z"
                             fill="currentColor" />
@@ -404,9 +472,9 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             <a href="https://www.facebook.com/KamakuraInterFC" target="_blank" rel="noopener noreferrer"
                 class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
                 <div
-                    class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
+                    class="p-2 sm:p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
                     <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        class="h-8 w-8">
+                        class="h-5 w-5 sm:h-8 sm:w-8">
                         <g clip-path="url(#clip0_332_7)">
                             <path
                                 d="M48 24C48 10.7452 37.2548 0 24 0C10.7452 0 0 10.7452 0 24C0 35.9789 8.77641 45.908 20.25 47.7084V30.9375H14.1562V24H20.25V18.7125C20.25 12.6975 23.8331 9.375 29.3152 9.375C31.9402 9.375 34.6875 9.84375 34.6875 9.84375V15.75H31.6613C28.68 15.75 27.75 17.6002 27.75 19.5V24H34.4062L33.3422 30.9375H27.75V47.7084C39.2236 45.908 48 35.9789 48 24Z"
@@ -426,9 +494,9 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             <a href="https://www.instagram.com/kamakura_inter_fc/" target="_blank" rel="noopener noreferrer"
                 class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
                 <div
-                    class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
+                    class="p-2 sm:p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
                     <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        class="h-8 w-8">
+                        class="h-5 w-5 sm:h-8 sm:w-8">
                         <g clip-path="url(#clip0_332_22)">
                             <path
                                 d="M24 4.32187C30.4125 4.32187 31.1719 4.35 33.6938 4.4625C36.0375 4.56562 37.3031 4.95938 38.1469 5.2875C39.2625 5.71875 40.0688 6.24375 40.9031 7.07812C41.7469 7.92188 42.2625 8.71875 42.6938 9.83438C43.0219 10.6781 43.4156 11.9531 43.5188 14.2875C43.6313 16.8187 43.6594 17.5781 43.6594 23.9813C43.6594 30.3938 43.6313 31.1531 43.5188 33.675C43.4156 36.0188 43.0219 37.2844 42.6938 38.1281C42.2625 39.2438 41.7375 40.05 40.9031 40.8844C40.0594 41.7281 39.2625 42.2438 38.1469 42.675C37.3031 43.0031 36.0281 43.3969 33.6938 43.5C31.1625 43.6125 30.4031 43.6406 24 43.6406C17.5875 43.6406 16.8281 43.6125 14.3063 43.5C11.9625 43.3969 10.6969 43.0031 9.85313 42.675C8.7375 42.2438 7.93125 41.7188 7.09688 40.8844C6.25313 40.0406 5.7375 39.2438 5.30625 38.1281C4.97813 37.2844 4.58438 36.0094 4.48125 33.675C4.36875 31.1438 4.34063 30.3844 4.34063 23.9813C4.34063 17.5688 4.36875 16.8094 4.48125 14.2875C4.58438 11.9437 4.97813 10.6781 5.30625 9.83438C5.7375 8.71875 6.2625 7.9125 7.09688 7.07812C7.94063 6.23438 8.7375 5.71875 9.85313 5.2875C10.6969 4.95938 11.9719 4.56562 14.3063 4.4625C16.8281 4.35 17.5875 4.32187 24 4.32187ZM24 0C17.4844 0 16.6688 0.028125 14.1094 0.140625C11.5594 0.253125 9.80625 0.665625 8.2875 1.25625C6.70313 1.875 5.3625 2.69062 4.03125 4.03125C2.69063 5.3625 1.875 6.70313 1.25625 8.27813C0.665625 9.80625 0.253125 11.55 0.140625 14.1C0.028125 16.6687 0 17.4844 0 24C0 30.5156 0.028125 31.3313 0.140625 33.8906C0.253125 36.4406 0.665625 38.1938 1.25625 39.7125C1.875 41.2969 2.69063 42.6375 4.03125 43.9688C5.3625 45.3 6.70313 46.125 8.27813 46.7344C9.80625 47.325 11.55 47.7375 14.1 47.85C16.6594 47.9625 17.475 47.9906 23.9906 47.9906C30.5063 47.9906 31.3219 47.9625 33.8813 47.85C36.4313 47.7375 38.1844 47.325 39.7031 46.7344C41.2781 46.125 42.6188 45.3 43.95 43.9688C45.2813 42.6375 46.1063 41.2969 46.7156 39.7219C47.3063 38.1938 47.7188 36.45 47.8313 33.9C47.9438 31.3406 47.9719 30.525 47.9719 24.0094C47.9719 17.4938 47.9438 16.6781 47.8313 14.1188C47.7188 11.5688 47.3063 9.81563 46.7156 8.29688C46.125 6.70312 45.3094 5.3625 43.9688 4.03125C42.6375 2.7 41.2969 1.875 39.7219 1.26562C38.1938 0.675 36.45 0.2625 33.9 0.15C31.3313 0.028125 30.5156 0 24 0Z"
@@ -454,9 +522,9 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             <a href="https://page.line.me/346jwclp" target="_blank" rel="noopener noreferrer"
                 class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
                 <div
-                    class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
+                    class="p-2 sm:p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
                     <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        class="h-8 w-8">
+                        class="h-5 w-5 sm:h-8 sm:w-8">
                         <path fill-rule="evenodd" clip-rule="evenodd"
                             d="M42.8491 32.6503C37.8107 38.4872 26.5642 45.5684 24 46.6543C21.5467 47.6933 21.7906 46.1229 21.8951 45.4502L21.8952 45.4499C21.8999 45.4196 21.9043 45.3911 21.9082 45.3648C21.9531 45.1235 22.0656 44.4372 22.2456 43.306C22.3355 42.6726 22.4255 41.7224 22.1781 41.1115C21.9082 40.4328 20.851 40.0935 20.0637 39.9125C8.52484 38.3967 0 30.2749 0 20.592C0 9.80056 10.7516 1 24 1C37.2259 1 48 9.80056 48 20.592C48 24.9131 46.313 28.8043 42.8491 32.6503ZM39.6401 26.4519H32.8922C32.6448 26.4519 32.4424 26.2483 32.4424 25.9994V25.9768V15.4568C32.4424 15.208 32.6448 15.0044 32.8922 15.0044H39.6401C39.8875 15.0044 40.09 15.208 40.09 15.4568V17.1762C40.09 17.4251 39.8875 17.6287 39.6401 17.6287H35.0516V19.416H39.6401C39.8875 19.416 40.09 19.6196 40.09 19.8684V21.5878C40.09 21.8367 39.8875 22.0403 39.6401 22.0403H35.0516V23.8276H39.6401C39.8875 23.8276 40.09 24.0312 40.09 24.28V25.9994C40.09 26.2483 39.8875 26.4519 39.6401 26.4519ZM7.94754 26.4519H7.97004H14.6954C14.9429 26.4519 15.1453 26.2483 15.1453 25.9994V24.28C15.1453 24.0312 14.9429 23.8276 14.6954 23.8276H10.1069V15.4568C10.1069 15.208 9.90444 15.0044 9.65701 15.0044H7.94754C7.70012 15.0044 7.49768 15.208 7.49768 15.4568V25.9768V25.9994C7.49768 26.2483 7.70012 26.4519 7.94754 26.4519ZM18.7437 15.0044H17.0346C16.7862 15.0044 16.5848 15.207 16.5848 15.4568V25.9994C16.5848 26.2493 16.7862 26.4519 17.0346 26.4519H18.7437C18.9921 26.4519 19.1935 26.2493 19.1935 25.9994V15.4568C19.1935 15.207 18.9921 15.0044 18.7437 15.0044ZM30.8005 25.9994V15.4568C30.8005 15.208 30.598 15.0044 30.3281 15.0044H28.6411C28.3937 15.0044 28.1688 15.208 28.1688 15.4568V21.7009L23.3778 15.208C23.3778 15.1929 23.3703 15.1778 23.3553 15.1627L23.3103 15.1175L23.2878 15.0949H23.2653C23.2653 15.0798 23.2578 15.0722 23.2428 15.0722V15.0496H23.1978L23.1753 15.027H23.1528C23.1379 15.027 23.1303 15.0195 23.1303 15.0044H23.1079H23.0854H23.0629H23.0404H23.0179H22.9954H21.3084C21.061 15.0044 20.8361 15.208 20.8361 15.4568V25.9994C20.8361 26.2483 21.061 26.4519 21.3084 26.4519H22.9954C23.2653 26.4519 23.4677 26.2483 23.4677 25.9994V19.7327L28.2587 26.2483C28.2887 26.2935 28.3262 26.3312 28.3712 26.3614H28.3937C28.3937 26.3765 28.4012 26.384 28.4162 26.384L28.4387 26.4066H28.4612H28.4837V26.4293H28.5287C28.5586 26.4443 28.5961 26.4519 28.6411 26.4519H30.3281C30.598 26.4519 30.8005 26.2483 30.8005 25.9994Z"
                             fill="currentColor" />
@@ -469,9 +537,9 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             <a href="https://www.youtube.com/channel/UCxt6P4I8nhwMW7ZtOKyt_AQ" target="_blank" rel="noopener noreferrer"
                 class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
                 <div
-                    class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
+                    class="p-2 sm:p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
                     <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        class="h-8 w-8">
+                        class="h-5 w-5 sm:h-8 sm:w-8">
                         <path
                             d="M47.5219 14.3996C47.5219 14.3996 47.0531 11.0902 45.6094 9.63711C43.7812 7.72461 41.7375 7.71523 40.8 7.60273C34.0875 7.11523 24.0094 7.11523 24.0094 7.11523H23.9906C23.9906 7.11523 13.9125 7.11523 7.2 7.60273C6.2625 7.71523 4.21875 7.72461 2.39062 9.63711C0.946875 11.0902 0.4875 14.3996 0.4875 14.3996C0.4875 14.3996 0 18.2902 0 22.1715V25.809C0 29.6902 0.478125 33.5809 0.478125 33.5809C0.478125 33.5809 0.946875 36.8902 2.38125 38.3434C4.20937 40.2559 6.60938 40.1902 7.67813 40.3965C11.5219 40.7621 24 40.8746 24 40.8746C24 40.8746 34.0875 40.8559 40.8 40.3777C41.7375 40.2652 43.7812 40.2559 45.6094 38.3434C47.0531 36.8902 47.5219 33.5809 47.5219 33.5809C47.5219 33.5809 48 29.6996 48 25.809V22.1715C48 18.2902 47.5219 14.3996 47.5219 14.3996ZM19.0406 30.2246V16.734L32.0062 23.5027L19.0406 30.2246Z"
                             fill="currentColor" />
@@ -484,9 +552,9 @@ $current_user = $is_logged_in ? wp_get_current_user() : null;
             <a href="https://note.com/kamakura_inter" target="_blank" rel="noopener noreferrer"
                 class="group flex flex-col items-center space-y-2 text-gray-400 hover:text-white transition">
                 <div
-                    class="p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
+                    class="p-2 sm:p-3 rounded-full bg-gray-800 group-hover:bg-kmnft-green group-hover:text-black transition duration-300">
                     <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        class="h-8 w-8">
+                        class="h-5 w-5 sm:h-8 sm:w-8">
                         <path fill-rule="evenodd" clip-rule="evenodd"
                             d="M18.9175 16.263V12.5919C18.9175 11.9229 18.9515 11.6998 19.0524 11.3566C19.322 10.4131 20.2325 9.7099 21.3111 9.7099C22.3897 9.7099 23.2999 10.4303 23.5695 11.3566C23.6707 11.6998 23.7047 11.9229 23.7047 12.5919V18.2529C23.7047 18.5962 23.7047 18.9391 23.6371 19.248C23.4518 20.1056 22.6933 20.8779 21.8504 21.0665C21.5471 21.1349 21.2099 21.135 20.8727 21.135H15.3105C14.6532 21.135 14.434 21.1007 14.0968 20.9977C13.1866 20.7233 12.4788 19.7969 12.4788 18.6991C12.4788 17.601 13.1866 16.6747 14.0968 16.4003C14.434 16.2973 14.6532 16.263 15.3105 16.263H18.9175ZM38.7396 41.9273H8.90544V15.1824C8.90544 14.8391 9.02345 14.5476 9.25947 14.3074L16.996 6.43303C17.232 6.19312 17.5185 6.073 17.8557 6.073H38.7396V41.9273ZM42.1278 0.034229C41.9761 0.0171142 41.7737 0 41.3861 0H17.0633C16.7939 0 16.5243 0.0171142 16.3387 0.034229C15.2261 0.137224 14.2316 0.669007 13.4394 1.47524L4.38795 10.6876C3.5961 11.4941 3.07331 12.506 2.97241 13.6384C2.95529 13.8269 2.93848 14.1014 2.93848 14.3758V44.6204C2.93848 45.015 2.95529 45.221 2.97241 45.3753C3.10694 46.662 4.25312 47.8282 5.51732 47.9655C5.66927 47.9829 5.87136 48 6.25903 48H41.3861C41.7737 48 41.9761 47.9829 42.1278 47.9655C43.392 47.8282 44.5381 46.662 44.673 45.3753C44.6895 45.221 44.7066 45.015 44.7066 44.6204V3.37956C44.7066 2.985 44.6895 2.77902 44.673 2.62468C44.5381 1.33801 43.392 0.171453 42.1278 0.034229Z"
                             fill="currentColor" />
