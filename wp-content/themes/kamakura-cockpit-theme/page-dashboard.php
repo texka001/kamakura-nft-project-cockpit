@@ -613,14 +613,14 @@ if (!$is_logged_in) {
             <!-- My Seat / Holdings -->
             <?php if ($is_logged_in): ?>
                 <div class="glass-card p-6 rounded-lg">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center gap-4">
+                    <div class="flex flex-wrap items-center justify-between mb-6 gap-y-2">
+                        <div class="flex flex-wrap items-center gap-2">
                             <h2
-                                class="text-lg font-bold text-white tracking-wide border-b border-kmnft-green pb-1 inline-block">
+                                class="text-lg font-bold text-white tracking-wide border-b border-kmnft-green pb-1 inline-block whitespace-nowrap">
                                 OWNED ASSETS</h2>
-                            <div class="flex items-center gap-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <a href="https://kamakura-stadium-nft.com/" target="_blank"
-                                    class="inline-flex items-center gap-1.5 px-3 py-1 border border-kmnft-green/50 text-kmnft-green text-[10px] font-bold rounded hover:bg-kmnft-green hover:text-black transition duration-200 group uppercase tracking-wider">
+                                    class="inline-flex items-center gap-1 px-2 py-1 border border-kmnft-green/50 text-kmnft-green text-[10px] font-bold rounded hover:bg-kmnft-green hover:text-black transition duration-200 group uppercase tracking-wider whitespace-nowrap">
                                     <span>アセットを追加購入</span>
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         class="h-2.5 w-2.5 transform group-hover:translate-x-0.5 transition" fill="none"
@@ -631,17 +631,17 @@ if (!$is_logged_in) {
                                 </a>
                                 <?php if (count($holdings) > 5): ?>
                                     <button id="show-more-assets" onclick="showAllAssets()"
-                                        class="px-3 py-1 border border-gray-600 text-gray-400 text-[10px] font-bold rounded hover:border-kmnft-green hover:text-kmnft-green transition uppercase tracking-wider">
+                                        class="px-2 py-1 border border-gray-600 text-gray-400 text-[10px] font-bold rounded hover:border-kmnft-green hover:text-kmnft-green transition uppercase tracking-wider whitespace-nowrap">
                                         Show More
                                     </button>
                                     <button id="show-less-assets" onclick="showLessAssets()" style="display:none;"
-                                        class="px-3 py-1 border border-red-900/50 text-red-500 text-[10px] font-bold rounded hover:bg-red-500 hover:text-white transition uppercase tracking-wider">
+                                        class="px-2 py-1 border border-red-900/50 text-red-500 text-[10px] font-bold rounded hover:bg-red-500 hover:text-white transition uppercase tracking-wider whitespace-nowrap">
                                         Show Less
                                     </button>
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <span class="text-xs text-gray-500">
+                        <span class="text-xs text-gray-500 whitespace-nowrap">
                             <?php echo count($holdings); ?> ASSETS
                         </span>
                     </div>
