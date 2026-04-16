@@ -27,6 +27,7 @@ class KMNFT_User_Manager
         add_action('admin_post_kmnft_delete_token_ksp', array($this, 'process_token_ksp_delete'));
         add_action('admin_post_kmnft_delete_token_ksp_by_date', array($this, 'process_token_ksp_delete_by_date'));
         add_action('admin_post_kmnft_delete_token_ksp_by_only_date', array($this, 'process_token_ksp_delete_by_only_date'));
+        add_action('admin_post_kmnft_delete_token_ksp_by_season', array($this, 'process_token_ksp_delete_by_season'));
         add_action('admin_post_kmnft_aggregate_token_ksp', array($this, 'process_token_ksp_aggregation'));
         add_action('admin_post_kmnft_export_token_summary', array($this, 'process_token_summary_export'));
         add_action('admin_post_kmnft_export_user_summary', array($this, 'process_user_summary_export'));
@@ -522,6 +523,27 @@ class KMNFT_User_Manager
                         </tr>
                     </table>
                     <?php submit_button('Delete Records for this Date', 'delete'); ?>
+                </form>
+            </div>
+
+            <div
+                style="background: #fff; border: 1px solid #c3c4c7; padding: 20px; margin-top: 20px; border-left: 4px solid #d63638;">
+                <h2 style="color: #d63638;">Delete Token KSP (Year)</h2>
+                <p>Delete all records for a specific year (season). This is useful for clearing out a whole season's data.</p>
+                <form action="<?php echo admin_url('admin-post.php'); ?>" method="post"
+                    onsubmit="return confirm('Are you sure you want to delete ALL KSP records for this Year?');">
+                    <input type="hidden" name="action" value="kmnft_delete_token_ksp_by_season">
+                    <?php wp_nonce_field('kmnft_token_ksp_delete_by_season_nonce', 'kmnft_nonce'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="delete_season">Year / Season</label></th>
+                            <td>
+                                <input type="number" name="delete_season" id="delete_season" class="regular-text" placeholder="e.g. 2024" required>
+                                <p class="description">Enter the year (e.g., 2024)</p>
+                            </td>
+                        </tr>
+                    </table>
+                    <?php submit_button('Delete Records for this Year', 'delete'); ?>
                 </form>
             </div>
 
@@ -1360,6 +1382,32 @@ class KMNFT_User_Manager
         $deleted = $wpdb->delete(
             $table_name,
             array('acquisition_date' => $acquisition_date),
+            array('%s')
+        );
+
+        wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=deleted&count=' . intval($deleted)));
+        exit;
+    }
+
+    public function process_token_ksp_delete_by_season()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        check_admin_referer('kmnft_token_ksp_delete_by_season_nonce', 'kmnft_nonce');
+
+        $season = isset($_POST['delete_season']) ? sanitize_text_field($_POST['delete_season']) : '';
+        if (empty($season)) {
+            wp_redirect(admin_url('admin.php?page=kmnft-token-ksp&status=error&msg=No year provided'));
+            exit;
+        }
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'kmnft_token_ksp';
+
+        $deleted = $wpdb->delete(
+            $table_name,
+            array('season' => $season),
             array('%s')
         );
 
