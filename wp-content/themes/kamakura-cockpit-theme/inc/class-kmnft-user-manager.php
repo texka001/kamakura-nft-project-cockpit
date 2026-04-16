@@ -948,6 +948,9 @@ class KMNFT_User_Manager
                 }
 
                 while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                    // Shift-JIS対策
+                    mb_convert_variables('UTF-8', 'SJIS-win, UTF-8, auto', $data);
+
                     $token_id = sanitize_text_field($data[0]);
                     // New Order: token_id, zone_x, zone_y, login_id
                     $zone_x = isset($data[1]) ? sanitize_text_field($data[1]) : '';
@@ -1134,6 +1137,9 @@ class KMNFT_User_Manager
                 }
 
                 while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                    // Shift-JIS対策
+                    mb_convert_variables('UTF-8', 'SJIS-win, UTF-8, auto', $data);
+
                     // Format: token_id, acquisition_date, acquisition_point, season, reason_1, reason_2
                     $token_id = sanitize_text_field($data[0]);
 
@@ -2366,6 +2372,9 @@ class KMNFT_User_Manager
                 $csv_data = array();
                 $row_idx = 0;
                 while (($row = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                    // Shift-JIS対策
+                    mb_convert_variables('UTF-8', 'SJIS-win, UTF-8, auto', $row);
+
                     $row_idx++;
                     // Basic heuristic to skip header line if it contains "rank" or "clubname"
                     if ($row_idx === 1 && (stripos($row[0], 'rank') !== false || stripos($row[1], 'club') !== false)) {
@@ -2663,6 +2672,9 @@ class KMNFT_User_Manager
 
                 $row_idx = 0;
                 while (($row = fgetcsv($handle, 1000, ',')) !== FALSE) {
+                    // Shift-JIS対策
+                    mb_convert_variables('UTF-8', 'SJIS-win, UTF-8, auto', $row);
+
                     $row_idx++;
                     // Skip header if it looks like one (contains "Section" or "Score")
                     if ($row_idx === 1 && (stripos($row[0], 'section') !== false || stripos($row[3], 'score') !== false)) {
