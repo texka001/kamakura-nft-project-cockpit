@@ -28,6 +28,18 @@ if (!empty($user_tokens)) {
     ));
 }
 
+// Determine current season (Starts April 1st)
+$month = intval(date('n'));
+$year = intval(date('Y'));
+$current_season_str = strval(($month >= 4) ? $year : $year - 1);
+
+// Ensure current season is in the list
+if (!in_array($current_season_str, $all_seasons)) {
+    array_unshift($all_seasons, $current_season_str);
+    // Re-sort just in case, though current is usually the latest
+    rsort($all_seasons);
+}
+
 // Default to latest season
 $selected_season = isset($_GET['season']) ? sanitize_text_field($_GET['season']) : (!empty($all_seasons) ? $all_seasons[0] : '');
 

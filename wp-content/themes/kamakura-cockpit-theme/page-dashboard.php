@@ -32,8 +32,31 @@ if ($is_logged_in) {
         $kmnft_manager = new KMNFT_User_Manager();
         $ksp_by_season = $kmnft_manager->get_user_ksp_summary($current_user->ID);
 
+        // Determine current season (Starts April 1st)
+        $month = intval(date('n'));
+        $year = intval(date('Y'));
+        $current_season_year = ($month >= 4) ? $year : $year - 1;
+        $current_season_str = strval($current_season_year);
+
+        // If current season is not in the list, prepend it as 0 points
+        $has_current_season = false;
+        foreach ($ksp_by_season as $s) {
+            if ($s->season == $current_season_str) {
+                $has_current_season = true;
+                break;
+            }
+        }
+
+        if (!$has_current_season) {
+            $new_season = new stdClass();
+            $new_season->season = $current_season_str;
+            $new_season->total_points = 0;
+            $new_season->rank = 0;
+            array_unshift($ksp_by_season, $new_season);
+        }
+
         if (!empty($ksp_by_season)) {
-            // Latest season is always first due to ORDER BY season DESC
+            // Latest season is always first due to ORDER BY season DESC (and our unshift)
             $ksp_total_val = intval($ksp_by_season[0]->total_points);
             $latest_rank = intval($ksp_by_season[0]->rank);
         }

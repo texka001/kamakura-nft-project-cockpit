@@ -14,10 +14,18 @@ if (!is_user_logged_in()) {
 $table_token_summary = $wpdb->prefix . 'kmnft_ksp_token_summary';
 $table_user_summary = $wpdb->prefix . 'kmnft_ksp_user_summary';
 
-// Get available seasons from both tables
-$token_seasons = $wpdb->get_col("SELECT DISTINCT season FROM $table_token_summary ORDER BY season DESC");
-$user_seasons = $wpdb->get_col("SELECT DISTINCT season FROM $table_user_summary ORDER BY season DESC");
 $all_seasons = array_unique(array_merge($token_seasons, $user_seasons));
+
+// Determine current season (Starts April 1st)
+$month = intval(date('n'));
+$year = intval(date('Y'));
+$current_season_str = strval(($month >= 4) ? $year : $year - 1);
+
+// Ensure current season is in the list
+if (!in_array($current_season_str, $all_seasons)) {
+    $all_seasons[] = $current_season_str;
+}
+
 rsort($all_seasons);
 
 // Default to latest season

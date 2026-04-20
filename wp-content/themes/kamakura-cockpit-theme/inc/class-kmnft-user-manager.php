@@ -1436,20 +1436,14 @@ class KMNFT_User_Manager
 
         // 1. Transaction Start (Optional/Simulated by order)
 
-        // DEBUG: Check if data exists
+        // Check if data exists
         $debug_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$table_token_ksp} WHERE season = %s", $season));
         if ($debug_count == 0) {
-            $all_seasons = $wpdb->get_col("SELECT DISTINCT season FROM {$table_token_ksp} LIMIT 20");
-            $table_status = $wpdb->get_row("SHOW TABLE STATUS LIKE '{$table_token_ksp}'");
-            wp_die(sprintf(
-                "DEBUG INFO:<br>No data found for season '%s' in table '%s'.<br>Rows with season='%s': %d<br>Available seasons: %s<br>Table Rows (approx): %d",
-                esc_html($season),
-                $table_token_ksp,
-                esc_html($season),
-                $debug_count,
-                implode(', ', $all_seasons),
-                $table_status->Rows
-            ));
+            // Optional: You might want to allow clearing out a season even if no new data exists
+            // But for safety, we'll just return with a notice instead of dying.
+            $msg = urlencode("No KSP point records found for season " . $season . ". Aggregation skipped.");
+            wp_redirect(admin_url('admin.php?page=kmnft-token-ksp-aggregation&status=success&msg=' . $msg));
+            exit;
         }
 
 
